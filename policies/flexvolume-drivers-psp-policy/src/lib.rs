@@ -1,24 +1,13 @@
-use lazy_static::lazy_static;
-
 extern crate wapc_guest as guest;
 use guest::prelude::*;
 
 use k8s_openapi::api::core::v1 as apicore;
 
 extern crate kubewarden_policy_sdk as kubewarden;
-use kubewarden::{logging, protocol_version_guest, request::ValidationRequest, validate_settings};
+use kubewarden::{protocol_version_guest, request::ValidationRequest, validate_settings};
 
 mod settings;
 use settings::Settings;
-
-use slog::{info, o, warn, Logger};
-
-lazy_static! {
-    static ref LOG_DRAIN: Logger = Logger::root(
-        logging::KubewardenDrain::new(),
-        o!("policy" => "sample-policy")
-    );
-}
 
 #[no_mangle]
 pub extern "C" fn wapc_init() {
@@ -30,35 +19,41 @@ pub extern "C" fn wapc_init() {
 fn validate(payload: &[u8]) -> CallResult {
     let validation_request: ValidationRequest<Settings> = ValidationRequest::new(payload)?;
 
-    info!(LOG_DRAIN, "starting validation");
+    let pod = match serde_json::from_value::<apicore::Pod>(validation_request.request.object) {
+        Ok(pod) => pod,
+        Err(_) => return kubewarden::accept_request(),
+    };
 
-    // TODO: you can unmarshal any Kubernetes API type you are interested in
-    match serde_json::from_value::<apicore::Pod>(validation_request.request.object) {
-        Ok(pod) => {
-            // TODO: your logic goes here
-            if pod.metadata.name == Some("invalid-pod-name".to_string()) {
-                let pod_name = pod.metadata.name.unwrap();
-                info!(
-                    LOG_DRAIN,
-                    "rejecting pod";
-                    "pod_name" => &pod_name
-                );
-                kubewarden::reject_request(
-                    Some(format!("pod name {} is not accepted", &pod_name)),
-                    None,
-                )
-            } else {
-                info!(LOG_DRAIN, "accepting resource");
-                kubewarden::accept_request()
-            }
-        }
-        Err(_) => {
-            // TODO: handle as you wish
-            // We were forwarded a request we cannot unmarshal or
-            // understand, just accept it
-            warn!(LOG_DRAIN, "cannot unmarshal resource: this policy does not know how to evaluate this resource; accept it");
-            kubewarden::accept_request()
-        }
+    let pod_spec = pod.spec.ok_or("invalid pod spec")?;
+    let settings = validation_request.settings;
+
+    if any_invalid_flexvolume_driver(
+        pod_spec,
+        settings
+            .allowed_flex_volumes
+            .iter()
+            .map(|flex_volume| flex_volume.driver.clone())
+            .collect(),
+    ) {
+        return kubewarden::reject_request(
+            Some("Pod has at least one invalid flex volume driver".to_string()),
+            None,
+        );
+    }
+
+    kubewarden::accept_request()
+}
+
+fn any_invalid_flexvolume_driver(
+    pod_spec: apicore::PodSpec,
+    allowed_flex_volumes: Vec<String>,
+) -> bool {
+    match &pod_spec.volumes {
+        Some(volumes) => volumes.iter().any(|volume| match &volume.flex_volume {
+            Some(flex_volume) => !allowed_flex_volumes.contains(&flex_volume.driver),
+            None => false,
+        }),
+        None => false,
     }
 }
 
@@ -66,65 +61,107 @@ fn validate(payload: &[u8]) -> CallResult {
 mod tests {
     use super::*;
 
-    use kubewarden_policy_sdk::test::Testcase;
-
     #[test]
-    fn accept_pod_with_valid_name() -> Result<(), ()> {
-        let request_file = "test_data/pod_creation.json";
-        let tc = Testcase {
-            name: String::from("Valid name"),
-            fixture_file: String::from(request_file),
-            expected_validation_result: true,
-            settings: Settings {},
-        };
+    fn no_volumes_accepts_with_no_containers() {
+        let allowed_flex_volumes = vec!["example/lvm".to_string(), "example/cifs".to_string()];
 
-        let res = tc.eval(validate).unwrap();
-        assert!(
-            res.mutated_object.is_none(),
-            "Something mutated with test case: {}",
-            tc.name,
-        );
-
-        Ok(())
+        assert!(!any_invalid_flexvolume_driver(
+            apicore::PodSpec::default(),
+            allowed_flex_volumes
+        ));
     }
 
     #[test]
-    fn reject_pod_with_invalid_name() -> Result<(), ()> {
-        let request_file = "test_data/pod_creation_invalid_name.json";
-        let tc = Testcase {
-            name: String::from("Bad name"),
-            fixture_file: String::from(request_file),
-            expected_validation_result: false,
-            settings: Settings {},
-        };
+    fn a_valid_volume_accepts() {
+        let allowed_flex_volumes = vec!["example/lvm".to_string(), "example/cifs".to_string()];
 
-        let res = tc.eval(validate).unwrap();
-        assert!(
-            res.mutated_object.is_none(),
-            "Something mutated with test case: {}",
-            tc.name,
-        );
-
-        Ok(())
+        assert!(!any_invalid_flexvolume_driver(
+            apicore::PodSpec {
+                volumes: Some(vec![apicore::Volume {
+                    flex_volume: Some(apicore::FlexVolumeSource {
+                        driver: "example/lvm".to_string(),
+                        ..apicore::FlexVolumeSource::default()
+                    }),
+                    ..apicore::Volume::default()
+                }]),
+                ..apicore::PodSpec::default()
+            },
+            allowed_flex_volumes
+        ));
     }
 
     #[test]
-    fn accept_request_with_non_pod_resource() -> Result<(), ()> {
-        let request_file = "test_data/ingress_creation.json";
-        let tc = Testcase {
-            name: String::from("Ingress creation"),
-            fixture_file: String::from(request_file),
-            expected_validation_result: true,
-            settings: Settings {},
-        };
+    fn an_invalid_volume_rejects() {
+        let allowed_flex_volumes = vec!["example/lvm".to_string(), "example/cifs".to_string()];
 
-        let res = tc.eval(validate).unwrap();
-        assert!(
-            res.mutated_object.is_none(),
-            "Something mutated with test case: {}",
-            tc.name,
-        );
+        assert!(any_invalid_flexvolume_driver(
+            apicore::PodSpec {
+                volumes: Some(vec![apicore::Volume {
+                    flex_volume: Some(apicore::FlexVolumeSource {
+                        driver: "example/other".to_string(),
+                        ..apicore::FlexVolumeSource::default()
+                    }),
+                    ..apicore::Volume::default()
+                }]),
+                ..apicore::PodSpec::default()
+            },
+            allowed_flex_volumes
+        ));
+    }
 
-        Ok(())
+    #[test]
+    fn some_invalid_volume_rejects() {
+        let allowed_flex_volumes = vec!["example/lvm".to_string(), "example/cifs".to_string()];
+
+        assert!(any_invalid_flexvolume_driver(
+            apicore::PodSpec {
+                volumes: Some(vec![
+                    apicore::Volume {
+                        flex_volume: Some(apicore::FlexVolumeSource {
+                            driver: "example/cifs".to_string(),
+                            ..apicore::FlexVolumeSource::default()
+                        }),
+                        ..apicore::Volume::default()
+                    },
+                    apicore::Volume {
+                        flex_volume: Some(apicore::FlexVolumeSource {
+                            driver: "example/other".to_string(),
+                            ..apicore::FlexVolumeSource::default()
+                        }),
+                        ..apicore::Volume::default()
+                    }
+                ]),
+                ..apicore::PodSpec::default()
+            },
+            allowed_flex_volumes
+        ));
+    }
+
+    #[test]
+    fn no_invalid_volume_accepts() {
+        let allowed_flex_volumes = vec!["example/lvm".to_string(), "example/cifs".to_string()];
+
+        assert!(!any_invalid_flexvolume_driver(
+            apicore::PodSpec {
+                volumes: Some(vec![
+                    apicore::Volume {
+                        flex_volume: Some(apicore::FlexVolumeSource {
+                            driver: "example/cifs".to_string(),
+                            ..apicore::FlexVolumeSource::default()
+                        }),
+                        ..apicore::Volume::default()
+                    },
+                    apicore::Volume {
+                        flex_volume: Some(apicore::FlexVolumeSource {
+                            driver: "example/lvm".to_string(),
+                            ..apicore::FlexVolumeSource::default()
+                        }),
+                        ..apicore::Volume::default()
+                    }
+                ]),
+                ..apicore::PodSpec::default()
+            },
+            allowed_flex_volumes
+        ));
     }
 }
