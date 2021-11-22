@@ -1,25 +1,27 @@
-Please, note well: this file and the scaffold were generated from [a
-template](https://github.com/kubewarden/policy-rust-template). Make
-this project yours!
-
 # Kubewarden policy psp-flexvolume-drivers
 
 ## Description
 
-This policy will reject pods that have a name `invalid-pod-name`. If
-the pod to be validated has a different name, or if a different type
-of resource is evaluated, it will be accepted.
+Replacement for the Kubernetes Pod Security Policy that controls Flex Volume drivers.
 
 ## Settings
 
-This policy has no configurable settings. This would be a good place
-to document if yours does, and what behaviors can be configured by
-tweaking them.
+This policy allows to provide a list of allowed Flex Volume drivers.
+
+The configuration supports a list of allowed flex volume drivers. An example follows:
+
+```yaml
+allowedFlexVolumes:
+  - driver: example/lvm
+  - driver: example/cifs
+```
+
+If the pod to be evaluated has a different driver on any `flexVolume` volume, it will be rejected.
 
 ## License
 
 ```
-Copyright (C) 2021 Rafael Fernández López <ereslibre@ereslibre.es>
+Copyright (C) 2021 Rafael Fernández López <rfernandezlopez@suse.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

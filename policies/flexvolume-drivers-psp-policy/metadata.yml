@@ -8,12 +8,20 @@ contextAware: false
 executionMode: kubewarden-wapc
 annotations:
   io.kubewarden.policy.title: psp-flexvolume-drivers
-  io.kubewarden.policy.description: Short description
-  io.kubewarden.policy.author: Rafael Fernández López <ereslibre@ereslibre.es>
-  io.kubewarden.policy.url: https://github.com/yourorg/psp-flexvolume-drivers
-  io.kubewarden.policy.source: https://github.com/yourorg/psp-flexvolume-drivers
+  io.kubewarden.policy.description:  Replacement for the Kubernetes Pod Security Policy that controls the allowed `flexVolume` drivers 
+  io.kubewarden.policy.author: Rafael Fernández López <rfernandezlopez@suse.com>
+  io.kubewarden.policy.url: https://github.com/kubewarden/psp-flexvolume-drivers
+  io.kubewarden.policy.source: https://github.com/kubewarden/psp-flexvolume-drivers
   io.kubewarden.policy.license: Apache-2.0
   io.kubewarden.policy.usage: |
-    Long explaination.
+    This policy allows to provide a list of allowed Flex Volume drivers.
 
-    **Note well:** this can be Markdown text
+    The configuration supports a list of allowed flex volume drivers. An example follows:
+
+    ```yaml
+    allowedFlexVolumes:
+      - driver: example/lvm
+      - driver: example/cifs
+    ```
+
+    If the pod to be evaluated has a different driver on any `flexVolume` volume, it will be rejected.
