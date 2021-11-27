@@ -10,8 +10,8 @@ annotations:
   io.kubewarden.policy.title: psp-flexvolume-drivers
   io.kubewarden.policy.description:  Replacement for the Kubernetes Pod Security Policy that controls the allowed `flexVolume` drivers 
   io.kubewarden.policy.author: Rafael Fernández López <rfernandezlopez@suse.com>
-  io.kubewarden.policy.url: https://github.com/kubewarden/psp-flexvolume-drivers
-  io.kubewarden.policy.source: https://github.com/kubewarden/psp-flexvolume-drivers
+  io.kubewarden.policy.url: https://github.com/kubewarden/flexvolume-drivers-psp-policy
+  io.kubewarden.policy.source: https://github.com/kubewarden/flexvolume-drivers-psp-policy
   io.kubewarden.policy.license: Apache-2.0
   io.kubewarden.policy.usage: |
     This policy allows to provide a list of allowed Flex Volume drivers.
