@@ -27,8 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     env:
-      WASM_BINARY_NAME: psp_flexvolume_drivers
-      OCI_TARGET: ghcr.io/kubewarden/policies/psp-flexvolume-drivers
+      WASM_BINARY_NAME: flexvolume_drivers_psp
+      OCI_TARGET: ghcr.io/kubewarden/policies/flexvolume-drivers-psp
       METADATA_FILE: metadata.yml
       KWCTL_VERSION: v0.1.9
     steps:
