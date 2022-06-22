@@ -1,5 +1,5 @@
-extern crate wapc_guest as guest;
 use guest::prelude::*;
+use kubewarden_policy_sdk::wapc_guest as guest;
 
 use k8s_openapi::api::core::v1 as apicore;
 
@@ -37,6 +37,8 @@ fn validate(payload: &[u8]) -> CallResult {
     ) {
         return kubewarden::reject_request(
             Some("Pod has at least one invalid flex volume driver".to_string()),
+            None,
+            None,
             None,
         );
     }
