@@ -28,4 +28,3 @@ jobs:
     with:
       input-wasm: sleeping_policy
       oci-target: ghcr.io/kubewarden/tests/sleeping-policy
-    
