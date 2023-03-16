@@ -5,9 +5,15 @@ questions:
     evaluated has a different driver on any `flexVolume` volume, it will be
     rejected.
   tooltip: >-
-    The `Key` needs to be `driver`, then provide a flex volume driver as the
-    `Value`. (e.g. `driver: example/lvm`)
+    Provide a flex volume driver as the `Value`. (e.g. `driver: example/lvm`)
   group: Settings
   label: Allowed flex volumes
-  type: map[
-  variable: allowed_flex_volumes
+  hide_input: true
+  type: sequence[
+  variable: allowedFlexVolumes
+  sequence_questions:
+    - default: ''
+      group: Settings
+      label: Driver
+      type: string
+      variable: driver
