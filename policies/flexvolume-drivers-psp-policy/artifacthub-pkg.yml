@@ -1,15 +1,15 @@
 ---
-version: 0.1.3
+version: 0.1.4
 name: flexvolume-drivers-psp
 displayName: Flexvolume Drivers Psp
-createdAt: '2023-01-19T14:46:21+02:00'
+createdAt: '2023-03-16T13:21:22+00:00'
 description: Replacement for the Kubernetes Pod Security Policy that controls the
   allowed `flexVolume` drivers
 license: Apache-2.0
 homeURL: https://github.com/kubewarden/flexvolume-drivers-psp-policy
 containersImages:
 - name: policy
-  image: ghcr.io/kubewarden/policies/flexvolume-drivers-psp:v0.1.3
+  image: ghcr.io/kubewarden/policies/flexvolume-drivers-psp:v0.1.4
 keywords:
 - psp
 - container
@@ -18,7 +18,7 @@ keywords:
 - flex
 links:
 - name: policy
-  url: https://github.com/kubwarden/flexvolume-drivers-psp-policy/releases/download/v0.1.3/policy.wasm
+  url: https://github.com/kubwarden/flexvolume-drivers-psp-policy/releases/download/v0.1.4/policy.wasm
 - name: source
   url: https://github.com/kubewarden/flexvolume-drivers-psp-policy
 provider:
@@ -43,9 +43,15 @@ annotations:
         evaluated has a different driver on any `flexVolume` volume, it will be
         rejected.
       tooltip: >-
-        The `Key` needs to be `driver`, then provide a flex volume driver as the
-        `Value`. (e.g. `driver: example/lvm`)
+        Provide a flex volume driver as the `Value`. (e.g. `driver: example/lvm`)
       group: Settings
       label: Allowed flex volumes
-      type: map[
-      variable: allowed_flex_volumes
+      hide_input: true
+      type: sequence[
+      variable: allowedFlexVolumes
+      sequence_questions:
+        - default: ''
+          group: Settings
+          label: Driver
+          type: string
+          variable: driver
