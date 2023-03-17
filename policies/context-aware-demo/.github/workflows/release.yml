@@ -27,3 +27,4 @@ jobs:
     uses: kubewarden/github-actions/.github/workflows/reusable-release-policy-rust.yml@v2
     with:
       oci-target: ghcr.io/kubewarden/tests/context-aware-policy-demo
+      artifacthub: false
