@@ -16,9 +16,9 @@ policies that are taking a long time to be evaluated.
 This policy has just one mandatory setting:
 
 * `sleepMilliseconds`: the amount of time the policy will wait before accepting
-  the request. Espressed in milliseconds.
+  the request. Expressed in milliseconds.
 
-The value provided inside of the settings can be overidden by adding a special
+The value provided inside of the settings can be overridden by adding a special
 annotation to the resource being evaluated.
 
 The annotation name is `kubewarden.sleep_duration_milliseconds` had takes the
