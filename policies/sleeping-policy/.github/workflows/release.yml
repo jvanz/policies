@@ -11,7 +11,7 @@ jobs:
 
   test:
     name: run tests and linters
-    uses: kubewarden/github-actions/.github/workflows/reusable-test-policy-rust.yml@v2.0.5
+    uses: kubewarden/github-actions/.github/workflows/reusable-test-policy-rust.yml@v3.0.4
 
   release:
     needs: test
