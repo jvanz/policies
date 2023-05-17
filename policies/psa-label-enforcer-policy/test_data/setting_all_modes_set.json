@@ -1,0 +1,10 @@
+{
+	"modes": {
+		"enforce": "baseline",
+		"enforce-version": "latest",
+		"audit": "restricted",
+		"audit-version": "v1.25",
+		"warn": "privileged",
+		"warn-version": "v1.27"
+	}
+}
