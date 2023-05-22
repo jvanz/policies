@@ -4,29 +4,29 @@
 #
 # This config can be saved to its default location with:
 #   kwctl scaffold artifacthub > artifacthub-pkg.yml 
-version: 0.1.0
+version: 0.1.1
 name: psa-label-enforcer
 displayName: PSA Label Enforcer
-createdAt: 2023-05-22T14:37:17.849562838Z
+createdAt: 2023-05-22T21:21:36.078772788Z
 description: Policy to ensure that namespaces have the required PSA labels configuration for deployment in the cluster.
 license: Apache-2.0
 homeURL: https://github.com/kubewarden/psa-label-enforcer
 containersImages:
 - name: policy
-  image: ghcr.io/kubewarden/policies/psa-label-enforcer:v0.1.0
+  image: ghcr.io/kubewarden/policies/psa-label-enforcer:v0.1.1
 keywords:
 - namespace
 - psa
 - kubewarden
 links:
 - name: policy
-  url: https://github.com/kubwarden/psa-label-enforcer/releases/download/v0.1.0/policy.wasm
+  url: https://github.com/kubwarden/psa-label-enforcer/releases/download/v0.1.1/policy.wasm
 - name: source
   url: https://github.com/kubwarden/psa-label-enforcer
 install: |
   The policy can be obtained using [`kwctl`](https://github.com/kubewarden/kwctl):
   ```console
-  kwctl pull ghcr.io/kubewarden/policies/psa-label-enforcer:v0.1.0
+  kwctl pull ghcr.io/kubewarden/policies/psa-label-enforcer:v0.1.1
   ```
 maintainers:
 - name: Kubewarden developers
