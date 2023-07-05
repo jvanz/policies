@@ -1,8 +1,12 @@
 rules:
-- apiGroups: [""]
-  apiVersions: ["v1"]
-  resources: ["pods"]
-  operations: ["CREATE"]
+  - apiGroups:
+      - ''
+    apiVersions:
+      - v1
+    resources:
+      - pods
+    operations:
+      - CREATE
 mutating: false
 contextAware: false
 executionMode: kubewarden-wapc
@@ -11,24 +15,14 @@ annotations:
   io.artifacthub.displayName: Flexvolume Drivers Psp
   io.artifacthub.resources: Pod
   io.artifacthub.keywords: psp, container, runtime, flex volume, flex
+  # kubewarden specific
   io.kubewarden.policy.ociUrl: ghcr.io/kubewarden/policies/flexvolume-drivers-psp
-  # io.kubewarden.hidden-ui: "true"
-  # rest
   io.kubewarden.policy.title: flexvolume-drivers-psp
-  io.kubewarden.policy.description:  Replacement for the Kubernetes Pod Security Policy that controls the allowed `flexVolume` drivers 
-  io.kubewarden.policy.author: "Kubewarden developers <cncf-kubewarden-maintainers@lists.cncf.io>"
+  io.kubewarden.policy.description: Replacement for the Kubernetes Pod Security Policy
+    that controls the allowed `flexVolume` drivers
+  io.kubewarden.policy.author: Kubewarden developers <cncf-kubewarden-maintainers@lists.cncf.io>
   io.kubewarden.policy.url: https://github.com/kubewarden/flexvolume-drivers-psp-policy
   io.kubewarden.policy.source: https://github.com/kubewarden/flexvolume-drivers-psp-policy
   io.kubewarden.policy.license: Apache-2.0
-  io.kubewarden.policy.usage: |
-    This policy allows to provide a list of allowed Flex Volume drivers.
-
-    The configuration supports a list of allowed flex volume drivers. An example follows:
-
-    ```yaml
-    allowedFlexVolumes:
-      - driver: example/lvm
-      - driver: example/cifs
-    ```
-
-    If the pod to be evaluated has a different driver on any `flexVolume` volume, it will be rejected.
+  io.kubewarden.policy.category: PSP
+  io.kubewarden.policy.severity: medium
