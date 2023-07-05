@@ -1,14 +1,21 @@
 rules:
-- apiGroups: [""]
-  apiVersions: ["v1"]
-  resources: ["pods"]
-  operations: ["CREATE"]
+  - apiGroups:
+      - ''
+    apiVersions:
+      - v1
+    resources:
+      - pods
+    operations:
+      - CREATE
 mutating: true
 contextAwareResources:
   - apiVersion: v1
     kind: Namespace
+backgroundAudit: false
 executionMode: kubewarden-wapc
 annotations:
+  # artifacthub specific:
+  io.kubewarden.policy.ociUrl: ghcr.io/kubewarden/tests/context-aware-policy-demo
   # kubewarden specific:
   io.kubewarden.policy.title: context-aware-policy
   io.kubewarden.policy.description: A policy demonstrating context-aware policy features
@@ -16,5 +23,5 @@ annotations:
   io.kubewarden.policy.source: https://github.com/kubewarden/context-aware-demo
   io.kubewarden.policy.author: Kubewarden developers <cncf-kubewarden-maintainers@lists.cncf.io>
   io.kubewarden.policy.license: Apache-2.0
-  # artifacthub specific:
-  io.kubewarden.policy.ociUrl: ghcr.io/kubewarden/tests/context-aware-policy-demo
+  io.kubewarden.policy.category: demo
+  io.kubewarden.policy.severity: info
