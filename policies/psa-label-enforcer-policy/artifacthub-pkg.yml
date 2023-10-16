@@ -7,7 +7,7 @@
 version: 0.1.2
 name: psa-label-enforcer
 displayName: PSA Label Enforcer
-createdAt: 2023-07-07T18:55:59.967056681Z
+createdAt: 2023-10-16T08:45:57.932575772Z
 description: Policy to ensure that namespaces have the required PSA labels configuration for deployment in the cluster.
 license: Apache-2.0
 homeURL: https://github.com/kubewarden/psa-label-enforcer
@@ -27,6 +27,10 @@ install: |
   The policy can be obtained using [`kwctl`](https://github.com/kubewarden/kwctl):
   ```console
   kwctl pull ghcr.io/kubewarden/policies/psa-label-enforcer:v0.1.2
+  ```
+  Then, generate the policy manifest and tune it to your liking. For example:
+  ```console
+  kwctl scaffold manifest -t ClusterAdmissionPolicy registry://ghcr.io/kubewarden/policies/psa-label-enforcer:v0.1.2
   ```
 maintainers:
 - name: Kubewarden developers
