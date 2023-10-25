@@ -1,15 +1,14 @@
 on:
   push:
     branches:
-    - main
-    - master
+      - main
+      - master
     tags:
-    - 'v*'
+      - "v*"
 
 name: Release policy
 
 jobs:
-
   test:
     name: run tests and linters
     uses: kubewarden/github-actions/.github/workflows/reusable-test-policy-rust.yml@v3.1.0
@@ -27,3 +26,4 @@ jobs:
     uses: kubewarden/github-actions/.github/workflows/reusable-release-policy-rust.yml@v3.1.0
     with:
       oci-target: ghcr.io/kubewarden/tests/raw-validation-policy
+      artifacthub: false
