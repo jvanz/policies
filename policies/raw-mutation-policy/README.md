@@ -16,6 +16,9 @@ The policy accepts requests in the following format:
 }
 ```
 
+The policy mutates the resource to `"hay"` if the resource is `"banana"`.
+It rejects requests only if the payload is not in the expected format.
+
 ## Settings
 
 This policy has no configurable settings.
