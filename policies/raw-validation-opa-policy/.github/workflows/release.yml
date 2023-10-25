@@ -11,6 +11,8 @@ jobs:
   test:
     name: run tests and linters
     uses: kubewarden/github-actions/.github/workflows/reusable-test-policy-rego.yml@v3.1.10
+    with:
+      artifacthub: false
 
   release:
     needs: test
