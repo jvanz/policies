@@ -1,6 +1,7 @@
 rules:
 mutating: true
 contextAware: false
+policyType: raw
 executionMode: wasi
 annotations:
   io.kubewarden.policy.title: raw-mutation-wasi-policy
