@@ -1,6 +1,7 @@
 rules:
 mutating: false
 contextAware: false
+policyType: raw
 executionMode: wasi
 annotations:
   io.kubewarden.policy.title: raw-validation-wasi-policy
