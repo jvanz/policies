@@ -1,0 +1,28 @@
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+
+name: Release policy
+
+jobs:
+  test:
+    name: run tests and linters
+    uses: kubewarden/github-actions/.github/workflows/reusable-test-policy-rego.yml@v3.1.10
+
+  release:
+    needs: test
+    permissions:
+      # Required to create GH releases
+      contents: write
+      # Required to push to GHCR
+      packages: write
+      # Required by cosign keyless signing
+      id-token: write
+
+    uses: kubewarden/github-actions/.github/workflows/reusable-release-policy-rego.yml@v3.1.10
+    with:
+      oci-target: ghcr.io/${{ github.repository_owner }}/tests/raw-validation-opa-policy
+      artifacthub: false
