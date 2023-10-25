@@ -3,10 +3,6 @@ package main
 //nolint:godox
 // TODO: figure out if it's worth to move this to a dedicated library
 
-import (
-	"encoding/json"
-)
-
 // Message is the optional string used to build validation responses
 type Message string
 
@@ -24,16 +20,12 @@ const (
 )
 
 // ValidationResponse defines the response given when validating a request
-//
-//nolint:tagliatelle
 type ValidationResponse struct {
 	Accepted bool `json:"accepted"`
 	// Optional - ignored if accepted
 	Message *string `json:"message,omitempty"`
 	// Optional - ignored if accepted
 	Code *uint16 `json:"code,omitempty"`
-	// Optional - used only by mutating policies
-	MutatedObject json.RawMessage `json:"mutated_object,omitempty"`
 }
 
 // SettingsValidationResponse is the response sent by a policy when validating
@@ -49,15 +41,6 @@ type SettingsValidationResponse struct {
 func AcceptRequest() ValidationResponse {
 	return ValidationResponse{
 		Accepted: true,
-	}
-}
-
-// MutateRequest accepts the request. The given `mutatedObject` is how
-// the evaluated object must look once accepted
-func MutateRequest(mutatedObject json.RawMessage) ValidationResponse {
-	return ValidationResponse{
-		Accepted:      true,
-		MutatedObject: mutatedObject,
 	}
 }
 

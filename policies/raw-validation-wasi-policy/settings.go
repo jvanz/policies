@@ -40,17 +40,17 @@ func validateSettings(input []byte) []byte {
 func validateCliSettings(settings *Settings) SettingsValidationResponse {
 	if settings.ValidUsers.Cardinality() == 0 {
 		return RejectSettings(Message(
-			fmt.Sprintf("At least one valid user must be specified")))
+			"At least one valid user must be specified"))
 	}
 
 	if settings.ValidActions.Cardinality() == 0 {
 		return RejectSettings(Message(
-			fmt.Sprintf("At least one valid action must be specified")))
+			"At least one valid action must be specified"))
 	}
 
 	if settings.ValidResources.Cardinality() == 0 {
 		return RejectSettings(Message(
-			fmt.Sprintf("At least one valid resource must be specified")))
+			"At least one valid resource must be specified"))
 	}
 
 	return AcceptSettings()
