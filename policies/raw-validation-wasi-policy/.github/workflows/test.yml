@@ -1,0 +1,45 @@
+on:
+  push:
+  pull_request:
+  workflow_call:
+
+name: Continuous integration
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: actions/setup-go@v4.1.0
+        with:
+          go-version: "1.21"
+      - run: make test
+
+  e2e-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: actions/setup-go@v4.1.0
+        with:
+          go-version: "1.21"
+      - name: Setup BATS
+        uses: mig4/setup-bats@v1.2.0
+        with:
+          bats-version: 1.5.0
+      - name: Install kwctl
+        uses: kubewarden/github-actions/kwctl-installer@v3.1.10
+      - run: make e2e-tests
+
+  golangci:
+    name: Golangci-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.1.1
+      - uses: actions/setup-go@v4.1.0
+        with:
+          go-version: "1.21"
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3.7.0
+        with:
+          version: v1.53.3
