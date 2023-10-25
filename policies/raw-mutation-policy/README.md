@@ -2,7 +2,19 @@
 
 ## Description
 
-This is a waPC test policy that mutates a raw request.
+This is a waPC test policy that mutates raw requests.
+
+The policy accepts requests in the following format:
+
+```json
+{
+  "request": {
+    "user": "tonio"
+    "action": "eats",
+    "resource": "banana",
+  }
+}
+```
 
 ## Settings
 
