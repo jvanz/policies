@@ -18,6 +18,11 @@ func (s *Settings) Valid() (bool, error) {
 	if s.DefaultResource == "" {
 		return false, fmt.Errorf("defaultResource cannot be empty")
 	}
+
+	if s.ForbiddenResources.Contains(s.DefaultResource) {
+		return false, fmt.Errorf("defaultResource cannot be forbidden")
+	}
+
 	return true, nil
 }
 
