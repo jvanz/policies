@@ -1,3 +1,4 @@
 {
-  "forbiddenResources": ["banana", "apple"]
+  "forbiddenResources": ["banana", "apple"],
+  "defaultResource": "hay"
 }
