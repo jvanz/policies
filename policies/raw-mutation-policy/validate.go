@@ -4,15 +4,19 @@ import (
 	"encoding/json"
 	"strings"
 
+	mapset "github.com/deckarep/golang-set/v2"
 	onelog "github.com/francoispqt/onelog"
 	kubewarden "github.com/kubewarden/policy-sdk-go"
 )
 
 func validate(payload []byte) ([]byte, error) {
+	validationRequest := RawValidationRequest{}
+	validationRequest.Settings = Settings{
+		ForbiddenResources: mapset.NewSet[string](),
+	}
+
 	decoder := json.NewDecoder(strings.NewReader(string(payload)))
 	decoder.DisallowUnknownFields()
-
-	validationRequest := RawValidationRequest{}
 	err := decoder.Decode(&validationRequest)
 	if err != nil {
 		return kubewarden.RejectRequest(
@@ -21,6 +25,7 @@ func validate(payload []byte) ([]byte, error) {
 	}
 
 	request := validationRequest.Request
+	settings := validationRequest.Settings
 
 	logger.DebugWithFields("validating request", func(e onelog.Entry) {
 		e.String("user", request.User)
@@ -28,8 +33,8 @@ func validate(payload []byte) ([]byte, error) {
 		e.String("resource", request.Resource)
 	})
 
-	if request.Action == "eats" && request.Resource == "banana" {
-		request.Resource = "hay"
+	if settings.ForbiddenResources.Contains(request.Resource) {
+		request.Resource = settings.DefaultResource
 		return kubewarden.MutateRequest(request)
 	}
 

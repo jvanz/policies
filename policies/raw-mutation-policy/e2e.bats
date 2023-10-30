@@ -1,7 +1,7 @@
 #!/usr/bin/env bats
 
 @test "accept" {
-  run kwctl run --raw annotated-policy.wasm --request-path test_data/accept.json
+  run kwctl run --raw annotated-policy.wasm --request-path test_data/accept.json --settings-path test_data/settings.json
   # this prints the output when one the checks below fails
   echo "output = ${output}"
 
@@ -11,7 +11,8 @@
 }
 
 @test "mutate" {
-  run kwctl run --raw annotated-policy.wasm --request-path test_data/mutate.json
+  run kwctl run --raw annotated-policy.wasm --request-path test_data/mutate.json --settings-path test_data/settings.json
+
   # this prints the output when one the checks below fails
   echo "output = ${output}"
 
