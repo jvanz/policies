@@ -39,5 +39,9 @@ func validateCliSettings(settings *Settings) SettingsValidationResponse {
 		return RejectSettings(Message("default resource cannot be empty"))
 	}
 
+	if settings.ForbiddenResources.Contains(settings.DefaultResource) {
+		return RejectSettings(Message("default resource cannot be forbidden"))
+	}
+
 	return AcceptSettings()
 }
