@@ -18,6 +18,6 @@ func main() {
 	wapc.RegisterFunctions(wapc.Functions{
 		"validate": validate,
 		// This policy does not require any settings.
-		"validate_settings": func(_ []byte) ([]byte, error) { return kubewarden.AcceptSettings() },
+		"validate_settings": validateSettings,
 	})
 }

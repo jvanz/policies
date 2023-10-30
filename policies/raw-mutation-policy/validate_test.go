@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	mapset "github.com/deckarep/golang-set/v2"
 	kubewarden_protocol "github.com/kubewarden/policy-sdk-go/protocol"
 )
 
@@ -14,8 +15,14 @@ func TestMutation(t *testing.T) {
 		Resource: "banana",
 	}
 
+	settings := Settings{
+		ForbiddenResources: mapset.NewSet("banana", "apple"),
+		DefaultResource:    "hay",
+	}
+
 	payload, err := json.Marshal(RawValidationRequest{
-		Request: request,
+		Request:  request,
+		Settings: settings,
 	})
 	if err != nil {
 		t.Errorf("Unexpected error: %+v", err)
@@ -60,8 +67,14 @@ func TestAcceptWithoutMutation(t *testing.T) {
 		Resource: "spinach",
 	}
 
+	settings := Settings{
+		ForbiddenResources: mapset.NewSet("banana", "apple"),
+		DefaultResource:    "hay",
+	}
+
 	payload, err := json.Marshal(RawValidationRequest{
-		Request: request,
+		Request:  request,
+		Settings: settings,
 	})
 	if err != nil {
 		t.Errorf("Unexpected error: %+v", err)
