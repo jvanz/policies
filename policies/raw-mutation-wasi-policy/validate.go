@@ -38,7 +38,7 @@ func marshalValidationResponseOrFail(response ValidationResponse) []byte {
 
 func mutateRequest(settings *Settings, request *Request) ValidationResponse {
 	if settings.ForbiddenResources.Contains(request.Resource) {
-		request.Resource = "hay"
+		request.Resource = settings.DefaultResource
 		return MutateRequest(request)
 	}
 	return AcceptRequest()

@@ -16,6 +16,7 @@ func TestValidateRequestAccept(t *testing.T) {
 		},
 		Settings: Settings{
 			ForbiddenResources: mapset.NewSet[string]("carrot", "banana"),
+			DefaultResource:    "hay",
 		},
 	}
 
@@ -50,6 +51,7 @@ func TestValidateAcceptWithoutMutating(t *testing.T) {
 		},
 		Settings: Settings{
 			ForbiddenResources: mapset.NewSet[string]("carrot", "banana"),
+			DefaultResource:    "hay",
 		},
 	}
 

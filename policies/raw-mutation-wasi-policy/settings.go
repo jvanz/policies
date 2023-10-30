@@ -11,6 +11,7 @@ import (
 // Settings defines the settings of the policy
 type Settings struct {
 	ForbiddenResources mapset.Set[string] `json:"forbiddenResources"`
+	DefaultResource    string             `json:"defaultResource"`
 }
 
 func validateSettings(input []byte) []byte {
@@ -33,7 +34,14 @@ func validateSettings(input []byte) []byte {
 	return responseBytes
 }
 
-func validateCliSettings(_ *Settings) SettingsValidationResponse {
-	// Settings are always valid
+func validateCliSettings(settings *Settings) SettingsValidationResponse {
+	if settings.DefaultResource == "" {
+		return RejectSettings(Message("default resource cannot be empty"))
+	}
+
+	if settings.ForbiddenResources.Contains(settings.DefaultResource) {
+		return RejectSettings(Message("default resource cannot be forbidden"))
+	}
+
 	return AcceptSettings()
 }
