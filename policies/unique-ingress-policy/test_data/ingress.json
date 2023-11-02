@@ -5,6 +5,20 @@
     "kind": "Ingress",
     "version": "v1"
   },
+  "resource": {
+    "group": "networking.k8s.io",
+    "version": "v1",
+    "resource": "ingresses"
+  },
+  "name": "foobar",
+  "operation": "CREATE",
+  "userInfo": {
+    "username": "kubernetes-admin",
+    "groups": [
+      "system:masters",
+      "system:authenticated"
+    ]
+  },
   "object": {
     "apiVersion": "networking.k8s.io/v1",
     "kind": "Ingress",
