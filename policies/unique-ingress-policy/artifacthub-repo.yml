@@ -1,5 +1,5 @@
 ---
-repositoryID: <THE REPOSITORY ID INSIDE OF ARTIFACTHUB> # obtained after publishing the policy for the 1st time
+repositoryID: 8503a901-5674-4756-a6d8-76b05845a9dd
 owners:
-- name: YOUR NAME
-  email: <YOUR EMAIL>
+  - name: Kubewarden developers
+    email: kubewarden@suse.de
