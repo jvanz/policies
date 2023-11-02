@@ -4,32 +4,32 @@
 #
 # This config can be saved to its default location with:
 #   kwctl scaffold artifacthub > artifacthub-pkg.yml 
-version: 0.1.0
+version: 0.1.2
 name: ingress-unique-host
 displayName: Unique Ingress host
-createdAt: 2023-11-02T09:17:06.93600344Z
+createdAt: 2023-11-02T09:48:21.47004886Z
 description: Requires all Ingress rule hosts to be unique
 license: Apache-2.0
 homeURL: https://github.com/kubewarden/unique-ingress-policy
 containersImages:
 - name: policy
-  image: ghcr.io/kubewarden/policies/unique-ingress-policy:v0.1.0
+  image: ghcr.io/kubewarden/policies/unique-ingress-policy:v0.1.2
 keywords:
 - ingress
 - kubewarden
 links:
 - name: policy
-  url: https://github.com/kubewarden/unique-ingress-policy/releases/download/v0.1.0/policy.wasm
+  url: https://github.com/kubewarden/unique-ingress-policy/releases/download/v0.1.2/policy.wasm
 - name: source
   url: https://github.com/kubewarden/unique-ingress-policy
 install: |
   The policy can be obtained using [`kwctl`](https://github.com/kubewarden/kwctl):
   ```console
-  kwctl pull ghcr.io/kubewarden/policies/unique-ingress-policy:v0.1.0
+  kwctl pull ghcr.io/kubewarden/policies/unique-ingress-policy:v0.1.2
   ```
   Then, generate the policy manifest and tune it to your liking. For example:
   ```console
-  kwctl scaffold manifest -t ClusterAdmissionPolicy registry://ghcr.io/kubewarden/policies/unique-ingress-policy:v0.1.0
+  kwctl scaffold manifest -t ClusterAdmissionPolicy registry://ghcr.io/kubewarden/policies/unique-ingress-policy:v0.1.2
   ```
 maintainers:
 - name: Kubewarden developers
