@@ -4,7 +4,7 @@ SOURCE_FILES := $(shell find . -type f -name '*.rego')
 VERSION ?= $(shell git describe | cut -c2-)
 
 policy.wasm: $(SOURCE_FILES)
-	opa build -t wasm -e policy/violation -o bundle.tar.gz policy.rego
+	opa build -t wasm -e k8suniqueingresshost/violation -o bundle.tar.gz policy.rego
 	tar xvf bundle.tar.gz /policy.wasm
 	rm bundle.tar.gz
 	touch policy.wasm # opa creates the bundle with unix epoch timestamp, fix it
@@ -22,7 +22,7 @@ artifacthub-pkg.yml: metadata.yml
 	    --metadata-path metadata.yml --version $(VERSION) \
 		--output artifacthub-pkg.yml
 
-annotated-policy.wasm: policy.wasm metadata.yml artifacthub-pkg.yml
+annotated-policy.wasm: policy.wasm metadata.yml
 	kwctl annotate -m metadata.yml -u README.md -o annotated-policy.wasm policy.wasm
 
 .PHONY: e2e-tests
