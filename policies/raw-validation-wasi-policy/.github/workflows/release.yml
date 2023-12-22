@@ -42,5 +42,5 @@ jobs:
         uses: kubewarden/github-actions/policy-release@v3.1.12
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          oci-target: ghcr.io/${{ github.repository_owner }}/tests/go-wasi-template
+          oci-target: ghcr.io/${{ github.repository_owner }}/tests/raw-validation-wasi-policy
           artifacthub: false
