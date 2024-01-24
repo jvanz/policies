@@ -1,0 +1,11 @@
+- type: Exchange
+  request: |
+    !KubernetesListResourceNamespace
+    api_version: v1
+    kind: Service
+    namespace: default
+    label_selector: null
+    field_selector: null
+  response:
+    type: Success
+    payload: '{"metadata":{"resourceVersion":"3654"},"items":[{"metadata":{"creationTimestamp":"2024-01-24T13:59:53Z","labels":{"component":"apiserver","provider":"kubernetes"},"managedFields":[{"apiVersion":"v1","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:labels":{".":{},"f:component":{},"f:provider":{}}},"f:spec":{"f:clusterIP":{},"f:internalTrafficPolicy":{},"f:ipFamilyPolicy":{},"f:ports":{".":{},"k:{\"port\":443,\"protocol\":\"TCP\"}":{".":{},"f:name":{},"f:port":{},"f:protocol":{},"f:targetPort":{}}},"f:sessionAffinity":{},"f:type":{}}},"manager":"k3s","operation":"Update","time":"2024-01-24T13:59:53Z"}],"name":"kubernetes","namespace":"default","resourceVersion":"198","uid":"2df19f0a-1767-4518-8e08-e2728c76f03c"},"spec":{"selector": {"app":"nginx"}, "ports":[{"name":"https","protocol":"TCP","port":443,"targetPort":6443}],"clusterIP":"10.43.0.1","clusterIPs":["10.43.0.1"],"type":"ClusterIP","sessionAffinity":"None","ipFamilies":["IPv4"],"ipFamilyPolicy":"SingleStack","internalTrafficPolicy":"Cluster"},"status":{"loadBalancer":{}}}]}'
