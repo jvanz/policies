@@ -89,7 +89,7 @@ spec:
 ```
 
 The latter object is not allowed because its `host` rule overlaps with the
-one of the `already-exiss` Ingress.
+one of the `already-exists` Ingress.
 
 ## Implementation details
 
