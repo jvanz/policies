@@ -57,7 +57,7 @@ fn validate(payload: &[u8]) -> CallResult {
                 .entry(patched_key.to_owned())
                 .and_modify(|v| {
                     if v != value {
-                        *v = value.to_owned();
+                        value.clone_into(v);
                         labels_changed = true;
                     }
                 })
@@ -122,11 +122,11 @@ mod tests {
         }
 
         #[allow(dead_code)]
-        pub fn list_resources_by_namespace<T: 'static>(
+        pub fn list_resources_by_namespace<T>(
             _req: &ListResourcesByNamespaceRequest,
         ) -> anyhow::Result<k8s_openapi::List<T>>
         where
-            T: k8s_openapi::ListableResource + serde::de::DeserializeOwned + Clone,
+            T: k8s_openapi::ListableResource + serde::de::DeserializeOwned + Clone + 'static,
         {
             Err(anyhow::anyhow!("not mocked"))
         }
@@ -224,7 +224,7 @@ mod tests {
         let settings = Settings::default();
         let request = KubernetesAdmissionRequest {
             namespace: namespace_name.clone(),
-            object: serde_json::to_value(&pod).expect("cannot serialize Pod"),
+            object: serde_json::to_value(pod).expect("cannot serialize Pod"),
             ..Default::default()
         };
         let validation_request = ValidationRequest::<Settings> { settings, request };
@@ -252,10 +252,10 @@ mod tests {
 
         assert!(validation_response.accepted);
         if should_mutate && validation_response.mutated_object.is_none() {
-            assert!(false, "should have been mutated");
+            panic!("should have been mutated");
         }
         if !should_mutate && validation_response.mutated_object.is_some() {
-            assert!(false, "should not have been mutated");
+            panic!("should not have been mutated");
         }
     }
 
@@ -283,7 +283,7 @@ mod tests {
         let settings = Settings { evil: true };
         let request = KubernetesAdmissionRequest {
             namespace: namespace_name.clone(),
-            object: serde_json::to_value(&pod).expect("cannot serialize Pod"),
+            object: serde_json::to_value(pod).expect("cannot serialize Pod"),
             ..Default::default()
         };
         let validation_request = ValidationRequest::<Settings> { settings, request };
