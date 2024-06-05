@@ -1,8 +1,8 @@
 SOURCE_FILES := $(shell test -e src/ && find src -type f)
 
 policy.wasm: $(SOURCE_FILES) Cargo.*
-	cargo build --target=wasm32-wasi --release
-	cp target/wasm32-wasi/release/*.wasm policy.wasm
+	cargo build --target=wasm32-wasip1 --release
+	cp target/wasm32-wasip1/release/*.wasm policy.wasm
 
 annotated-policy.wasm: policy.wasm metadata.yml
 	kwctl annotate -m metadata.yml -u README.md -o annotated-policy.wasm policy.wasm
