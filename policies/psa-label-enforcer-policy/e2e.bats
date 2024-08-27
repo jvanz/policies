@@ -28,5 +28,5 @@
 	run kwctl run  --request-path test_data/namespace_with_invalid_labels.json --settings-path test_data/invalid_settings.json annotated-policy.wasm
 	[ "$status" -ne 0 ]
 	echo "$output"
-	[ $(expr "$output" : '.*"valid":false.*') -ne 0 ]
- }
+	[ $(expr "$output" : '.*Provided settings are not valid.*') -ne 0 ]
+}
