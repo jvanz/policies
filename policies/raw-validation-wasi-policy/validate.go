@@ -21,6 +21,7 @@ func validate(input []byte) []byte {
 	decoder.DisallowUnknownFields()
 	err := decoder.Decode(&validationRequest)
 	if err != nil {
+		//nolint: mnd
 		return marshalValidationResponseOrFail(
 			RejectRequest(
 				Message(fmt.Sprintf("Error deserializing validation request: %v", err)),
@@ -47,18 +48,21 @@ func validateRequest(settings Settings, request Request) ValidationResponse {
 	}
 
 	if !settings.ValidUsers.Contains(request.User) {
+		//nolint: mnd
 		return RejectRequest(
 			Message(fmt.Sprintf("User '%s' is not allowed", request.User)),
 			Code(403))
 	}
 
 	if !settings.ValidActions.Contains(request.Action) {
+		//nolint: mnd
 		return RejectRequest(
 			Message(fmt.Sprintf("Action '%s' is not allowed", request.Action)),
 			Code(403))
 	}
 
 	if !settings.ValidResources.Contains(request.Resource) {
+		//nolint: mnd
 		return RejectRequest(
 			Message(fmt.Sprintf("Resource '%s' is not allowed", request.Resource)),
 			Code(403))
