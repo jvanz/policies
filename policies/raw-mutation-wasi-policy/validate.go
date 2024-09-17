@@ -18,6 +18,7 @@ func validate(input []byte) []byte {
 	decoder.DisallowUnknownFields()
 	err := decoder.Decode(&validationRequest)
 	if err != nil {
+		//nolint:mnd
 		return marshalValidationResponseOrFail(
 			RejectRequest(
 				Message(fmt.Sprintf("Error deserializing validation request: %v", err)),
