@@ -10,12 +10,12 @@ name: Release policy
 jobs:
   test:
     name: run tests and linters
-    uses: ./.github/workflows/test.yml
+    uses: kubewarden/github-actions/.github/workflows/reusable-test-policy-go-wasi.yml@v3.3.5
+    with:
+      artifacthub: false
 
   release:
-    runs-on: ubuntu-latest
     needs: test
-
     permissions:
       # Required to create GH releases
       contents: write
@@ -24,23 +24,7 @@ jobs:
       # Required by cosign keyless signing
       id-token: write
 
-    steps:
-      - name: Install dependencies
-        uses: kubewarden/github-actions/policy-gh-action-dependencies@v3.3.5
-
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      - uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32 # v5.0.2
-        with:
-          go-version: "1.21"
-
-      - run: make annotated-policy.wasm
-      - name: Run e2e tests
-        run: |
-          make e2e-tests
-
-      - name: Release
-        uses: kubewarden/github-actions/policy-release@v3.3.5
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          oci-target: ghcr.io/${{ github.repository_owner }}/tests/raw-mutation-wasi-policy
-          artifacthub: false
+    uses: kubewarden/github-actions/.github/workflows/reusable-release-policy-go-wasi.yml@v3.3.5
+    with:
+      oci-target: ghcr.io/${{ github.repository_owner }}/tests/raw-mutation-wasi-policy
+      artifacthub: false
