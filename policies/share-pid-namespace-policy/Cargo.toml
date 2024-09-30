@@ -17,4 +17,4 @@ kubewarden-policy-sdk = "0.11.1"
 serde = { version = "1.0", features = ["derive"] }
 
 [dev-dependencies]
-rstest = "0.22.0"
+rstest = "0.23.0"
