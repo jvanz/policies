@@ -1,40 +1,50 @@
+[![Kubewarden Policy Repository](https://github.com/kubewarden/community/blob/main/badges/kubewarden-policies.svg)](https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#policy-scope)
 [![Stable](https://img.shields.io/badge/status-stable-brightgreen?style=for-the-badge)](https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#stable)
 
-Please, note well: this file and the scaffold were generated from [a
-template](https://github.com/kubewarden/rust-policy-template). Make
-this project yours!
+Kubewarden policy that enforces the DNS lookup configuration of a Pod to have a specific `ndots` value.
 
-You can use `cargo generate -g https://github.com/kubewarden/rust-policy-template.git`
-to create your Policy from this template.
+This is done by mutating the Pod's `.spec.dnsConfig.options` field to have the desired `ndots` value.
 
-# Kubewarden policy pod-ndots
+# Configuration
 
-## Description
+The number of `ndots` to enforce can be configured using the `ndots` field.
 
-This policy will reject pods that have a name `invalid-pod-name`. If
-the pod to be validated has a different name, or if a different type
-of resource is evaluated, it will be accepted.
-
-## Settings
-
-This policy has no configurable settings. This would be a good place
-to document if yours does, and what behaviors can be configured by
-tweaking them.
-
-## License
-
+```yaml
+ndots: 2
 ```
-Copyright (C) 2021 Flavio Castelli <fcastelli@suse.com>
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+When no configuration is provided, the default value is `1`.
 
-   http://www.apache.org/licenses/LICENSE-2.0
+## Examples
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Assuming the no configuration is provided, the policy will enforce the `ndots` value to be `1`.
+
+This will change the following Pod:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+```
+
+To the following Pod:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  dnsConfig:
+    options:
+      - name: ndots
+        value: "1"
+  containers:
+    - name: nginx
+      image: nginx
 ```

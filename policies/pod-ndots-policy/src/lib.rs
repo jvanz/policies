@@ -1,25 +1,14 @@
-use lazy_static::lazy_static;
-
 use guest::prelude::*;
 use kubewarden_policy_sdk::wapc_guest as guest;
 
-use k8s_openapi::api::core::v1 as apicore;
+use k8s_openapi::api::core::v1::{self as apicore, PodSpec};
 use k8s_openapi::Resource;
 
 extern crate kubewarden_policy_sdk as kubewarden;
-use kubewarden::{logging, protocol_version_guest, request::ValidationRequest, validate_settings};
+use kubewarden::{protocol_version_guest, request::ValidationRequest, validate_settings};
 
 mod settings;
 use settings::Settings;
-
-use slog::{info, o, warn, Logger};
-
-lazy_static! {
-    static ref LOG_DRAIN: Logger = Logger::root(
-        logging::KubewardenDrain::new(),
-        o!("policy" => "sample-policy")
-    );
-}
 
 #[no_mangle]
 pub extern "C" fn wapc_init() {
@@ -31,40 +20,68 @@ pub extern "C" fn wapc_init() {
 fn validate(payload: &[u8]) -> CallResult {
     let validation_request: ValidationRequest<Settings> = ValidationRequest::new(payload)?;
 
-    info!(LOG_DRAIN, "starting validation");
     if validation_request.request.kind.kind != apicore::Pod::KIND {
-        warn!(LOG_DRAIN, "Policy validates Pods only. Accepting resource"; "kind" => &validation_request.request.kind.kind);
         return kubewarden::accept_request();
     }
-    // TODO: you can unmarshal any Kubernetes API type you are interested in
-    match serde_json::from_value::<apicore::Pod>(validation_request.request.object) {
-        Ok(pod) => {
-            // TODO: your logic goes here
-            if pod.metadata.name == Some("invalid-pod-name".to_string()) {
-                let pod_name = pod.metadata.name.unwrap();
-                info!(
-                    LOG_DRAIN,
-                    "rejecting pod";
-                    "pod_name" => &pod_name
-                );
-                kubewarden::reject_request(
-                    Some(format!("pod name {} is not accepted", &pod_name)),
-                    None,
-                    None,
-                    None,
-                )
+    let pod = serde_json::from_value::<apicore::Pod>(validation_request.request.object)?;
+
+    let podspec = pod.spec.clone().unwrap_or_default();
+    let podspec_patched = enforce_ndots(&validation_request.settings, &podspec);
+    if podspec_patched != podspec {
+        let patched_pod = apicore::Pod {
+            spec: Some(podspec_patched),
+            ..pod
+        };
+        return kubewarden::mutate_request(serde_json::to_value(&patched_pod)?);
+    }
+
+    kubewarden::accept_request()
+}
+
+fn enforce_ndots(settings: &Settings, podspec: &apicore::PodSpec) -> PodSpec {
+    // preserve the order of the options to prevent needless updates
+    let mut dns_options: Vec<apicore::PodDNSConfigOption> = podspec
+        .dns_config
+        .as_ref()
+        .and_then(|dns_config| dns_config.options.clone())
+        .unwrap_or_default()
+        .iter()
+        .map(|option| {
+            if option.name == Some("ndots".to_string()) {
+                apicore::PodDNSConfigOption {
+                    name: Some("ndots".to_string()),
+                    value: Some(settings.ndots.to_string()),
+                }
             } else {
-                info!(LOG_DRAIN, "accepting resource");
-                kubewarden::accept_request()
+                option.clone()
             }
-        }
-        Err(_) => {
-            // TODO: handle as you wish
-            // We were forwarded a request we cannot unmarshal or
-            // understand, just accept it
-            warn!(LOG_DRAIN, "cannot unmarshal resource: this policy does not know how to evaluate this resource; accept it");
-            kubewarden::accept_request()
-        }
+        })
+        .collect();
+
+    // ensure the option is added if it's not present
+    if dns_options
+        .iter()
+        .all(|option| option.name != Some("ndots".to_string()))
+    {
+        dns_options.push(apicore::PodDNSConfigOption {
+            name: Some("ndots".to_string()),
+            value: Some(settings.ndots.to_string()),
+        });
+    }
+
+    PodSpec {
+        dns_config: Some(apicore::PodDNSConfig {
+            nameservers: podspec
+                .dns_config
+                .as_ref()
+                .and_then(|dns_config| dns_config.nameservers.clone()),
+            searches: podspec
+                .dns_config
+                .as_ref()
+                .and_then(|dns_config| dns_config.searches.clone()),
+            options: Some(dns_options),
+        }),
+        ..podspec.clone()
     }
 }
 
@@ -73,64 +90,98 @@ mod tests {
     use super::*;
 
     use kubewarden_policy_sdk::test::Testcase;
+    use rstest::*;
 
-    #[test]
-    fn accept_pod_with_valid_name() -> Result<(), ()> {
-        let request_file = "test_data/pod_creation.json";
-        let tc = Testcase {
-            name: String::from("Valid name"),
-            fixture_file: String::from(request_file),
-            expected_validation_result: true,
-            settings: Settings::default(),
-        };
+    fn build_pod_dns_config(ndots: Option<usize>) -> apicore::PodDNSConfig {
+        let mut options = vec![apicore::PodDNSConfigOption {
+            name: Some("timeout".to_string()),
+            value: Some("5".to_string()),
+        }];
 
-        let res = tc.eval(validate).unwrap();
-        assert!(
-            res.mutated_object.is_none(),
-            "Something mutated with test case: {}",
-            tc.name,
-        );
+        if let Some(ndots) = ndots {
+            options.push(apicore::PodDNSConfigOption {
+                name: Some("ndots".to_string()),
+                value: Some(ndots.to_string()),
+            });
+        }
 
-        Ok(())
+        apicore::PodDNSConfig {
+            nameservers: Some(vec!["1.1.1.1".to_string()]),
+            searches: Some(vec!["example.com".to_string()]),
+            options: Some(options),
+        }
     }
 
-    #[test]
-    fn reject_pod_with_invalid_name() -> Result<(), ()> {
-        let request_file = "test_data/pod_creation_invalid_name.json";
-        let tc = Testcase {
-            name: String::from("Bad name"),
-            fixture_file: String::from(request_file),
-            expected_validation_result: false,
-            settings: Settings::default(),
+    #[rstest]
+    #[case::no_dns_config(None, apicore::PodDNSConfig {
+        options: Some(vec![apicore::PodDNSConfigOption{
+          name: Some("ndots".to_string()),
+          value: Some("5".to_string()),
+        }]),
+        ..Default::default()
+    })]
+    #[case::no_dns_config_option_about_ndots(
+        Some(build_pod_dns_config(None)),
+        build_pod_dns_config(Some(5))
+    )]
+    #[case::change_dns_config_option_about_ndots(
+        Some(build_pod_dns_config(Some(1))),
+        build_pod_dns_config(Some(5))
+    )]
+    fn enforce_ndots_preserve_other_options(
+        #[case] dns_config: Option<apicore::PodDNSConfig>,
+        #[case] expected_dns_config: apicore::PodDNSConfig,
+    ) {
+        let settings = Settings { ndots: 5 };
+        let podspec = PodSpec {
+            dns_config,
+            containers: vec![apicore::Container {
+                name: "nginx".to_string(),
+                image: Some("nginx".to_string()),
+                ..Default::default()
+            }],
+            ..Default::default()
+        };
+        let expected_podspec = PodSpec {
+            dns_config: Some(expected_dns_config),
+            ..podspec.clone()
         };
 
-        let res = tc.eval(validate).unwrap();
-        assert!(
-            res.mutated_object.is_none(),
-            "Something mutated with test case: {}",
-            tc.name,
+        let podspec_patched = enforce_ndots(&settings, &podspec);
+        assert_eq!(
+            podspec_patched, expected_podspec,
+            "got: {:?} instead of {:?}",
+            podspec_patched, expected_podspec
         );
-
-        Ok(())
     }
 
-    #[test]
-    fn accept_request_with_non_pod_resource() -> Result<(), ()> {
-        let request_file = "test_data/ingress_creation.json";
-        let tc = Testcase {
-            name: String::from("Ingress creation"),
-            fixture_file: String::from(request_file),
+    #[rstest]
+    // Note: this test cares only about covering the switch statement of the resournce kind
+    #[case::change_pod("test_data/pod_without_ndots.json", true)]
+    #[case::do_not_change_pod("test_data/pod_with_5_ndots.json", false)]
+    fn test_validate(#[case] fixture: &str, #[case] expect_mutated_object: bool) {
+        let settings = Settings { ndots: 5 };
+
+        let test_case = Testcase {
+            name: "test".to_string(),
+            fixture_file: fixture.to_string(),
             expected_validation_result: true,
-            settings: Settings::default(),
+            settings: settings.clone(),
         };
 
-        let res = tc.eval(validate).unwrap();
-        assert!(
-            res.mutated_object.is_none(),
-            "Something mutated with test case: {}",
-            tc.name,
-        );
-
-        Ok(())
+        let validation_response = test_case.eval(validate).expect("validation failed");
+        if expect_mutated_object {
+            assert!(validation_response.mutated_object.is_some());
+            let pod =
+                serde_json::from_value::<apicore::Pod>(validation_response.mutated_object.unwrap())
+                    .expect("failed to parse mutated object");
+            let dns_config_options = pod.spec.unwrap().dns_config.unwrap().options.unwrap();
+            assert_eq!(dns_config_options.len(), 1);
+            let option = dns_config_options[0].clone();
+            assert_eq!(option.name, Some("ndots".to_string()));
+            assert_eq!(option.value, Some(settings.ndots.to_string()));
+        } else {
+            assert!(validation_response.mutated_object.is_none());
+        }
     }
 }

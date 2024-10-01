@@ -35,6 +35,14 @@
       "name": "invalid-pod-name"
     },
     "spec": {
+      "dnsConfig": {
+        "options": [
+          {
+            "name": "ndots",
+            "value": "5"
+          }
+        ]
+      },
       "containers": [
         {
           "image": "nginx",
