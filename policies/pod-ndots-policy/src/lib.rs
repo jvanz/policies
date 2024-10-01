@@ -39,19 +39,35 @@ fn validate(payload: &[u8]) -> CallResult {
 }
 
 fn enforce_ndots(settings: &Settings, podspec: &apicore::PodSpec) -> PodSpec {
+    // preserve the order of the options to prevent needless updates
     let mut dns_options: Vec<apicore::PodDNSConfigOption> = podspec
         .dns_config
         .as_ref()
         .and_then(|dns_config| dns_config.options.clone())
         .unwrap_or_default()
         .iter()
-        .filter(|option| option.name != Some("ndots".to_string()))
-        .cloned()
+        .map(|option| {
+            if option.name == Some("ndots".to_string()) {
+                apicore::PodDNSConfigOption {
+                    name: Some("ndots".to_string()),
+                    value: Some(settings.ndots.to_string()),
+                }
+            } else {
+                option.clone()
+            }
+        })
         .collect();
-    dns_options.push(apicore::PodDNSConfigOption {
-        name: Some("ndots".to_string()),
-        value: Some(settings.ndots.to_string()),
-    });
+
+    // ensure the option is added if it's not present
+    if dns_options
+        .iter()
+        .all(|option| option.name != Some("ndots".to_string()))
+    {
+        dns_options.push(apicore::PodDNSConfigOption {
+            name: Some("ndots".to_string()),
+            value: Some(settings.ndots.to_string()),
+        });
+    }
 
     PodSpec {
         dns_config: Some(apicore::PodDNSConfig {
