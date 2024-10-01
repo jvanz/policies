@@ -7,7 +7,7 @@
 version: 0.1.0
 name: pod-ndots
 displayName: Pod ndots
-createdAt: 2024-10-01T06:58:50.339806282Z
+createdAt: 2024-10-01T08:10:32.365438639Z
 description: Enforce a minimum value for the ndots option in the resolv.conf file of a Pod.
 license: Apache-2.0
 homeURL: https://github.com/kubewarden/pod-ndots
@@ -32,7 +32,7 @@ install: |
   ```
 maintainers:
 - name: Kubewarden Developers
-  email: kubewarden@suse.de
+  email: cncf-kubewarden-maintainers@lists.cncf.io
 provider:
   name: kubewarden
 recommendations:
