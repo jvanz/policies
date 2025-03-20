@@ -12,8 +12,6 @@ jobs:
   test:
     name: run tests and linters
     uses: kubewarden/github-actions/.github/workflows/reusable-test-policy-rust.yml@v4.0.0
-    with:
-      artifacthub: false
 
   release:
     needs: test
@@ -28,4 +26,3 @@ jobs:
     uses: kubewarden/github-actions/.github/workflows/reusable-release-policy-rust.yml@v4.0.0
     with:
       oci-target: ghcr.io/kubewarden/tests/raw-validation-policy
-      artifacthub: false
