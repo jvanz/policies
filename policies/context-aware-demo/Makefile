@@ -26,3 +26,4 @@ test: fmt lint
 .PHONY: clean
 clean:
 	cargo clean
+	rm -f policy.wasm annotated-policy.wasm
