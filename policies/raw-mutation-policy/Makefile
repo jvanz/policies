@@ -1,6 +1,4 @@
 SOURCE_FILES := $(shell find . -type f -name '*.go')
-# It's necessary to call cut because kwctl command does not handle version
-# starting with v.
 VERSION ?= $(shell git describe | cut -c2-)
 
 
