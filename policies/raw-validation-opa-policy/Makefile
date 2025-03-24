@@ -1,7 +1,4 @@
 SOURCE_FILES := $(shell find . -type f -name '*.rego')
-# It's necessary to call cut because kwctl command does not handle version
-# starting with v.
-VERSION ?= $(shell git describe | cut -c2-)
 
 policy.wasm: $(SOURCE_FILES)
 	opa build -t wasm -e policy/main utility/policy.rego -o bundle.tar.gz policy.rego
