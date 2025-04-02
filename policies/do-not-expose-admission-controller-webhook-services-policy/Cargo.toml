@@ -1,5 +1,5 @@
 [package]
-authors = ["Flavio Castelli <fcastelli@suse.com>"]
+authors = ["Kubewarden Developers <kubewarden@suse.de>"]
 edition = "2021"
 name    = "do-not-expose-admission-controller-webhook-services"
 version = "0.1.0"
