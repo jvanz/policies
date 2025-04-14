@@ -815,7 +815,7 @@ dependencies = [
 
 [[package]]
 name = "share-pid-namespace-policy"
-version = "0.1.1"
+version = "1.0.0"
 dependencies = [
  "k8s-openapi",
  "kubewarden-policy-sdk",
