@@ -1,0 +1,5 @@
+{
+  "allowed_priority_classes": [
+    "noncritical"
+  ]
+}
