@@ -24,7 +24,7 @@ jobs:
       id-token: write
     uses: kubewarden/github-actions/.github/workflows/reusable-release-policy-rust.yml@17c5644b077a978dfb14bb78985432362b619c1e # v4.4.7
     with:
-      oci-target: ghcr.io/kubewarden/policies/psa-label-enforcer
+      oci-target: ghcr.io/${{ github.repository_owner }}/policies/psa-label-enforcer
 
   release-catalog:
     needs: release
