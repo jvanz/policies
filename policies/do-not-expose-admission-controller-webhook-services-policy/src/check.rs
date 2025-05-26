@@ -6,7 +6,7 @@ use crate::service_details::ServiceDetails;
 use crate::service_finder::ServiceFinder;
 
 #[cfg(test)]
-use crate::ingress_check::tests::mock_kubernetes_sdk::list_resources_by_namespace;
+use crate::check::tests::mock_kubernetes_sdk::list_resources_by_namespace;
 use k8s_openapi::{api::networking::v1::Ingress, Resource};
 #[cfg(not(test))]
 use kubewarden::host_capabilities::kubernetes::list_resources_by_namespace;
@@ -14,7 +14,7 @@ use kubewarden::host_capabilities::kubernetes::ListResourcesByNamespaceRequest;
 
 /// Given a list of services being used by (Validating|Mutating)WebhookConfiguration, find all
 /// the ones that are exposed by an Ingress resource, or by NodePort/LoadBalancer services.
-pub(crate) fn find_webhook_services_exposed_by_ingress(
+pub(crate) fn find_webhook_services_exposed(
     services: &HashSet<ServiceDetails>,
 ) -> Result<HashSet<ServiceDetails>> {
     // Group the services by namespace, this is done to optimize the number of queries done to the
@@ -152,7 +152,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn test_find_services_exposed_by_ingress_no_ingress_defined() {
+    fn test_find_services_exposed_no_ingress_nor_service_defined() {
         let mut services = HashSet::new();
         let expected_namespace = "my-namespace";
         services.insert(ServiceDetails {
@@ -177,7 +177,7 @@ mod tests {
                 }
             });
 
-        let result = find_webhook_services_exposed_by_ingress(&services);
+        let result = find_webhook_services_exposed(&services);
         assert!(result.is_ok());
         let exposed_services = result.unwrap();
         assert!(exposed_services.is_empty());
@@ -185,7 +185,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn test_find_services_exposed_by_ingress_ingress_defined_no_match() {
+    fn test_find_services_exposed_ingress_defined_no_match() {
         let mut services = HashSet::new();
         let expected_namespace = "my-namespace";
         services.insert(ServiceDetails {
@@ -231,7 +231,7 @@ mod tests {
                 }
             });
 
-        let result = find_webhook_services_exposed_by_ingress(&services);
+        let result = find_webhook_services_exposed(&services);
         assert!(result.is_ok());
         let exposed_services = result.unwrap();
         assert!(exposed_services.is_empty());
@@ -239,7 +239,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn test_find_services_exposed_by_ingress_ingress_defined_match() {
+    fn test_find_services_exposed_ingress_defined_match() {
         let mut services = HashSet::new();
         let service_name = "my-service";
         let namespace = "my-namespace";
@@ -286,7 +286,7 @@ mod tests {
                 }
             });
 
-        let result = find_webhook_services_exposed_by_ingress(&services);
+        let result = find_webhook_services_exposed(&services);
         assert!(result.is_ok());
         let exposed_services = result.unwrap();
         assert_eq!(exposed_services.len(), 1);
