@@ -47,12 +47,12 @@ fn validate(payload: &[u8]) -> CallResult {
     let exposed_services = find_webhook_services_exposed_by_ingress(&services)?;
 
     if exposed_services.is_empty() {
-        // no services exposed by ingresses
+        // no services exposed by Ingress, NodePort, nor LoadBalancer
         return kubewarden::accept_request();
     }
 
     let msg = format!(
-        "Webhook service(s) exposed by ingress: {}",
+        "Webhook service(s) exposed by Ingress, NodePort, or LoadBalancer: {}",
         exposed_services
             .iter()
             .map(|svc| format!("{}/{}", svc.namespace, svc.name))

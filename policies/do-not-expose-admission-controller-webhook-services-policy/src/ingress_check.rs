@@ -13,7 +13,7 @@ use kubewarden::host_capabilities::kubernetes::list_resources_by_namespace;
 use kubewarden::host_capabilities::kubernetes::ListResourcesByNamespaceRequest;
 
 /// Given a list of services being used by (Validating|Mutating)WebhookConfiguration, find all
-/// the ones that are exposed by an Ingress resource.
+/// the ones that are exposed by an Ingress resource, or by NodePort/LoadBalancer services.
 pub(crate) fn find_webhook_services_exposed_by_ingress(
     services: &HashSet<ServiceDetails>,
 ) -> Result<HashSet<ServiceDetails>> {
@@ -30,15 +30,21 @@ pub(crate) fn find_webhook_services_exposed_by_ingress(
             .or_insert([svc].into());
     }
 
-    // List of Services exposed by ingresses, regardless of the namespace
+    // List of Services exposed by ingresses, nodeport, loadbalancer, regardless of the namespace
     let mut exposed_services_being_used = HashSet::new();
 
     for (namespace, webhook_services_inside_namespace) in webhook_svcs_by_namespace.iter() {
-        let svcs_exposed = find_webhook_services_exposed_by_ingress_inside_of_namespace(
+        let svcs_exposed_by_ingress = find_webhook_services_exposed_by_ingress_inside_of_namespace(
             webhook_services_inside_namespace,
             namespace,
         )?;
-        exposed_services_being_used.extend(svcs_exposed);
+        let svcs_exposed_by_nodeport_loadbalancer =
+            find_webhook_services_exposed_by_nodeport_loadbalancer_inside_of_namespace(
+                webhook_services_inside_namespace,
+                namespace,
+            )?;
+        exposed_services_being_used.extend(svcs_exposed_by_ingress);
+        exposed_services_being_used.extend(svcs_exposed_by_nodeport_loadbalancer);
     }
 
     Ok(exposed_services_being_used)
@@ -70,6 +76,45 @@ fn find_webhook_services_exposed_by_ingress_inside_of_namespace(
     let svcs_ptr: HashSet<&ServiceDetails> = svcs_exposed_by_ingresses.iter().collect();
 
     // return the intersection of the services and the services exposed by ingresses
+    Ok(svcs_ptr
+        .intersection(webhook_services)
+        .map(|s| (**s).clone())
+        .collect())
+}
+
+/// Given a list of services being used by (Validating|Mutating)WebhookConfiguration, find all
+/// the ones that are exposed by a NodePort or LoadBalancer Service in the given namespace.
+fn find_webhook_services_exposed_by_nodeport_loadbalancer_inside_of_namespace(
+    webhook_services: &HashSet<&ServiceDetails>,
+    namespace: &str,
+) -> Result<HashSet<ServiceDetails>> {
+    // Get all Services in the namespace
+    let services = list_resources_by_namespace::<k8s_openapi::api::core::v1::Service>(
+        &ListResourcesByNamespaceRequest {
+            namespace: namespace.to_string(),
+            api_version: k8s_openapi::api::core::v1::Service::API_VERSION.to_string(),
+            kind: k8s_openapi::api::core::v1::Service::KIND.to_string(),
+            label_selector: None,
+            field_selector: None,
+        },
+    )?;
+
+    // each service can refer to multiple ports, build unique set of all possible service-port
+    // pairs to correctly compare against webhook_services
+    let mut svcs_exposed: HashSet<ServiceDetails> = HashSet::new();
+    for service in services.items.iter() {
+        if let Some(spec) = &service.spec {
+            if let Some(ref type_) = spec.type_ {
+                if type_ == "NodePort" || type_ == "LoadBalancer" {
+                    svcs_exposed.extend(service.get_services());
+                }
+            }
+        }
+    }
+
+    let svcs_ptr: HashSet<&ServiceDetails> = svcs_exposed.iter().collect();
+
+    // return the intersection of the services and the services exposed by NodePort, LoadBalancer
     Ok(svcs_ptr
         .intersection(webhook_services)
         .map(|s| (**s).clone())
