@@ -176,6 +176,15 @@ mod tests {
                     })
                 }
             });
+        ctx_list_resources_by_namespace
+            .expect::<k8s_openapi::api::core::v1::Service>()
+            .times(1)
+            .returning(move |_req| {
+                Ok(k8s_openapi::List::<k8s_openapi::api::core::v1::Service> {
+                    items: vec![],
+                    ..Default::default()
+                })
+            });
 
         let result = find_webhook_services_exposed(&services);
         assert!(result.is_ok());
@@ -185,7 +194,7 @@ mod tests {
 
     #[test]
     #[serial]
-    fn test_find_services_exposed_ingress_defined_no_match() {
+    fn test_find_services_exposed_ingress_nodeport_defined_no_match() {
         let mut services = HashSet::new();
         let expected_namespace = "my-namespace";
         services.insert(ServiceDetails {
@@ -215,6 +224,23 @@ mod tests {
             ..Default::default()
         };
 
+        let nodeport = k8s_openapi::api::core::v1::Service {
+            metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta {
+                name: Some("yet-another-service".to_string()),
+                namespace: Some(expected_namespace.to_string()),
+                ..Default::default()
+            },
+            spec: Some(k8s_openapi::api::core::v1::ServiceSpec {
+                type_: Some("NodePort".to_string()),
+                ports: Some(vec![k8s_openapi::api::core::v1::ServicePort {
+                    port: 80,
+                    ..Default::default()
+                }]),
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+
         let ctx_list_resources_by_namespace =
             mock_kubernetes_sdk::list_resources_by_namespace_context();
         ctx_list_resources_by_namespace
@@ -229,6 +255,15 @@ mod tests {
                         ..Default::default()
                     })
                 }
+            });
+        ctx_list_resources_by_namespace
+            .expect::<k8s_openapi::api::core::v1::Service>()
+            .times(1)
+            .returning(move |_req| {
+                Ok(k8s_openapi::List::<k8s_openapi::api::core::v1::Service> {
+                    items: vec![nodeport.clone()],
+                    ..Default::default()
+                })
             });
 
         let result = find_webhook_services_exposed(&services);
@@ -284,6 +319,143 @@ mod tests {
                         ..Default::default()
                     })
                 }
+            });
+        ctx_list_resources_by_namespace
+            .expect::<k8s_openapi::api::core::v1::Service>()
+            .times(1)
+            .returning(move |_req| {
+                Ok(k8s_openapi::List::<k8s_openapi::api::core::v1::Service> {
+                    items: vec![],
+                    ..Default::default()
+                })
+            });
+
+        let result = find_webhook_services_exposed(&services);
+        assert!(result.is_ok());
+        let exposed_services = result.unwrap();
+        assert_eq!(exposed_services.len(), 1);
+    }
+
+    #[test]
+    #[serial]
+    fn test_find_services_exposed_nodeport_defined_match() {
+        let mut services = HashSet::new();
+        let service_name = "my-service";
+        let expected_namespace = "my-namespace";
+        services.insert(ServiceDetails {
+            name: "my-service".to_string(),
+            namespace: expected_namespace.to_string(),
+            port_number: Some(80),
+        });
+
+        let nodeport = k8s_openapi::api::core::v1::Service {
+            metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta {
+                name: Some(service_name.to_string()),
+                namespace: Some(expected_namespace.to_string()),
+                ..Default::default()
+            },
+            spec: Some(k8s_openapi::api::core::v1::ServiceSpec {
+                type_: Some("NodePort".to_string()),
+                ports: Some(vec![
+                    // this port should not match
+                    k8s_openapi::api::core::v1::ServicePort {
+                        port: 81,
+                        ..Default::default()
+                    },
+                    // this port should match
+                    k8s_openapi::api::core::v1::ServicePort {
+                        port: 80,
+                        ..Default::default()
+                    },
+                ]),
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+
+        let ctx_list_resources_by_namespace =
+            mock_kubernetes_sdk::list_resources_by_namespace_context();
+        ctx_list_resources_by_namespace
+            .expect::<Ingress>()
+            .times(1)
+            .returning(move |req| {
+                if req.namespace != expected_namespace {
+                    Err(anyhow::anyhow!("namespace mismatch"))
+                } else {
+                    Ok(k8s_openapi::List::<Ingress> {
+                        items: vec![],
+                        ..Default::default()
+                    })
+                }
+            });
+        ctx_list_resources_by_namespace
+            .expect::<k8s_openapi::api::core::v1::Service>()
+            .times(1)
+            .returning(move |_req| {
+                Ok(k8s_openapi::List::<k8s_openapi::api::core::v1::Service> {
+                    items: vec![nodeport.clone()],
+                    ..Default::default()
+                })
+            });
+
+        let result = find_webhook_services_exposed(&services);
+        assert!(result.is_ok());
+        let exposed_services = result.unwrap();
+        assert_eq!(exposed_services.len(), 1);
+    }
+
+    #[test]
+    #[serial]
+    fn test_find_services_exposed_loadbalancer_defined_match() {
+        let mut services = HashSet::new();
+        let service_name = "my-service";
+        let expected_namespace = "my-namespace";
+        services.insert(ServiceDetails {
+            name: "my-service".to_string(),
+            namespace: expected_namespace.to_string(),
+            port_number: Some(80),
+        });
+
+        let loadbalancer = k8s_openapi::api::core::v1::Service {
+            metadata: k8s_openapi::apimachinery::pkg::apis::meta::v1::ObjectMeta {
+                name: Some(service_name.to_string()),
+                namespace: Some(expected_namespace.to_string()),
+                ..Default::default()
+            },
+            spec: Some(k8s_openapi::api::core::v1::ServiceSpec {
+                type_: Some("LoadBalancer".to_string()),
+                ports: Some(vec![k8s_openapi::api::core::v1::ServicePort {
+                    port: 80,
+                    ..Default::default()
+                }]),
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+
+        let ctx_list_resources_by_namespace =
+            mock_kubernetes_sdk::list_resources_by_namespace_context();
+        ctx_list_resources_by_namespace
+            .expect::<Ingress>()
+            .times(1)
+            .returning(move |req| {
+                if req.namespace != expected_namespace {
+                    Err(anyhow::anyhow!("namespace mismatch"))
+                } else {
+                    Ok(k8s_openapi::List::<Ingress> {
+                        items: vec![],
+                        ..Default::default()
+                    })
+                }
+            });
+        ctx_list_resources_by_namespace
+            .expect::<k8s_openapi::api::core::v1::Service>()
+            .times(1)
+            .returning(move |_req| {
+                Ok(k8s_openapi::List::<k8s_openapi::api::core::v1::Service> {
+                    items: vec![loadbalancer.clone()],
+                    ..Default::default()
+                })
             });
 
         let result = find_webhook_services_exposed(&services);
