@@ -2,6 +2,7 @@ use std::collections::HashSet;
 
 use k8s_openapi::api::{
     admissionregistration::v1::{MutatingWebhookConfiguration, ValidatingWebhookConfiguration},
+    core::v1::Service,
     networking::v1::Ingress,
 };
 
@@ -47,6 +48,8 @@ impl ServiceFinder for MutatingWebhookConfiguration {
 }
 
 impl ServiceFinder for Ingress {
+    /// Returns a HashSet of ServiceDetails for all backend services referenced by this Ingress.
+    /// This includes services referenced in the default backend and in all HTTP rules.
     fn get_services(&self) -> HashSet<ServiceDetails> {
         let mut services: HashSet<ServiceDetails> = HashSet::new();
         if self.spec.is_none() {
@@ -86,6 +89,27 @@ impl ServiceFinder for Ingress {
             }));
         }
 
+        services
+    }
+}
+
+impl ServiceFinder for Service {
+    /// Returns a HashSet of ServiceDetails, one for each port defined in the Service, creating all
+    /// possible service-port combinations that may be exposed.
+    fn get_services(&self) -> HashSet<ServiceDetails> {
+        let mut services = HashSet::new();
+        let namespace = self.metadata.namespace.clone().unwrap_or_default();
+        if let Some(spec) = &self.spec {
+            if let Some(ports) = &spec.ports {
+                for port in ports {
+                    services.insert(ServiceDetails {
+                        name: self.metadata.name.clone().unwrap_or_default(),
+                        namespace: namespace.clone(),
+                        port_number: Some(port.port),
+                    });
+                }
+            }
+        }
         services
     }
 }
