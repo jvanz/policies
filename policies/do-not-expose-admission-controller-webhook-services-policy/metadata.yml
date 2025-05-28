@@ -8,6 +8,8 @@ mutating: false
 contextAwareResources:
   - apiVersion: networking.k8s.io/v1
     kind: Ingress
+  - apiVersion: v1
+    kind: Service
 executionMode: kubewarden-wapc
 # Consider the policy for the background audit scans. Default is true. Note the
 # intrinsic limitations of the background audit feature on docs.kubewarden.io;
