@@ -17,8 +17,8 @@ mod service_details;
 mod service_finder;
 use service_finder::ServiceFinder;
 
-mod ingress_check;
-use ingress_check::find_webhook_services_exposed_by_ingress;
+mod check;
+use check::find_webhook_services_exposed;
 
 #[no_mangle]
 pub extern "C" fn wapc_init() {
@@ -44,15 +44,15 @@ fn validate(payload: &[u8]) -> CallResult {
         _ => return kubewarden::accept_request(),
     };
 
-    let exposed_services = find_webhook_services_exposed_by_ingress(&services)?;
+    let exposed_services = find_webhook_services_exposed(&services)?;
 
     if exposed_services.is_empty() {
-        // no services exposed by ingresses
+        // no services exposed by Ingress, NodePort, nor LoadBalancer
         return kubewarden::accept_request();
     }
 
     let msg = format!(
-        "Webhook service(s) exposed by ingress: {}",
+        "Webhook service(s) exposed by Ingress, NodePort, or LoadBalancer: {}",
         exposed_services
             .iter()
             .map(|svc| format!("{}/{}", svc.namespace, svc.name))
