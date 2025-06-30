@@ -83,8 +83,7 @@ fn validate_service(service: &Service) -> CallResult {
             if !duplicate_services.is_empty() {
                 return kubewarden::reject_request(
                     Some(format!(
-                        "service is using selector(s) already defined by these services: {:?}",
-                        duplicate_services
+                        "service is using selector(s) already defined by these services: {duplicate_services:?}"
                     )),
                     None,
                     None,
