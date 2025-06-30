@@ -152,12 +152,12 @@ mod tests {
         };
         let settings = Settings {
             modes: crate::settings::Modes {
-                enforce: enforce,
-                enforce_version: enforce_version,
-                audit: audit,
-                audit_version: audit_version,
-                warn: warn,
-                warn_version: warn_version,
+                enforce,
+                enforce_version,
+                audit,
+                audit_version,
+                warn,
+                warn_version,
             },
         };
         let validation_request = ValidationRequest::<Settings> { settings, request };
