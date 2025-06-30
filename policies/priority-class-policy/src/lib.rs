@@ -45,8 +45,7 @@ fn validate(payload: &[u8]) -> CallResult {
             error!(LOG_DRAIN, "Priority class policy failed to extract PodSpec from the request"; "err" => %err);
             kubewarden::reject_request(
                 Some(format!(
-                    "Priority class policy failed to extract PodSpec from the request : {}",
-                    err
+                    "Priority class policy failed to extract PodSpec from the request : {err}"
                 )),
                 None,
                 None,
@@ -66,8 +65,7 @@ fn validate_pod_priority_class(
     let priority_class_name = pod.priority_class_name.as_ref().unwrap();
     if !allowed_priority_classes.contains(priority_class_name) {
         return Err(format!(
-            "Priority class \"{}\" is not allowed",
-            priority_class_name
+            "Priority class \"{priority_class_name}\" is not allowed"
         ));
     }
     Ok(())
