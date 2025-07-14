@@ -2,7 +2,7 @@ rules:
   - apiGroups: ["admissionregistration.k8s.io"]
     apiVersions: ["v1"]
     resources:
-    ["validatingwebhookconfigurations", "mutatingwebhookconfigurations"]
+      ["validatingwebhookconfigurations", "mutatingwebhookconfigurations"]
     operations: ["CREATE", "UPDATE"]
 mutating: false
 contextAwareResources:
