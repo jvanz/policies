@@ -19,6 +19,7 @@ linters:
     - paralleltest
     - testpackage
     - wsl
+    - wsl_v5 # linter complaining too much about missing empty lines.
   settings:
     cyclop:
       max-complexity: 13
