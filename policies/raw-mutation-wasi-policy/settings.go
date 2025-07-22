@@ -21,7 +21,8 @@ func validateSettings(input []byte) []byte {
 		// this is required to make the unmarshal work
 		ForbiddenResources: mapset.NewSet[string](),
 	}
-	if err := json.Unmarshal(input, &settings); err != nil {
+	err := json.Unmarshal(input, &settings)
+	if err != nil {
 		response = RejectSettings(Message(fmt.Sprintf("cannot unmarshal settings: %v", err)))
 	} else {
 		response = validateCliSettings(settings)
