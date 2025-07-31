@@ -24,7 +24,9 @@ func validateSettings(input []byte) []byte {
 		ValidActions:   mapset.NewSet[string](),
 		ValidResources: mapset.NewSet[string](),
 	}
-	if err := json.Unmarshal(input, &settings); err != nil {
+
+	err := json.Unmarshal(input, &settings)
+	if err != nil {
 		response = RejectSettings(Message(fmt.Sprintf("cannot unmarshal settings: %v", err)))
 	} else {
 		response = validateCliSettings(settings)
@@ -34,6 +36,7 @@ func validateSettings(input []byte) []byte {
 	if err != nil {
 		log.Fatalf("cannot marshal validation response: %v", err)
 	}
+
 	return responseBytes
 }
 

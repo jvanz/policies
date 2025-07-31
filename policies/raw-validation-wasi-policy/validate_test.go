@@ -29,6 +29,7 @@ func TestValidateRequestAccept(t *testing.T) {
 	responseJSON := validate(validationRequestJSON)
 
 	var response ValidationResponse
+
 	err = json.Unmarshal(responseJSON, &response)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -61,6 +62,7 @@ func TestValidateRequestReject(t *testing.T) {
 	responseJSON := validate(validationRequestJSON)
 
 	var response ValidationResponse
+
 	err = json.Unmarshal(responseJSON, &response)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -81,6 +83,7 @@ func TestValidateSettingsRejectInvalidPayload(t *testing.T) {
 	responseJSON := validate(payload)
 
 	var response ValidationResponse
+
 	err := json.Unmarshal(responseJSON, &response)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)

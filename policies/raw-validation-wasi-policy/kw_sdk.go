@@ -52,10 +52,12 @@ func RejectRequest(message Message, code Code) ValidationResponse {
 	response := ValidationResponse{
 		Accepted: false,
 	}
+
 	if message != NoMessage {
 		msg := string(message)
 		response.Message = &msg
 	}
+
 	if code != NoCode {
 		c := uint16(code)
 		response.Code = &c

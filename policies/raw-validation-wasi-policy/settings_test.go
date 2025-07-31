@@ -13,13 +13,16 @@ func TestValidateSettingsAccept(t *testing.T) {
 		ValidActions:   mapset.NewSet[string]("eats", "likes"),
 		ValidResources: mapset.NewSet[string]("hay", "carrot", "banana"),
 	}
+
 	settingsJSON, err := json.Marshal(&settings)
 	if err != nil {
 		t.Errorf("cannot marshal settings: %v", err)
 	}
 
 	responseJSON := validateSettings(settingsJSON)
+
 	var response SettingsValidationResponse
+
 	err = json.Unmarshal(responseJSON, &response)
 	if err != nil {
 		t.Errorf("cannot unmarshal response: %v", err)
@@ -36,13 +39,16 @@ func TestValidateSettingsReject(t *testing.T) {
 		ValidActions:   mapset.NewSet[string](),
 		ValidResources: mapset.NewSet[string](),
 	}
+
 	settingsJSON, err := json.Marshal(&settings)
 	if err != nil {
 		t.Errorf("cannot marshal settings: %v", err)
 	}
 
 	responseJSON := validateSettings(settingsJSON)
+
 	var response SettingsValidationResponse
+
 	err = json.Unmarshal(responseJSON, &response)
 	if err != nil {
 		t.Errorf("cannot unmarshal response: %v", err)
