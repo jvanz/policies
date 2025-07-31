@@ -11,6 +11,7 @@ import (
 
 func validate(input []byte) []byte {
 	var validationRequest RawValidationRequest
+
 	validationRequest.Settings = Settings{
 		// this is required to make the unmarshal work
 		ValidUsers:     mapset.NewSet[string](),
@@ -19,6 +20,7 @@ func validate(input []byte) []byte {
 	}
 	decoder := json.NewDecoder(strings.NewReader(string(input)))
 	decoder.DisallowUnknownFields()
+
 	err := decoder.Decode(&validationRequest)
 	if err != nil {
 		//nolint: mnd
@@ -37,6 +39,7 @@ func marshalValidationResponseOrFail(response ValidationResponse) []byte {
 	if err != nil {
 		log.Fatalf("cannot marshal validation response: %v", err)
 	}
+
 	return responseBytes
 }
 
