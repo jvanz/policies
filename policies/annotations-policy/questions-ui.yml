@@ -17,6 +17,6 @@ questions:
     label: "Annotations"
     description: "Annotation names to be validated with the resources definition"
     group: Settings
-    variable: annotations
+    variable: values
     required: true
     type: array[
