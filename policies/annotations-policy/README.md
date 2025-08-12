@@ -24,11 +24,14 @@ The `criteria` configuration can have the following values:
 - `containsAnyOf`: enforces that the resource has at least one of the
   annotations in `values`.
 - `doesNotContainAnyOf`: enforces that the resource does not have any annotation
-  defined in `values`. It's the opposite of `containsAnyOf`.
+  defined in `values` (denylist).
 - `containsAllOf`: enforces that all of the annotations in `values` are defined in
   the resource.
 - `doesNotContainAllOf`: enforces that the annotations defined in `values` are
-  not all set together in the resource. It's the opposite of `containsAllOf`.
+  not all set together in the resource.
+- `ContainsOtherThan`: enforces that the resource contains at least one annotation not in `values`.
+- `DoesNotContainOtherThan`: enforces that the resource contains only
+  annotations from `values` (allowlist).
 
 The `values` field must contain at least one annotation name for
 validation. Annotation names should be [valid annotation
