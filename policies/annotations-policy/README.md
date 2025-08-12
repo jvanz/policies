@@ -3,7 +3,7 @@
 
 # annotations-policy
 
-This policy validates the labels of generic Kubernetes objects.
+This policy validates the annotations of generic Kubernetes objects.
 
 ## Settings
 
