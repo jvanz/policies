@@ -20,25 +20,15 @@ pub extern "C" fn wapc_init() {
     register_function("protocol_version", protocol_version_guest);
 }
 
-fn validate_label(settings: &Settings, labels: &[String]) -> Result<()> {
-    validate_values(&settings.0, labels)
-}
-
 fn validate_labels(
-    resource_labels: &HashSet<String>,
     settings: &Settings,
+    resource_labels: &HashSet<String>,
 ) -> Result<(), Vec<String>> {
-    let errors = validate_label(
-        settings,
+    validate_values(
+        &settings.0,
         &resource_labels.iter().cloned().collect::<Vec<_>>(),
     )
-    .map(|_| vec![])
-    .unwrap_or_else(|e| vec![e.to_string()]);
-
-    if !errors.is_empty() {
-        return Err(errors);
-    }
-    Ok(())
+    .map_err(|e| vec![e.to_string()])
 }
 
 fn get_resource_label_keys(validation_request: &ValidationRequest<Settings>) -> HashSet<String> {
@@ -57,7 +47,7 @@ fn validate(payload: &[u8]) -> CallResult {
         ValidationRequest::new(payload)?;
     let labels = get_resource_label_keys(&validation_request);
 
-    if let Err(errors) = validate_labels(&labels, &validation_request.settings) {
+    if let Err(errors) = validate_labels(&validation_request.settings, &labels) {
         return reject_request(Some(errors.join(", ")), None, None, None);
     }
     accept_request()
@@ -180,7 +170,7 @@ mod tests {
         let labels = get_resource_label_keys(&req);
 
         // Validate the annotation keys against the settings
-        let result = crate::validate_labels(&labels, &settings.clone()).is_ok();
+        let result = crate::validate_labels(&settings.clone(), &labels).is_ok();
         assert_eq!(result, expected);
     }
 }
