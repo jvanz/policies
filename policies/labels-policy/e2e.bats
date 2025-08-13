@@ -39,3 +39,30 @@
 	[ $(expr "$output" : '.*allowed.*false') -ne 0 ]
 	[ $(expr "$output" : '.*The following labels were found that should not be present: .*') -ne 0 ]
 }
+
+@test "reject because a required label does not exist with ingress without labels" {
+	run kwctl run policy.wasm \
+		-r test_data/ingress-no-labels.json \
+		--settings-json '{"criteria": "doesNotContainOtherThan" ,"values": ["foo", "bar"]}'
+
+	# this prints the output when one the checks below fails
+	echo "output = ${output}"
+
+	# request rejected
+	[ "$status" -eq 0 ]
+	[ $(expr "$output" : '.*allowed.*false') -ne 0 ]
+	[ $(expr "$output" : '.*The following labels were found that should not be present: .*') -ne 0 ]
+}
+
+@test "reject because empty label list on settings" {
+	run kwctl run policy.wasm \
+		-r test_data/ingress-no-labels.json \
+		--settings-json '{"criteria": "doesNotContainOtherThan" ,"values": []}'
+
+	# this prints the output when one the checks below fails
+	echo "output = ${output}"
+
+	# incorrect settings
+	[ "$status" -eq 1 ]
+	[ $(expr "$output" : '.*Provided settings are not valid: \"Empty label list is not allowed\".*') -ne 0 ]
+}
