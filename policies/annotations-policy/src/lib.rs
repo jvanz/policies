@@ -20,25 +20,15 @@ pub extern "C" fn wapc_init() {
     register_function("protocol_version", protocol_version_guest);
 }
 
-fn validate_annotation(settings: &Settings, annots: &[String]) -> Result<()> {
-    validate_values(&settings.0, annots)
-}
-
 fn validate_annotations(
-    resource_annots: &HashSet<String>,
     settings: &Settings,
+    resource_annots: &HashSet<String>,
 ) -> Result<(), Vec<String>> {
-    let errors = validate_annotation(
-        settings,
+    validate_values(
+        &settings.0,
         &resource_annots.iter().cloned().collect::<Vec<_>>(),
     )
-    .map(|_| vec![])
-    .unwrap_or_else(|e| vec![e.to_string()]);
-
-    if !errors.is_empty() {
-        return Err(errors);
-    }
-    Ok(())
+    .map_err(|e| vec![e.to_string()])
 }
 
 fn get_resource_annotation_keys(
@@ -59,7 +49,7 @@ fn validate(payload: &[u8]) -> CallResult {
         ValidationRequest::new(payload)?;
     let annots = get_resource_annotation_keys(&validation_request);
 
-    if let Err(errors) = validate_annotations(&annots, &validation_request.settings) {
+    if let Err(errors) = validate_annotations(&validation_request.settings, &annots) {
         return reject_request(Some(errors.join(", ")), None, None, None);
     }
     accept_request()
@@ -182,7 +172,7 @@ mod tests {
         let annots = get_resource_annotation_keys(&req);
 
         // Validate the annotation keys against the settings
-        let result = crate::validate_annotations(&annots, &settings.clone()).is_ok();
+        let result = crate::validate_annotations(&settings.clone(), &annots).is_ok();
         assert_eq!(result, expected);
     }
 }
