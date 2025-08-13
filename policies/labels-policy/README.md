@@ -7,8 +7,8 @@ This policy validates the labels of generic Kubernetes objects.
 
 ## Settings
 
-The policy settings has the `criteria` field which define the logic operatation
-performed with the `values` defined in the settings and the environment variables
+The policy settings has the `criteria` field which define the logic operation
+performed with the `values` defined in the settings and the labels
 defined in the resource:
 
 ```yaml
