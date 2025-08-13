@@ -5,6 +5,13 @@
 
 This policy validates the annotations of generic Kubernetes objects.
 
+> [!NOTE]  
+> By default, the policy metadata targets only workload resources (Deployments,
+> Pods, Replicasets, Jobs..).
+>
+> Deploy the policy with your desired rules to target other resources.
+> Note that the audit scanner feature does [not support policies targeting `"*"`](https://docs.kubewarden.io/explanations/audit-scanner/limitations#usage-of--by-policies).
+
 ## Settings
 
 The policy settings has the `criteria` field which define the logic operatation
