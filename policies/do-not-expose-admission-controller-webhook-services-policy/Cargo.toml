@@ -11,10 +11,10 @@ crate-type = ["cdylib"]
 
 [dependencies]
 anyhow = "1.0"
-k8s-openapi = { version = "0.25", default-features = false, features = [
+k8s-openapi = { version = "0.26", default-features = false, features = [
   "v1_31",
 ] }
-kubewarden-policy-sdk = { version = "0.14.0", features = ["cluster-context"] }
+kubewarden-policy-sdk = { version = "0.14.6", features = ["cluster-context"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
