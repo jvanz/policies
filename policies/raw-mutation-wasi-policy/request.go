@@ -6,7 +6,7 @@ type Request struct {
 	Resource string `json:"resource"`
 }
 
-// ValidationRequest describes the input received by the policy
+// RawValidationRequest describes the input received by the policy
 // when invoked via the `validate` subcommand
 type RawValidationRequest struct {
 	Request  Request  `json:"request"`
