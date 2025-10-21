@@ -7,12 +7,19 @@ use std::collections::HashSet;
 #[serde(default)]
 pub(crate) struct Settings {
     pub allowed_priority_classes: HashSet<String>,
+    pub denied_priority_classes: HashSet<String>,
 }
 
 impl kubewarden::settings::Validatable for Settings {
     fn validate(&self) -> Result<(), String> {
-        if self.allowed_priority_classes.is_empty() {
-            return Err("The allowed priority class list cannot be empty".to_string());
+        if !self.allowed_priority_classes.is_empty() && !self.denied_priority_classes.is_empty() {
+            return Err(
+                "Both allowed and denied priority calls lists cannot be set at the same time"
+                    .to_string(),
+            );
+        }
+        if self.allowed_priority_classes.is_empty() && self.denied_priority_classes.is_empty() {
+            return Err("The priority class lists cannot be empty".to_string());
         }
         Ok(())
     }
@@ -33,12 +40,40 @@ mod tests {
     }
 
     #[test]
-    fn validate_nonempty_settings() {
+    fn validate_both_settings() {
         let settings = Settings {
             allowed_priority_classes: HashSet::from([
                 "high-priority".to_string(),
                 "low-priority".to_string(),
             ]),
+            denied_priority_classes: HashSet::from([
+                "high-priority".to_string(),
+                "low-priority".to_string(),
+            ]),
+        };
+        assert!(settings.validate().is_err());
+    }
+
+    #[test]
+    fn validate_allowlist_settings() {
+        let settings = Settings {
+            allowed_priority_classes: HashSet::from([
+                "high-priority".to_string(),
+                "low-priority".to_string(),
+            ]),
+            ..Default::default()
+        };
+        assert!(settings.validate().is_ok());
+    }
+
+    #[test]
+    fn validate_denylist_settings() {
+        let settings = Settings {
+            denied_priority_classes: HashSet::from([
+                "high-priority".to_string(),
+                "low-priority".to_string(),
+            ]),
+            ..Default::default()
         };
         assert!(settings.validate().is_ok());
     }

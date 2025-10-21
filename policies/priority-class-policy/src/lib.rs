@@ -32,6 +32,7 @@ fn validate(payload: &[u8]) -> CallResult {
             match validate_pod_priority_class(
                 pod_spec,
                 validation_request.settings.allowed_priority_classes,
+                validation_request.settings.denied_priority_classes,
             ) {
                 Ok(_) => kubewarden::accept_request(),
                 Err(err) => kubewarden::reject_request(Some(err.to_owned()), None, None, None),
@@ -58,12 +59,20 @@ fn validate(payload: &[u8]) -> CallResult {
 fn validate_pod_priority_class(
     pod: apicore::PodSpec,
     allowed_priority_classes: HashSet<String>,
+    denied_priority_classes: HashSet<String>,
 ) -> Result<(), String> {
     if pod.priority_class_name.is_none() {
         return Ok(());
     }
     let priority_class_name = pod.priority_class_name.as_ref().unwrap();
-    if !allowed_priority_classes.contains(priority_class_name) {
+
+    if !denied_priority_classes.is_empty() {
+        if denied_priority_classes.contains(priority_class_name) {
+            return Err(format!(
+                "Priority class \"{priority_class_name}\" is denied"
+            ));
+        }
+    } else if !allowed_priority_classes.contains(priority_class_name) {
         return Err(format!(
             "Priority class \"{priority_class_name}\" is not allowed"
         ));
@@ -80,19 +89,22 @@ mod tests {
     use k8s_openapi::api::core::v1::PodSpec;
 
     #[rstest]
-    #[case(Some("low-priority".to_string()), HashSet::from(["high-priority".to_string(), "low-priority".to_string()]), true)]
-    #[case(Some("no-priority".to_string()), HashSet::from(["high-priority".to_string(), "low-priority".to_string()]), false)]
-    #[case(None, HashSet::from(["high-priority".to_string(), "low-priority".to_string()]), true)]
+    #[case(Some("low-priority".to_string()), HashSet::from(["high-priority".to_string(), "low-priority".to_string()]), HashSet::new(), true)]
+    #[case(Some("no-priority".to_string()), HashSet::from(["high-priority".to_string(), "low-priority".to_string()]),HashSet::new(), false)]
+    #[case(Some("no-priority".to_string()), HashSet::new(), HashSet::from(["high-priority".to_string(), "low-priority".to_string()]), true)]
+    #[case(Some("low-priority".to_string()), HashSet::new(), HashSet::from(["high-priority".to_string(), "low-priority".to_string()]), false)]
+    #[case(None, HashSet::from(["high-priority".to_string(), "low-priority".to_string()]),HashSet::new(), true)]
     fn test_pod_validation(
         #[case] pod_priority_class: Option<String>,
         #[case] allowed_classes: HashSet<String>,
+        #[case] denied_classes: HashSet<String>,
         #[case] should_succeed: bool,
     ) {
         let pod = PodSpec {
             priority_class_name: pod_priority_class,
             ..Default::default()
         };
-        let result = validate_pod_priority_class(pod, allowed_classes);
+        let result = validate_pod_priority_class(pod, allowed_classes, denied_classes);
         assert_eq!(result.is_ok(), should_succeed);
     }
 }
