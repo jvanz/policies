@@ -20,7 +20,7 @@ This policy can inspect `Pod` resources, but can also operate against
 
 The policy settings accept a list of the `PriorityClass` names that would match
 the Pod's `priorityClassName` field, under `allowed_priority_classes` for an
-allow list, or `settings.denied_priority_classes` for a deny list.
+allow list, or `denied_priority_classes` for a deny list.
 
 The user **must** provide a list of priority classes names when deploying the
 policy. Both `allowed_priority_classes` and `denied_priority_classes` cannot
