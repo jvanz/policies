@@ -27,3 +27,12 @@ questions:
     required: true
     type: array[
     variable: denied_priority_classes
+  - default: ""
+    description: "If used together with the Allowed priority class list, the name must be provided in the list as well. However, if used together with Denied priority classes list the name must not be listed."
+    tooltip: >-
+      Priority class name to be used when resource does not define it.
+    group: Settings
+    label: Default priority class
+    required: false
+    type: string
+    variable: default_priority_class

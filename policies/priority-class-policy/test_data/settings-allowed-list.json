@@ -1,5 +1,3 @@
 {
-  "allowed_priority_classes": [
-    "noncritical"
-  ]
+  "allowed_priority_classes": ["noncritical"]
 }
