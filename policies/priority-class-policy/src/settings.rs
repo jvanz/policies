@@ -15,7 +15,7 @@ impl kubewarden::settings::Validatable for Settings {
     fn validate(&self) -> Result<(), String> {
         if !self.allowed_priority_classes.is_empty() && !self.denied_priority_classes.is_empty() {
             return Err(
-                "Both allowed and denied priority calls lists cannot be set at the same time"
+                "Both allowed and denied priority class lists cannot be set at the same time"
                     .to_string(),
             );
         }
