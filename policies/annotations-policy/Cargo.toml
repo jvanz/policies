@@ -3,7 +3,7 @@
 authors = ["Kubewarden Developers <cncf-kubewarden-maintainers@lists.cncf.io>"]
 edition = "2018"
 name    = "annotations-policy"
-version = "0.1.2"
+version = "0.1.3"
 
 [lib]
 crate-type = ["cdylib"]
