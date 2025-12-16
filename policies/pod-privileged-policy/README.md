@@ -1,6 +1,8 @@
 [![Kubewarden Policy Repository](https://github.com/kubewarden/community/blob/main/badges/kubewarden-policies.svg)](https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#policy-scope)
 [![Stable](https://img.shields.io/badge/status-stable-brightgreen?style=for-the-badge)](https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#stable)
 
+DUMMY CHANGE
+
 Given the following scenario:
 
 > As an operator of a Kubernetes cluster used by multiple users,
@@ -28,6 +30,7 @@ configured as privileged in their [SecurityContext](https://kubernetes.io/docs/t
 # Settings
 
 The policy has two configurations:
+
 - `skip_init_containers`: if set to `true` instructs the policy to ignore that
   some init container is configured as privileged. Default value is `false`
 - `skip_ephemeral_containers`: if set to `true` instructs the policy to ignore
@@ -101,7 +104,7 @@ spec:
 EOF
 ```
 
-After the policy is running and active, we apply the following Pod specification which doesn't 
+After the policy is running and active, we apply the following Pod specification which doesn't
 have any security context defined. Therefore, it should be accepted by the policy
 and it can be scheduled by the users of the cluster:
 
@@ -146,7 +149,6 @@ Error from server: error when creating "STDIN": admission webhook "clusterwide-p
 The next pod does not have a privileged container. But there is a init
 container requesting privileged access. Therefore, this will be rejected by the
 policy as well:
-
 
 ```console
 kubectl apply -f - <<EOF
@@ -223,5 +225,3 @@ EOF
 
 pod/nginx created
 ```
-
-
