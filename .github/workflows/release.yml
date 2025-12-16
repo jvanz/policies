@@ -160,13 +160,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload SPDX assets
+      - name: Upload release assets
         if: ${{ ! startsWith(github.ref, 'refs/heads/') }}
-        # this step is done since some languages (like Rego) don't have library dependencies or the
-        # sbom generator doesn't support them.
-
-        # if we are on a single repo, we obtain the last draft release as it contains the changelog
-        # and edit it by adding the artifacts. Then we mark the release as latest
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         env:
           POLICY_WORKING_DIR: ${{ needs.calculate-policy-from-tag.outputs.policy-working-dir }}
@@ -178,6 +173,7 @@ jobs:
             let workingDir = process.env.POLICY_WORKING_DIR || '.';
 
             let files = [
+            `${workingDir}/policy.wasm`,
             `${workingDir}/policy-sbom.spdx.json`,
             `${workingDir}/policy-sbom.spdx.jsonl.bundle.sigstore`,
             ]
