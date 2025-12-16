@@ -122,7 +122,7 @@ jobs:
         id: create-release
         uses: release-drafter/release-drafter@b1476f6e6eb133afa41ed8589daba6dc69b4d3f5 # v6.1.0
         with:
-          config-name: "release-drafter-${{ steps.policy-info.outputs.policy-id }}.yml"
+          config-name: "release-drafter-${{ steps.policy-info.outputs.policy-basename }}.yml"
           disable-autolabeler: true
           version: ${{ steps.get-expected-version.outputs.version}}
         env:

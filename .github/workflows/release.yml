@@ -13,6 +13,7 @@ jobs:
       policy-working-dir: ${{ steps.calculate-vars.outputs.policy_working_dir }}
       policy-version: ${{ steps.calculate-vars.outputs.policy_version }}
       policy-id: ${{ steps.calculate-vars.outputs.policy_id }}
+      policy-name: ${{ steps.calculate-vars.outputs.policy_name }}
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - id: calculate-vars
@@ -30,10 +31,12 @@ jobs:
           fi
 
           echo "policy_id=$policy_id"
+          echo "policy_name=$policy_name"
           echo "policy_working_dir=$policy_working_dir"
           echo "policy_version=$( echo ${{ github.ref_name }} | sed 's/\(.*\)\/\(.*\)$/\2/' | cut -c2- )"
 
           echo "policy_id=$policy_id" >> $GITHUB_OUTPUT
+          echo "policy_name=$policy_name" >> $GITHUB_OUTPUT
           echo "policy_working_dir=$policy_working_dir" >> $GITHUB_OUTPUT
           echo "policy_version=$( echo ${{ github.ref_name }} | sed 's/\(.*\)\/\(.*\)$/\2/' | cut -c2- )" >> $GITHUB_OUTPUT
 
@@ -151,7 +154,7 @@ jobs:
         id: create-release
         uses: release-drafter/release-drafter@b1476f6e6eb133afa41ed8589daba6dc69b4d3f5 # v6.1.0
         with:
-          config-name: "release-drafter-${{ needs.calculate-policy-from-tag.outputs.policy-id }}.yml"
+          config-name: "release-drafter-${{ needs.calculate-policy-from-tag.outputs.policy-name }}.yml"
           disable-autolabeler: true
           prerelease: ${{ contains(needs.calculate-policy-from-tag.outputs.policy-version, '-alpha') || contains(needs.calculate-policy-from-tag.outputs.policy-version, '-beta') || contains(needs.calculate-policy-from-tag.outputs.policy-version, '-rc') }}
         env:
