@@ -1,0 +1,6 @@
+_extends: kubewarden-policies:.github/release-drafter.yml
+name-template: "allow-privilege-escalation-psp-policy/v$RESOLVED_VERSION"
+tag-template: "allow-privilege-escalation-psp-policy/v$RESOLVED_VERSION"
+tag-prefix: allow-privilege-escalation-psp-policy/v
+include-paths:
+  - "policies/allow-privilege-escalation-psp-policy/"
