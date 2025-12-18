@@ -1,0 +1,15 @@
+on: [push, pull_request]
+name: Continuous integration
+jobs:
+  test:
+    name: run tests and linters
+    uses: kubewarden/github-actions/.github/workflows/reusable-test-policy-rust.yml@247608f0b5a1562a6fd2576e5b2e6cbe62551baf # v4.5.15
+
+  check-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - id: check-policy-metadata
+        shell: bash
+        run: |
+          make check-policy-metadata
