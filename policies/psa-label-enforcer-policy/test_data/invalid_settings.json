@@ -1,0 +1,10 @@
+{
+	"modes": {
+		"enforce": "high",
+		"enforce-version": "foo",
+		"audit": "fail-all",
+		"audit-version": "v1.025",
+		"warn": "you cannot pass",
+		"warn-version": "v1"
+	}
+}
