@@ -1,0 +1,4 @@
+{
+  "criteria": "containsOtherThan",
+  "values": ["a", "b"]
+}

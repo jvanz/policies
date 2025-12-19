@@ -1,0 +1,4 @@
+{
+  "criteria": "containsAnyOf",
+  "values": ["a", "b"]
+}

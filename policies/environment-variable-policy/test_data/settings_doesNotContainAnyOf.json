@@ -1,0 +1,4 @@
+{
+  "criteria": "doesNotContainAnyOf",
+  "values": ["a", "b"]
+}
