@@ -1,0 +1,6 @@
+_extends: kubewarden-policies:.github/release-drafter.yml
+name-template: "selinux-psp-policy/v$RESOLVED_VERSION"
+tag-template: "selinux-psp-policy/v$RESOLVED_VERSION"
+tag-prefix: selinux-psp-policy/v
+include-paths:
+  - "policies/selinux-psp-policy/"
