@@ -16,7 +16,7 @@
 	  echo "output = ${output}"
 
 	[ "$status" -ne 0 ]
-	[ $(expr "$output" : '.*Provided settings are not valid: "deniedStorageClasses cannot be empty".*') -ne 0 ]
+	[ $(expr "$output" : '.*Provided settings are not valid: deniedStorageClasses cannot be empty.*') -ne 0 ]
 }
 
 @test "Fallback cannot be in the denied storage classes list" {
@@ -26,7 +26,7 @@
 	  echo "output = ${output}"
 
 	[ "$status" -ne 0 ]
-	[ $(expr "$output" : '.*Provided settings are not valid: "fallbackStorageClass cannot be in deniedStorageClasses".*') -ne 0 ]
+	[ $(expr "$output" : '.*Provided settings are not valid: fallbackStorageClass cannot be in deniedStorageClasses.*') -ne 0 ]
 }
 
 @test "Accept PVC not using denied storage classes names" {
