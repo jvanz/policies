@@ -1,0 +1,21 @@
+name: flexvolume-drivers-psp
+description: Replacement for the Kubernetes Pod Security Policy that controls the allowed `flexVolume` drivers
+homepage: https://github.com/kubewarden/flexvolume-drivers-psp-policy
+author:
+  name: Kubewarden devs
+  homepage: https://github.com/kubewarden
+download:
+  # Important: leave the __TAG__ around: this is automatically replaced with the value of the git tag
+  registry: ghcr.io/kubewarden/policies/flexvolume-drivers-psp:__TAG__
+  # url is optional
+  url: https://github.com/kubwarden/flexvolume-drivers-psp-policy/releases/download/__TAG__/policy.wasm
+keywords:
+  - PSP
+  - Container
+  - Runtime
+  - Flex Volume
+  - Flex
+resources:
+  - Pod
+mutation: false
+contextAware: false

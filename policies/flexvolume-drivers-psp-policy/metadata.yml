@@ -1,0 +1,29 @@
+rules:
+  - apiGroups:
+      - ''
+    apiVersions:
+      - v1
+    resources:
+      - pods
+    operations:
+      - CREATE
+      - UPDATE
+mutating: false
+contextAware: false
+executionMode: kubewarden-wapc
+annotations:
+  # artifacthub specific
+  io.artifacthub.displayName: Flexvolume Drivers Psp
+  io.artifacthub.resources: Pod
+  io.artifacthub.keywords: psp, container, runtime, flex volume, flex
+  # kubewarden specific
+  io.kubewarden.policy.ociUrl: ghcr.io/kubewarden/policies/flexvolume-drivers-psp
+  io.kubewarden.policy.title: flexvolume-drivers-psp
+  io.kubewarden.policy.version: 1.0.9
+  io.kubewarden.policy.description: Replacement for the Kubernetes Pod Security Policy that controls the allowed `flexVolume` drivers
+  io.kubewarden.policy.author: Kubewarden developers <cncf-kubewarden-maintainers@lists.cncf.io>
+  io.kubewarden.policy.url: https://github.com/kubewarden/flexvolume-drivers-psp-policy
+  io.kubewarden.policy.source: https://github.com/kubewarden/flexvolume-drivers-psp-policy
+  io.kubewarden.policy.license: Apache-2.0
+  io.kubewarden.policy.category: PSP
+  io.kubewarden.policy.severity: medium
