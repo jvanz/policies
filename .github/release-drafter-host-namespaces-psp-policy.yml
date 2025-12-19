@@ -1,0 +1,6 @@
+_extends: kubewarden-policies:.github/release-drafter.yml
+name-template: "host-namespaces-psp-policy/v$RESOLVED_VERSION"
+tag-template: "host-namespaces-psp-policy/v$RESOLVED_VERSION"
+tag-prefix: host-namespaces-psp-policy/v
+include-paths:
+  - "policies/host-namespaces-psp-policy/"
