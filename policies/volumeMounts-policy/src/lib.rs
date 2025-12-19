@@ -57,38 +57,26 @@ fn validate_pod(pod: &apicore::PodSpec, settings: &settings::Settings) -> Result
     let mut err_message = String::new();
     for container in &pod.containers {
         let container_valid = validate_container(container, settings);
-        if container_valid.is_err() {
-            err_message = err_message
-                + &format!(
-                    "container {} is invalid: {}\n",
-                    container.name,
-                    container_valid.unwrap_err()
-                );
+        if let Err(e) = container_valid {
+            err_message =
+                err_message + &format!("container {} is invalid: {}\n", container.name, e);
         }
     }
     if let Some(init_containers) = &pod.init_containers {
         for container in init_containers {
             let container_valid = validate_container(container, settings);
-            if container_valid.is_err() {
-                err_message = err_message
-                    + &format!(
-                        "container {} is invalid: {}\n",
-                        container.name,
-                        container_valid.unwrap_err()
-                    );
+            if let Err(e) = container_valid {
+                err_message =
+                    err_message + &format!("container {} is invalid: {}\n", container.name, e);
             }
         }
     }
     if let Some(ephemeral_containers) = &pod.ephemeral_containers {
         for container in ephemeral_containers {
             let container_valid = validate_ephemeral_container(container, settings);
-            if container_valid.is_err() {
-                err_message = err_message
-                    + &format!(
-                        "container {} is invalid: {}\n",
-                        container.name,
-                        container_valid.unwrap_err()
-                    );
+            if let Err(e) = container_valid {
+                err_message =
+                    err_message + &format!("container {} is invalid: {}\n", container.name, e);
             }
         }
     }
