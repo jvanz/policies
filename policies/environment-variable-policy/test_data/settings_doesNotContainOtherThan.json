@@ -1,0 +1,4 @@
+{
+  "criteria": "doesNotContainOtherThan",
+  "values": ["a", "b"]
+}
