@@ -1,0 +1,20 @@
+[package]
+name = "persistentvolumeclaim-storageclass-policy"
+version = "1.1.2"
+authors = ["Kubewarden developers <cncf-kubewarden-maintainers@lists.cncf.io>"]
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+k8s-openapi = { version = "0.26", default-features = false, features = [
+  "v1_32",
+] }
+kubewarden-policy-sdk = "0.15.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rstest = "0.26"
+
+[dev-dependencies]
+rstest = "0.26"
