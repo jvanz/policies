@@ -1,0 +1,29 @@
+rules:
+  - apiGroups:
+      - ''
+    apiVersions:
+      - v1
+    resources:
+      - namespaces
+    operations:
+      - CREATE
+      - UPDATE
+mutating: true
+contextAware: false
+executionMode: kubewarden-wapc
+annotations:
+  # artifacthub specific
+  io.artifacthub.displayName: PSA Label Enforcer
+  io.artifacthub.resources: Namespace
+  io.artifacthub.keywords: namespace, psa, kubewarden
+  # kubewarden specific
+  io.kubewarden.policy.ociUrl: ghcr.io/kubewarden/policies/psa-label-enforcer
+  io.kubewarden.policy.title: psa-label-enforcer
+  io.kubewarden.policy.version: 1.0.8
+  io.kubewarden.policy.description: Policy to ensure that namespaces have the required PSA labels configuration for deployment in the cluster.
+  io.kubewarden.policy.author: Kubewarden developers <cncf-kubewarden-maintainers@lists.cncf.io>
+  io.kubewarden.policy.url: https://github.com/kubewarden/psa-label-enforcer-policy
+  io.kubewarden.policy.source: https://github.com/kubewarden/psa-label-enforcer-policy
+  io.kubewarden.policy.license: Apache-2.0
+  io.kubewarden.policy.category: Pod Security
+  io.kubewarden.policy.severity: medium
