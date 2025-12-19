@@ -1,0 +1,6 @@
+_extends: kubewarden-policies:.github/release-drafter.yml
+name-template: "allowed-fsgroups-psp-policy/v$RESOLVED_VERSION"
+tag-template: "allowed-fsgroups-psp-policy/v$RESOLVED_VERSION"
+tag-prefix: allowed-fsgroups-psp-policy/v
+include-paths:
+  - "policies/allowed-fsgroups-psp-policy/"
