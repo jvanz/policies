@@ -7,7 +7,7 @@ inputs:
   KWCTL_VERSION:
     description: "kwctl release to be installed"
     required: false
-    default: v1.29.1
+    default: v1.31.0
   SYFT_VERSION:
     description: "syft release to be installed"
     required: false
