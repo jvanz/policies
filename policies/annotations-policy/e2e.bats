@@ -64,5 +64,5 @@
 
 	# incorrect settings
 	[ "$status" -eq 1 ]
-	[ $(expr "$output" : '.*Provided settings are not valid: \"Empty annotation list is not allowed\".*') -ne 0 ]
+	[ $(expr "$output" : '.*Provided settings are not valid: Empty annotation list is not allowed.*') -ne 0 ]
 }
