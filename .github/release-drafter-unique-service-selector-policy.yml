@@ -1,0 +1,6 @@
+_extends: kubewarden-policies:.github/release-drafter.yml
+name-template: "unique-service-selector-policy/v$RESOLVED_VERSION"
+tag-template: "unique-service-selector-policy/v$RESOLVED_VERSION"
+tag-prefix: unique-service-selector-policy/v
+include-paths:
+  - "policies/unique-service-selector-policy/"
