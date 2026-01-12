@@ -1,0 +1,86 @@
+name: Continuous integration crates
+
+on:
+  push:
+    paths:
+      - "policies/crates/**"
+  pull_request:
+    paths:
+      - "policies/crates/**"
+
+jobs:
+  calculate-crates-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: List crate folders
+        id: set-matrix
+        run: |
+          CRATES=$(ls -1 policies/crates | jq -R -s -c 'split("\n")[:-1]')
+          echo "matrix={\"crate\":$CRATES}" >> $GITHUB_OUTPUT
+
+  check:
+    needs: calculate-crates-matrix
+    name: Check
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.calculate-crates-matrix.outputs.matrix)}}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - name: "Run cargo check"
+        run: |
+          make -C policies/crates/${{ matrix.crate }} check
+
+  test:
+    needs: calculate-crates-matrix
+    name: Unit tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.calculate-crates-matrix.outputs.matrix)}}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - name: "Run cargo test"
+        run: |
+          make -C policies/crates/${{ matrix.crate }} test
+
+  fmt:
+    needs: calculate-crates-matrix
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.calculate-crates-matrix.outputs.matrix)}}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - name: "Run cargo fmt"
+        run: |
+          make -C policies/crates/${{ matrix.crate }} fmt
+
+  clippy:
+    needs: calculate-crates-matrix
+    name: Clippy
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.calculate-crates-matrix.outputs.matrix)}}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - name: "Run cargo clippy"
+        run: |
+          make -C policies/crates/${{ matrix.crate }} lint
+
+  spelling:
+    needs: calculate-crates-matrix
+    name: Spell Check with Typos
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{fromJson(needs.calculate-crates-matrix.outputs.matrix)}}
+    steps:
+      - name: Checkout Actions Repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - name: Install typos Spell check
+        uses: crate-ci/typos@5c19779cb52ea50e151f5a10333ccd269227b5ae # v1.41.0
+        with:
+          files: policies/crates/${{ matrix.crate }}/**

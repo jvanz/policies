@@ -33,6 +33,12 @@ clean:
 			$(MAKE) -C "$$policy" clean; \
 		fi; \
 	done
+	@for crate in policies/crates/*/; do \
+		if [ -f "$$crate/Makefile" ]; then \
+			echo "Cleaning $$crate"; \
+			$(MAKE) -C "$$crate" clean; \
+		fi; \
+	done
 
 annotated-policy.wasm:
 	@for policy in policies/*/; do \
@@ -44,9 +50,21 @@ annotated-policy.wasm:
 
 test:
 	$(call run-target,test)
+	
+	@for crate in policies/crates/*/; do \
+		if [ -f "$$crate/Makefile" ]; then \
+			$(MAKE) -C "$$crate" test; \
+		fi; \
+	done
 
 lint:
 	$(call run-target,lint)
+	
+	@for crate in policies/crates/*/; do \
+		if [ -f "$$crate/Makefile" ]; then \
+			$(MAKE) -C "$$crate" lint; \
+		fi; \
+	done
 
 e2e-tests:
 	$(call run-target,e2e-tests)
