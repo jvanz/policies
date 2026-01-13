@@ -1,9 +1,10 @@
 .PHONY: clean annotated-policy.wasm test lint e2e-tests
 
-# Helper function to run a target across all policies with summary
-define run-target
+# Helper function to run a target across all policies (excluding crates/) with summary
+define run-policy-target
 	@passed=0; failed=0; failed_policies=""; \
 	for policy in policies/*/; do \
+		[ "$$policy" = "policies/crates/" ] && continue; \
 		if [ -f "$$policy/Makefile" ]; then \
 			echo "Running $(1) in $$policy"; \
 			if $(MAKE) -C "$$policy" $(1); then \
@@ -26,45 +27,30 @@ define run-target
 	fi
 endef
 
-clean:
-	@for policy in policies/*/; do \
-		if [ -f "$$policy/Makefile" ]; then \
-			echo "Cleaning $$policy"; \
-			$(MAKE) -C "$$policy" clean; \
-		fi; \
-	done
+# Helper function to run a target across all crates
+define run-crate-target
 	@for crate in policies/crates/*/; do \
 		if [ -f "$$crate/Makefile" ]; then \
-			echo "Cleaning $$crate"; \
-			$(MAKE) -C "$$crate" clean; \
+			echo "Running $(1) in $$crate"; \
+			$(MAKE) -C "$$crate" $(1); \
 		fi; \
 	done
+endef
+
+clean:
+	$(call run-policy-target,clean)
+	$(call run-crate-target,clean)
 
 annotated-policy.wasm:
-	@for policy in policies/*/; do \
-		if [ -f "$$policy/Makefile" ]; then \
-			echo "Building annotated-policy.wasm in $$policy"; \
-			$(MAKE) -C "$$policy" annotated-policy.wasm; \
-		fi; \
-	done
+	$(call run-policy-target,annotated-policy.wasm)
 
 test:
-	$(call run-target,test)
-	
-	@for crate in policies/crates/*/; do \
-		if [ -f "$$crate/Makefile" ]; then \
-			$(MAKE) -C "$$crate" test; \
-		fi; \
-	done
+	$(call run-policy-target,test)
+	$(call run-crate-target,test)
 
 lint:
-	$(call run-target,lint)
-	
-	@for crate in policies/crates/*/; do \
-		if [ -f "$$crate/Makefile" ]; then \
-			$(MAKE) -C "$$crate" lint; \
-		fi; \
-	done
+	$(call run-policy-target,lint)
+	$(call run-crate-target,lint)
 
 e2e-tests:
-	$(call run-target,e2e-tests)
+	$(call run-policy-target,e2e-tests)
