@@ -1,26 +1,24 @@
 [package]
 edition = "2024"
-name    = "criteria_policy_base"
+name = "criteria_policy_base"
 version = "3.0.3"
 
 [dependencies]
-anyhow                = "1"
-const_format          = "0.2"
-kubewarden-policy-sdk = "0.15.0"
-serde                 = { version = "1.0", features = ["derive"] }
-serde_json            = "1.0"
+anyhow = { workspace = true }
+const_format = "0.2"
+kubewarden-policy-sdk = { workspace = true }
+k8s-openapi = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
 
 [features]
 annotations = []
-env_var     = []
-labels      = []
+env_var = []
+labels = []
 
 [dev-dependencies]
-# this is a transitive dependency of kubewarden-policy-sdk, we don't
-# care about the specific version, we just have to enable the k8s' version feature
-k8s-openapi = { version = "0", default-features = false, features = ["v1_32"] }
-rstest      = "0.26.0"
-serde_yaml  = "0.9"
+rstest = { workspace = true }
+serde_yaml = { workspace = true }
 
 # required to set at least one feature
 criteria_policy_base = { path = ".", features = ["env_var"] }
