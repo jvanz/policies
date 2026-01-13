@@ -248,6 +248,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "context-aware-policy-demo"
+version = "0.1.9"
+dependencies = [
+ "anyhow",
+ "k8s-openapi",
+ "kubewarden-policy-sdk",
+ "mockall",
+ "rstest",
+ "serde",
+ "serde_json",
+ "serial_test",
+]
+
+[[package]]
 name = "criteria_policy_base"
 version = "3.0.3"
 dependencies = [

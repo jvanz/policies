@@ -1,18 +1,20 @@
 [workspace]
 resolver = "3"
 members = [
-  "allow-privilege-escalation-psp-policy",
   "allowed-fsgroups-psp-policy",
   "allowed-proc-mount-types-psp-policy",
+  "allow-privilege-escalation-psp-policy",
   "annotations-policy",
   "apparmor-psp-policy",
   "capabilities-psp-policy",
   "context-aware-demo",
+  "crates/criteria_policy_base",
+  "crates/test_helpers",
   "deprecated-api-versions-policy",
   "do-not-expose-admission-controller-webhook-services-policy",
   "echo",
-  "env-variable-secrets-scanner-policy",
   "environment-variable-policy",
+  "env-variable-secrets-scanner-policy",
   "flexvolume-drivers-psp-policy",
   "host-namespaces-psp-policy",
   "image-cve-policy",
