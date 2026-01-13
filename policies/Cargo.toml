@@ -7,6 +7,7 @@ members = [
   "annotations-policy",
   "apparmor-psp-policy",
   "capabilities-psp-policy",
+  "context-aware-demo",
   "deprecated-api-versions-policy",
   "do-not-expose-admission-controller-webhook-services-policy",
   "echo",
