@@ -10,9 +10,9 @@ else
 	docker run \
 		--rm \
 		-e GOFLAGS="-buildvcs=false" \
-		-v $(ROOT_DIR):/src \
+		-v $(ROOT_DIR)$(POLICY_DIR):/src \
 		-w /src tinygo/tinygo:0.39.0 \
-		tinygo build -o $(POLICY_DIR)/policy.wasm -target=wasi -no-debug ./$(POLICY_DIR)
+		tinygo build -o policy.wasm -target=wasi -no-debug .
 endif
 
 
