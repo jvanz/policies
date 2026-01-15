@@ -1,0 +1,6 @@
+_extends: kubewarden-policies:.github/release-drafter.yml
+name-template: "cel-policy/v$RESOLVED_VERSION"
+tag-template: "cel-policy/v$RESOLVED_VERSION"
+tag-prefix: cel-policy/v
+include-paths:
+  - "policies/cel-policy/"
