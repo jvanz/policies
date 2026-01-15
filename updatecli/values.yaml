@@ -1,0 +1,19 @@
+---
+# Values.yaml contains settings that be used from Updatecli manifest.
+
+# pipelineid: release_pr # branch will be named: updatecli_main_release_pr
+
+github:
+  branch: "main"
+  git_author: "Kubewarden bot"
+  git_email: "cncf-kubewarden-maintainers@lists.cncf.io"
+  token: "UPDATECLI_GITHUB_TOKEN"
+
+# pr contains the pull request settings that can be overridden
+pr:
+  labels:
+    - "TRIGGER-RELEASE"
+    - "kind/chore"
+    - "area/release"
+  reviewers:
+    - "kubewarden/kubewarden-developers"
