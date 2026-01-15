@@ -19,6 +19,10 @@ endif
 .PHONY: test
 test:
 	opa test *.rego
+	
+.PHONY: lint
+lint:
+	opa check --strict *.rego
 
 annotated-policy.wasm: policy.wasm metadata.yml
 	kwctl annotate -m metadata.yml -u README.md -o annotated-policy.wasm policy.wasm
