@@ -1,16 +1,7 @@
-# Binary directory
-ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-BIN_DIR := $(abspath $(ROOT_DIR)/bin)
-
 SOURCE_FILES := $(shell find . -type f -name '*.go')
 VERSION ?= $(shell git describe | cut -c2-)
 
-GOLANGCI_LINT_VER := v2.5.0
-GOLANGCI_LINT_BIN := golangci-lint
-GOLANGCI_LINT := $(BIN_DIR)/$(GOLANGCI_LINT_BIN)
-
 E2E_TEST_ANNONATION_METADATA ?= "test_data/annotation-metadata.yml"
-
 
 policy.wasm: $(SOURCE_FILES) go.mod go.sum
 	GOOS=wasip1 GOARCH=wasm go build -gcflags=all="-l -B -wb=false" -ldflags="-w -s" -o policy.wasm
@@ -20,18 +11,14 @@ policy.wasm: $(SOURCE_FILES) go.mod go.sum
 annotated-policy.wasm: policy.wasm metadata.yml
 	kwctl annotate -m metadata.yml -u README.md -o annotated-policy.wasm policy.wasm
 
-golangci-lint: $(GOLANGCI_LINT) ## Install a local copy of golang ci-lint.
-$(GOLANGCI_LINT): ## Install golangci-lint.
-	GOBIN=$(BIN_DIR) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VER)
-
 .PHONY: lint
-lint: $(GOLANGCI_LINT)
+lint:
 	go vet ./...
-	$(GOLANGCI_LINT) run
+	golangci-lint run
 
 .PHONY: lint-fix
-lint-fix: $(GOLANGCI_LINT)
-	$(GOLANGCI_LINT) run --fix
+lint-fix:
+	golangci-lint run --fix
 
 .PHONY: fmt
 fmt:
