@@ -20,6 +20,10 @@ inputs:
     description: "binaryen release to be installed"
     required: false
     default: "116"
+  OPA_VERSION:
+    description: "opa release to be installed"
+    required: false
+    default: "v0.65.0"
 runs:
   using: "composite"
   steps:
@@ -123,3 +127,12 @@ runs:
         echo "$INSTALL_DIR" >> "$GITHUB_PATH"
     - name: Install updatecli
       uses: updatecli/updatecli-action@4fd2c16d992120bd5355264a03ad0cddec013e1b # v2.99.0
+    - name: Install OPA
+      shell: bash
+      run: |
+        set -e
+        INSTALL_DIR=$HOME/.opa
+        mkdir -p $INSTALL_DIR
+        curl -sL https://github.com/open-policy-agent/opa/releases/download/${{ inputs.OPA_VERSION || 'v0.65.0' }}/opa_linux_amd64_static -o $INSTALL_DIR/opa
+        chmod 755 $INSTALL_DIR/opa
+        echo $INSTALL_DIR >> $GITHUB_PATH
