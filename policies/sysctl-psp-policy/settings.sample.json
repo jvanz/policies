@@ -1,0 +1,9 @@
+{
+  "allowedUnsafeSysctls": [
+    "net.core.somaxconn"
+  ],
+  "forbiddenSysctls": [
+    "kernel.shm_rmid_forced",
+    "net.*"
+  ]
+}
