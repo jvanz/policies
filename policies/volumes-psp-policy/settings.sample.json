@@ -1,0 +1,11 @@
+{
+   "allowedTypes": [
+      "configMap",
+      "downwardAPI",
+      "emptyDir",
+      "persistentVolumeClaim",
+      "secret",
+      "projected"
+   ],
+   "ignoreInitContainersVolumes": true
+}
