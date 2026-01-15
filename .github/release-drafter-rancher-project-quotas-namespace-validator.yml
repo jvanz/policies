@@ -1,0 +1,6 @@
+_extends: kubewarden-policies:.github/release-drafter.yml
+name-template: "rancher-project-quotas-namespace-validator/v$RESOLVED_VERSION"
+tag-template: "rancher-project-quotas-namespace-validator/v$RESOLVED_VERSION"
+tag-prefix: rancher-project-quotas-namespace-validator/v
+include-paths:
+  - "policies/rancher-project-quotas-namespace-validator/"
