@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "readonly-root-filesystem-psp-policy/v$RESOLVED_VERSION"
 tag-template: "readonly-root-filesystem-psp-policy/v$RESOLVED_VERSION"
 tag-prefix: readonly-root-filesystem-psp-policy/v

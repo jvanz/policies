@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "raw-mutation-policy/v$RESOLVED_VERSION"
 tag-template: "raw-mutation-policy/v$RESOLVED_VERSION"
 tag-prefix: raw-mutation-policy/v

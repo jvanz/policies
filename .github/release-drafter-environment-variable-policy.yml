@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "environment-variable-policy/v$RESOLVED_VERSION"
 tag-template: "environment-variable-policy/v$RESOLVED_VERSION"
 tag-prefix: environment-variable-policy/v

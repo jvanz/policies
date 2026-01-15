@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "go-wasi-context-aware-test-policy/v$RESOLVED_VERSION"
 tag-template: "go-wasi-context-aware-test-policy/v$RESOLVED_VERSION"
 tag-prefix: go-wasi-context-aware-test-policy/v

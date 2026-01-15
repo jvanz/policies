@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "deprecated-api-versions-policy/v$RESOLVED_VERSION"
 tag-template: "deprecated-api-versions-policy/v$RESOLVED_VERSION"
 tag-prefix: deprecated-api-versions-policy/v

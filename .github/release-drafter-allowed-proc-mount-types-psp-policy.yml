@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "allowed-proc-mount-types-psp-policy/v$RESOLVED_VERSION"
 tag-template: "allowed-proc-mount-types-psp-policy/v$RESOLVED_VERSION"
 tag-prefix: allowed-proc-mount-types-psp-policy/v
