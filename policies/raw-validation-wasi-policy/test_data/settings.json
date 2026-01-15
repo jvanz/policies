@@ -1,0 +1,5 @@
+{
+  "validUsers": ["wanda", "oscar"],
+  "validActions": ["eats", "likes"],
+  "validResources": ["hay", "banana"]
+}
