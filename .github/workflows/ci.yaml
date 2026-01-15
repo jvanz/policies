@@ -1,4 +1,4 @@
-name: Continuous integration
+name: CI
 on:
   workflow_dispatch:
   pull_request:
@@ -41,7 +41,8 @@ jobs:
           echo "policy_working_dirs=$policy_working_dirs"
           echo "policy_working_dirs=$policy_working_dirs" >> $GITHUB_OUTPUT
 
-  continuos-integration:
+  policy-CI:
+    name: Policy
     uses: ./.github/workflows/reusable-ci.yaml
     needs: calculate-policy-matrix
     if: ${{ needs.calculate-policy-matrix.outputs.policy_working_dirs != '[]' }}

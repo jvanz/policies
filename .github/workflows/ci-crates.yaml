@@ -1,4 +1,4 @@
-name: Continuous integration crates
+name: CI crates
 
 on:
   push:
