@@ -1,0 +1,6 @@
+_extends: kubewarden-policies:.github/release-drafter.yml
+name-template: "raw-mutation-wasi-policy/v$RESOLVED_VERSION"
+tag-template: "raw-mutation-wasi-policy/v$RESOLVED_VERSION"
+tag-prefix: raw-mutation-wasi-policy/v
+include-paths:
+  - "policies/raw-mutation-wasi-policy/"
