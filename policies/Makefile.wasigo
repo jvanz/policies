@@ -1,7 +1,4 @@
-ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-
 SOURCE_FILES := $(shell find . -type f -name '*.go')
-VERSION ?= $(shell git describe | cut -c2-)
 
 policy.wasm: $(SOURCE_FILES) go.mod go.sum
 	GOOS=wasip1 GOARCH=wasm go build -gcflags=all="-B" -ldflags="-w -s" -o policy.wasm

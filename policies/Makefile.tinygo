@@ -45,6 +45,5 @@ clean:
 debug:
 	@echo $(MAKEFILE_LIST)
 	@echo "ROOT_DIR=$(ROOT_DIR)"
-	@echo "ROOT_DIR2:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))"
 	@echo "CURDIR=$(CURDIR)"
 	@echo "POLICY_DIR=$(POLICY_DIR)"
