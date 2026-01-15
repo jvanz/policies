@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "unique-ingress-policy/v$RESOLVED_VERSION"
 tag-template: "unique-ingress-policy/v$RESOLVED_VERSION"
 tag-prefix: unique-ingress-policy/v
