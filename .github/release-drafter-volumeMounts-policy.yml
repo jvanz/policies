@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "volumeMounts-policy/v$RESOLVED_VERSION"
 tag-template: "volumeMounts-policy/v$RESOLVED_VERSION"
 tag-prefix: volumeMounts-policy/v

@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "trusted-repos-policy/v$RESOLVED_VERSION"
 tag-template: "trusted-repos-policy/v$RESOLVED_VERSION"
 tag-prefix: trusted-repos-policy/v

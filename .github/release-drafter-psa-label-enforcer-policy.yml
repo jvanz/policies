@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "psa-label-enforcer-policy/v$RESOLVED_VERSION"
 tag-template: "psa-label-enforcer-policy/v$RESOLVED_VERSION"
 tag-prefix: psa-label-enforcer-policy/v

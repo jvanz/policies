@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "share-pid-namespace-policy/v$RESOLVED_VERSION"
 tag-template: "share-pid-namespace-policy/v$RESOLVED_VERSION"
 tag-prefix: share-pid-namespace-policy/v

@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "sleeping-policy/v$RESOLVED_VERSION"
 tag-template: "sleeping-policy/v$RESOLVED_VERSION"
 tag-prefix: sleeping-policy/v

@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "capabilities-psp-policy/v$RESOLVED_VERSION"
 tag-template: "capabilities-psp-policy/v$RESOLVED_VERSION"
 tag-prefix: capabilities-psp-policy/v

@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "namespace-label-propagator-policy/v$RESOLVED_VERSION"
 tag-template: "namespace-label-propagator-policy/v$RESOLVED_VERSION"
 tag-prefix: namespace-label-propagator-policy/v

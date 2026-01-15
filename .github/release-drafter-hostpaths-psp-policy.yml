@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "hostpaths-psp-policy/v$RESOLVED_VERSION"
 tag-template: "hostpaths-psp-policy/v$RESOLVED_VERSION"
 tag-prefix: hostpaths-psp-policy/v

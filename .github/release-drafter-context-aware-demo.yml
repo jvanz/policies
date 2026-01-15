@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "context-aware-demo/v$RESOLVED_VERSION"
 tag-template: "context-aware-demo/v$RESOLVED_VERSION"
 tag-prefix: context-aware-demo/v

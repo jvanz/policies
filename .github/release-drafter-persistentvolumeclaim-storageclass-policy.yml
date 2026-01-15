@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "persistentvolumeclaim-storageclass-policy/v$RESOLVED_VERSION"
 tag-template: "persistentvolumeclaim-storageclass-policy/v$RESOLVED_VERSION"
 tag-prefix: persistentvolumeclaim-storageclass-policy/v

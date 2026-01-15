@@ -1,4 +1,4 @@
-_extends: kubewarden-policies:.github/release-drafter.yml
+_extends: policies:.github/release-drafter.yml
 name-template: "annotations-policy/v$RESOLVED_VERSION"
 tag-template: "annotations-policy/v$RESOLVED_VERSION"
 tag-prefix: annotations-policy/v
