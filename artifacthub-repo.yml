@@ -1,5 +1,5 @@
 ---
-repositoryID: <PUT YOUR ARTIFACTHUB REPO ID HERE>
+repositoryID: 1470bf6b-0771-48e0-b950-90fbe0e6813e
 owners:
   - name: Kubewarden developers
     email: cncf-kubewarden-maintainers@lists.cncf.io
