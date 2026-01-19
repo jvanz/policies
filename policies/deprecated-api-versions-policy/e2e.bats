@@ -66,3 +66,23 @@
 }
 
 
+@test "accept valid ingress" {
+  run kwctl run \
+    --request-path test_data/valid_ingress.yaml \
+    --settings-json '{"kubernetes_version": "1.25.0"}' \
+    annotated-policy.wasm
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"allowed\":true"* ]]
+}
+
+@test "reject deprecated ingress" {
+  run kwctl run \
+    --request-path test_data/deprecated_ingress.yaml \
+    --settings-json '{"kubernetes_version": "1.25.0"}' \
+    annotated-policy.wasm
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"allowed\":false"* ]]
+  [[ "$output" == *"the API is deprecated"* ]]
+}
