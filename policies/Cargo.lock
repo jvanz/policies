@@ -785,6 +785,7 @@ name = "image-cve-policy"
 version = "0.5.4"
 dependencies = [
  "anyhow",
+ "criteria_policy_base",
  "k8s-openapi",
  "kubewarden-policy-sdk",
  "lazy_static",
