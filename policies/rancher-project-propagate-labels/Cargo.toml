@@ -1,0 +1,26 @@
+[package]
+name = "rancher-project-propagate-labels"
+version = "0.1.1"
+authors = ["Flavio Castelli <fcastelli@suse.com>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+anyhow = { workspace = true }
+k8s-openapi = { workspace = true, features = ["schemars"] }
+k8s-openapi-derive = "0.26.0"
+kubewarden-policy-sdk = { workspace = true }
+lazy_static = { workspace = true }
+schemars = { version = "1" }
+serde = { features = ["derive"], workspace = true }
+serde_json = { workspace = true }
+slog = { workspace = true }
+
+[dev-dependencies]
+mockall = { workspace = true }
+rstest = { workspace = true }
+serial_test = { workspace = true }

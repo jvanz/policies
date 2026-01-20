@@ -895,6 +895,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "k8s-openapi-codegen-common"
+version = "0.26.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1090c033b930718df81e3f1c5493ef7cd6db42256a115c41f3e755b2a04474c8"
+
+[[package]]
+name = "k8s-openapi-derive"
+version = "0.26.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "383d9a7f04e99fbfba656534f78288d0b9e39b5772c277a8c907a63aca78af21"
+dependencies = [
+ "k8s-openapi-codegen-common",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "kubewarden-policy-sdk"
 version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1389,6 +1407,24 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc74d9a594b72ae6656596548f56f667211f8a97b3d4c3d467150794690dc40a"
 dependencies = [
  "proc-macro2",
+]
+
+[[package]]
+name = "rancher-project-propagate-labels"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "k8s-openapi",
+ "k8s-openapi-derive",
+ "kubewarden-policy-sdk",
+ "lazy_static",
+ "mockall",
+ "rstest",
+ "schemars",
+ "serde",
+ "serde_json",
+ "serial_test",
+ "slog",
 ]
 
 [[package]]
