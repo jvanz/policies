@@ -15,6 +15,7 @@ serde_json = { workspace = true }
 annotations = []
 env_var = []
 labels = []
+cve_name = []
 
 [dev-dependencies]
 rstest = { workspace = true }
