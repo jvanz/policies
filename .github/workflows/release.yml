@@ -40,6 +40,13 @@ jobs:
           echo "policy_working_dir=$policy_working_dir" >> $GITHUB_OUTPUT
           echo "policy_version=$( echo ${{ github.ref_name }} | sed 's/\(.*\)\/\(.*\)$/\2/' | cut -c2- )" >> $GITHUB_OUTPUT
 
+          # Check for ArtifactHub metadata, to skip if none
+          if yq -e '.annotations."io.artifacthub.displayName"' $policy_working_dir/metadata.yml >/dev/null; then
+            echo "has_artifacthub_metadata=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_artifacthub_metadata=false" >> $GITHUB_OUTPUT
+          fi
+
   ci:
     uses: ./.github/workflows/reusable-ci.yaml
     needs: calculate-policy-from-tag
@@ -213,6 +220,7 @@ jobs:
             });
 
   push-artifacthub:
+    if: needs.calculate-policy-from-tag.outputs.has-artifacthub-metadata == 'true'
     needs: [calculate-policy-from-tag, release]
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the
