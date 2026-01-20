@@ -18,17 +18,64 @@
   ],
   "packageRules": [
     {
-      "description": "bundle dependencies updates together",
+      "description": "bundle Rust dependencies updates together",
+      "matchManagers": [
+        "cargo"
+      ],
       "matchUpdateTypes": [
         "patch",
         "minor",
         "major"
       ],
-      "groupName": "all dependencies updates",
-      "groupSlug": "all-updates",
-      "matchPackageNames": [
-        "*"
+      "groupName": "Rust dependencies",
+      "groupSlug": "rust-updates",
+      "semanticCommits": "enabled",
+      "semanticCommitType": "build"
+    },
+    {
+      "description": "bundle Go dependencies updates together",
+      "matchManagers": [
+        "gomod"
       ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor",
+        "major"
+      ],
+      "groupName": "Go dependencies",
+      "groupSlug": "go-updates",
+      "semanticCommits": "enabled",
+      "semanticCommitType": "build"
+    },
+    {
+      "description": "bundle GitHub Actions updates together",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor",
+        "major"
+      ],
+      "groupName": "GitHub Actions",
+      "groupSlug": "github-actions-updates",
+      "semanticCommits": "enabled",
+      "semanticCommitType": "build"
+    },
+    {
+      "description": "bundle other dependencies updates together",
+      "excludeManagers": [
+        "cargo",
+        "gomod",
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "patch",
+        "minor",
+        "major"
+      ],
+      "groupName": "other dependencies",
+      "groupSlug": "other-updates",
       "semanticCommits": "enabled",
       "semanticCommitType": "build"
     }
