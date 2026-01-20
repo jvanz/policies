@@ -61,23 +61,6 @@
       "groupSlug": "github-actions-updates",
       "semanticCommits": "enabled",
       "semanticCommitType": "build"
-    },
-    {
-      "description": "bundle other dependencies updates together",
-      "excludeManagers": [
-        "cargo",
-        "gomod",
-        "github-actions"
-      ],
-      "matchUpdateTypes": [
-        "patch",
-        "minor",
-        "major"
-      ],
-      "groupName": "other dependencies",
-      "groupSlug": "other-updates",
-      "semanticCommits": "enabled",
-      "semanticCommitType": "build"
     }
   ],
   "rebaseWhen": "behind-base-branch",
