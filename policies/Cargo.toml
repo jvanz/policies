@@ -29,6 +29,7 @@ members = [
   "priority-class-policy",
   "probes-policy",
   "psa-label-enforcer-policy",
+  "rancher-project-propagate-labels",
   "raw-validation-policy",
   "readonly-root-filesystem-psp-policy",
   "seccomp-psp-policy",
