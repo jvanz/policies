@@ -1,0 +1,48 @@
+{
+  "uid": "705ab4f5-6393-11e8-b7cc-42010a800002",
+  "kind": {
+    "group": "networking.k8s.io",
+    "version": "v1",
+    "kind": "Ingress"
+  },
+  "resource": {
+    "group": "networking.k8s.io",
+    "version": "v1",
+    "resource": "this-is-the-plural-name-of-the-resource-this-information-is-not-used-by-policies-and-requires-a-connection-to-an-api-server-to-be-obtained"
+  },
+  "requestKind": {
+    "group": "networking.k8s.io",
+    "version": "v1",
+    "kind": "Ingress"
+  },
+  "requestResource": {
+    "group": "networking.k8s.io",
+    "version": "v1",
+    "resource": "this-is-the-plural-name-of-the-resource-this-information-is-not-used-by-policies-and-requires-a-connection-to-an-api-server-to-be-obtained"
+  },
+  "name": "valid-ingress",
+  "operation": "CREATE",
+  "userInfo": {
+    "groups": [
+      "system:masters"
+    ],
+    "username": "test-user"
+  },
+  "object": {
+    "apiVersion": "networking.k8s.io/v1",
+    "kind": "Ingress",
+    "metadata": {
+      "name": "valid-ingress"
+    },
+    "spec": {
+      "defaultBackend": {
+        "service": {
+          "name": "test",
+          "port": {
+            "number": 80
+          }
+        }
+      }
+    }
+  }
+}

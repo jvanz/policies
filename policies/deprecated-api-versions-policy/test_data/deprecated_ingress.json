@@ -1,0 +1,44 @@
+{
+  "uid": "705ab4f5-6393-11e8-b7cc-42010a800002",
+  "kind": {
+    "group": "extensions",
+    "version": "v1beta1",
+    "kind": "Ingress"
+  },
+  "resource": {
+    "group": "extensions",
+    "version": "v1beta1",
+    "resource": "this-is-the-plural-name-of-the-resource-this-information-is-not-used-by-policies-and-requires-a-connection-to-an-api-server-to-be-obtained"
+  },
+  "requestKind": {
+    "group": "extensions",
+    "version": "v1beta1",
+    "kind": "Ingress"
+  },
+  "requestResource": {
+    "group": "extensions",
+    "version": "v1beta1",
+    "resource": "this-is-the-plural-name-of-the-resource-this-information-is-not-used-by-policies-and-requires-a-connection-to-an-api-server-to-be-obtained"
+  },
+  "name": "deprecated-ingress",
+  "operation": "CREATE",
+  "userInfo": {
+    "groups": [
+      "system:masters"
+    ],
+    "username": "test-user"
+  },
+  "object": {
+    "apiVersion": "extensions/v1beta1",
+    "kind": "Ingress",
+    "metadata": {
+      "name": "deprecated-ingress"
+    },
+    "spec": {
+      "backend": {
+        "serviceName": "test",
+        "servicePort": 80
+      }
+    }
+  }
+}
