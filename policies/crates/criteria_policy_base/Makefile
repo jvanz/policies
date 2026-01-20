@@ -10,14 +10,16 @@ fmt:
 
 .PHONY: lint
 lint:
-	cargo $(CARGO_GLOBAL_OPTIONS) clippy --no-default-features --features "annotations" -- -D warnings
+	@for feature in $$(cargo $(CARGO_GLOBAL_OPTIONS) read-manifest --manifest-path Cargo.toml | jq -r '.features | keys[]'); do \
+		cargo $(CARGO_GLOBAL_OPTIONS) clippy --no-default-features --features "$$feature" -- -D warnings; \
+	done
 
 .PHONY: check
 check:
 	@for feature in $$(cargo $(CARGO_GLOBAL_OPTIONS) read-manifest --manifest-path Cargo.toml | jq -r '.features | keys[]'); do \
 		cargo $(CARGO_GLOBAL_OPTIONS) check --no-default-features --features "$$feature"; \
 	done
-	
+
 .PHONY: typos
 typos:
 	# run typo checker from crate-ci/typos
@@ -25,7 +27,7 @@ typos:
 
 .PHONY: test
 test: fmt lint
-	cargo $(CARGO_GLOBAL_OPTIONS) test 
+	cargo $(CARGO_GLOBAL_OPTIONS) test
 
 .PHONY: clean
 clean:

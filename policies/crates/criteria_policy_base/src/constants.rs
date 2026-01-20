@@ -1,12 +1,18 @@
 use const_format::formatcp;
 
-#[cfg(not(any(feature = "env_var", feature = "labels", feature = "annotations", feature = "cve_name")))]
-compile_error!("At least one of the features: env_var, labels, annotations, or cve_name must be enabled.");
+#[cfg(not(any(
+    feature = "env_var",
+    feature = "labels",
+    feature = "annotations",
+    feature = "cve_name"
+)))]
+compile_error!(
+    "At least one of the features: env_var, labels, annotations, or cve_name must be enabled."
+);
 
 #[cfg(any(
     all(feature = "env_var", feature = "labels"),
     all(feature = "env_var", feature = "annotations"),
-    all(feature = "labels", feature = "annotations"),
     all(feature = "labels", feature = "annotations"),
     all(feature = "env_var", feature = "cve_name"),
     all(feature = "labels", feature = "cve_name"),
@@ -23,7 +29,6 @@ pub const RESOURCE_STR: &str = "label";
 pub const RESOURCE_STR: &str = "annotation";
 #[cfg(feature = "cve_name")]
 pub const RESOURCE_STR: &str = "CVE name";
-
 
 pub const CONTAINS_ANY_OF_ERROR_MSG: &str = formatcp!(
     "Resource must have at least one of the required {RESOURCE_STR}s specified by the validation rule. None of the expected {RESOURCE_STR}s were found:"
