@@ -13,6 +13,9 @@
     "enabled": true,
     "automerge": true
   },
+  "ignorePaths": [
+    "policies/kyverno-dsl-policy/go.mod"
+  ],
   "packageRules": [
     {
       "description": "bundle dependencies updates together",
