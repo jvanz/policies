@@ -274,7 +274,17 @@ jobs:
           VERSION=$(sed --posix -n 's,^version: \(.*\),\1,p' ${{ needs.calculate-policy-from-tag.outputs.policy-working-dir }}/artifacthub-pkg.yml)
           git commit -m "Bump ArtifactHub files for ${{ needs.calculate-policy-from-tag.outputs.policy-working-dir }}, version $VERSION"
 
-          git push origin artifacthub
+          # push can fail as several release jobs run simultaneuously and there's new changes.
+          # Retry in loop with pull fast-forward:
+          for i in {1..5}; do
+            git pull --ff-only origin artifacthub
+            if git push origin artifacthub; then
+              break
+            else
+              echo "Push failed, retrying in 5s..."
+              sleep 5
+            fi
+          done
 
   release-catalog:
     needs: [calculate-policy-from-tag, release]
