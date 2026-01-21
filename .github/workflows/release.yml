@@ -288,7 +288,7 @@ jobs:
           done
 
   release-catalog:
-    needs: [calculate-policy-from-tag, release, artifacthub-push]
+    needs: [calculate-policy-from-tag, release, push-artifacthub]
     uses: kubewarden/github-actions/.github/workflows/reusable-release-policy-catalog.yml@247608f0b5a1562a6fd2576e5b2e6cbe62551baf # v4.5.15
     with:
       policy-name: ${{ needs.calculate-policy-from-tag.outputs.policy-name }}
