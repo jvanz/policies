@@ -1411,7 +1411,7 @@ dependencies = [
 
 [[package]]
 name = "rancher-project-propagate-labels"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "anyhow",
  "k8s-openapi",
