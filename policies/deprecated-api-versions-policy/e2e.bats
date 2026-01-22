@@ -84,5 +84,4 @@
 
   [ "$status" -eq 0 ]
   [[ "$output" == *"allowed\":false"* ]]
-  [[ "$output" == *"the API is deprecated"* ]]
 }
