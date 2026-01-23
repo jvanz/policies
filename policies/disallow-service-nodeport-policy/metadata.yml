@@ -22,8 +22,8 @@ annotations:
   io.kubewarden.policy.title: disallow-service-nodeport
   io.kubewarden.policy.version: 0.1.9
   io.kubewarden.policy.description: A policy that prevents the creation of Service resources of type `NodePort`
-  io.kubewarden.policy.url: https://github.com/kubewarden/disallow-service-nodeport-policy
-  io.kubewarden.policy.source: https://github.com/kubewarden/disallow-service-nodeport-policy
+  io.kubewarden.policy.url: https://github.com/kubewarden/policies
+  io.kubewarden.policy.source: https://github.com/kubewarden/policies
   io.kubewarden.policy.license: Apache-2.0
   io.kubewarden.policy.category: Service
   io.kubewarden.policy.severity: high
