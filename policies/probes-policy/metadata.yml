@@ -11,8 +11,8 @@ annotations:
   io.artifacthub.displayName: Probes validator policy
   io.kubewarden.policy.description: This policy validates that all containers have livenessProbe and readinessProbe defined.
   io.kubewarden.policy.author: "Kubewarden developers <cncf-kubewarden-maintainers@lists.cncf.io>"
-  io.kubewarden.policy.url: https://github.com/kubewarden/probes-policy
-  io.kubewarden.policy.source: https://github.com/kubewarden/probes-policy
+  io.kubewarden.policy.url: https://github.com/kubewarden/policies
+  io.kubewarden.policy.source: https://github.com/kubewarden/policies
   io.kubewarden.policy.license: Apache-2.0
   io.kubewarden.policy.ociUrl: ghcr.io/kubewarden/policies/probes
   io.kubewarden.policy.version: 1.0.2

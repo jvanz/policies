@@ -20,8 +20,8 @@ annotations:
   io.kubewarden.policy.title: context-aware-policy
   io.kubewarden.policy.version: 0.1.10
   io.kubewarden.policy.description: A policy demonstrating context-aware policy features
-  io.kubewarden.policy.url: https://github.com/kubewarden/context-aware-demo
-  io.kubewarden.policy.source: https://github.com/kubewarden/context-aware-demo
+  io.kubewarden.policy.url: https://github.com/kubewarden/policies
+  io.kubewarden.policy.source: https://github.com/kubewarden/policies
   io.kubewarden.policy.author: Kubewarden developers <cncf-kubewarden-maintainers@lists.cncf.io>
   io.kubewarden.policy.license: Apache-2.0
   io.kubewarden.policy.category: demo
