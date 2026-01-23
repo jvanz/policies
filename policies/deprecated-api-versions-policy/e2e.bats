@@ -66,3 +66,22 @@
 }
 
 
+@test "accept valid ingress (from real manifest)" {
+  run kwctl run \
+    --request-path test_data/valid_ingress.json \
+    --settings-json '{"kubernetes_version": "1.25.0"}' \
+    annotated-policy.wasm
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"allowed\":true"* ]]
+}
+
+@test "reject deprecated ingress (from real manifest)" {
+  run kwctl run \
+    --request-path test_data/deprecated_ingress.json \
+    --settings-json '{"kubernetes_version": "1.25.0"}' \
+    annotated-policy.wasm
+
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"allowed\":false"* ]]
+}
