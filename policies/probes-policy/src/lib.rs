@@ -109,33 +109,30 @@ fn validate_container(
     container: &apicore::Container,
     settings: &Settings,
 ) -> Result<(), ProbeError> {
-    if container.liveness_probe.is_none() && settings.liveness.enforce {
+    if let Some(liveness_probe) = &container.liveness_probe {
+        if settings.liveness.enforce {
+            validate_probe(liveness_probe, &settings.liveness)?;
+        }
+    } else if settings.liveness.enforce {
         info!(
             LOG_DRAIN,
-            "rejecting pod";
+            "rejecting pod due to missing liveness probe";
             "container_name" => &container.name
         );
         return Err(ProbeError::MissingLivenessProbe(container.name.clone()));
     }
-    if container.liveness_probe.is_some() && settings.liveness.enforce {
-        validate_probe(
-            container.liveness_probe.as_ref().unwrap(),
-            &settings.liveness,
-        )?;
-    }
-    if container.readiness_probe.is_none() && settings.readiness.enforce {
+
+    if let Some(readiness_probe) = &container.readiness_probe {
+        if settings.readiness.enforce {
+            validate_probe(readiness_probe, &settings.readiness)?;
+        }
+    } else if settings.readiness.enforce {
         info!(
             LOG_DRAIN,
-            "rejecting pod";
+            "rejecting pod due to missing readiness probe";
             "container_name" => &container.name
         );
         return Err(ProbeError::MissingReadinessProbe(container.name.clone()));
-    }
-    if container.readiness_probe.is_some() && settings.readiness.enforce {
-        validate_probe(
-            container.readiness_probe.as_ref().unwrap(),
-            &settings.readiness,
-        )?;
     }
     Ok(())
 }
