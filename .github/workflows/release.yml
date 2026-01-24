@@ -16,7 +16,7 @@ jobs:
       policy-name: ${{ steps.calculate-vars.outputs.policy_name }}
       has-artifacthub-metadata: ${{ steps.calculate-vars.outputs.has_artifacthub_metadata }}
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - id: calculate-vars
         shell: bash
         run: |
@@ -60,7 +60,7 @@ jobs:
     needs: [calculate-policy-from-tag]
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Check that `io.kubewarden.policy.version` annotation is up-to-date
         shell: bash
@@ -85,7 +85,7 @@ jobs:
       id-token: write
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install dependencies
         uses: ./.github/actions/install-dependencies
@@ -160,7 +160,7 @@ jobs:
 
       - name: Create release
         id: create-release
-        uses: release-drafter/release-drafter@267d2e0268deae5d44f3ba5029dd4d6e85f9d52d # v6.1.1
+        uses: release-drafter/release-drafter@6db134d15f3909ccc9eefd369f02bd1e9cffdf97 # v6.2.0
         with:
           config-name: "release-drafter-${{ needs.calculate-policy-from-tag.outputs.policy-name }}.yml"
           disable-autolabeler: true
@@ -230,7 +230,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0 # fetch all history for all branches and tags
 
@@ -289,7 +289,7 @@ jobs:
 
   release-catalog:
     needs: [calculate-policy-from-tag, release, push-artifacthub]
-    uses: kubewarden/github-actions/.github/workflows/reusable-release-policy-catalog.yml@247608f0b5a1562a6fd2576e5b2e6cbe62551baf # v4.5.15
+    uses: kubewarden/github-actions/.github/workflows/reusable-release-policy-catalog.yml@f1695ca9a575bf58b85d6c3652c7ff7d1d12ec24 # v4.5.16
     with:
       policy-name: ${{ needs.calculate-policy-from-tag.outputs.policy-name }}
       policy-working-dir: ${{ needs.calculate-policy-from-tag.outputs.policy-working-dir }}
