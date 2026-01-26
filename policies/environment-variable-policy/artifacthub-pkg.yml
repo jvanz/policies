@@ -13,7 +13,7 @@ license: Apache-2.0
 homeURL: https://github.com/kubewarden/policies
 containersImages:
 - name: policy
-  image: ghcr.io/kubewarden/policies/environment-variable-policy:v3.0.4
+  image: ghcr.io/jvanz/policies/environment-variable-policy:v3.0.4
 keywords:
 - deployment
 - replicaset
