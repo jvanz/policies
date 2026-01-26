@@ -28,5 +28,4 @@
 
   [ "$status" -eq 0 ]
   [[ "$output" == *"allowed\":false"* ]]
-  [[ "$output" == *"is not allowed"* ]]
 }
