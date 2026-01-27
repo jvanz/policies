@@ -1,6 +1,6 @@
 [package]
 name = "rancher-project-propagate-labels"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Flavio Castelli <fcastelli@suse.com>"]
 edition = "2021"
 
