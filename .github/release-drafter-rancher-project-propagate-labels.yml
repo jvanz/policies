@@ -1,4 +1,4 @@
-_extends: policies:.github/release-drafter.yml
+_extends: policies:release-drafter.yml
 name-template: "rancher-project-propagate-labels/v$RESOLVED_VERSION"
 tag-template: "rancher-project-propagate-labels/v$RESOLVED_VERSION"
 tag-prefix: rancher-project-propagate-labels/v
