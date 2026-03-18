@@ -2,6 +2,7 @@
 [![Stable](https://img.shields.io/badge/status-stable-brightgreen?style=for-the-badge)](https://github.com/kubewarden/community/blob/main/REPOSITORIES.md#stable)
 
 # environment-variable-policy
+TESTESTE
 
 The environment-variable-policy can be used to inspect environment variables
 defined in the resources deployed in the cluster.
