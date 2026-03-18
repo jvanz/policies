@@ -174,13 +174,11 @@ jobs:
 
       - name: Create release
         id: create-release
-        uses: release-drafter/release-drafter@6db134d15f3909ccc9eefd369f02bd1e9cffdf97 # v6.2.0
+        uses: release-drafter/release-drafter@44a942e465867c7465b76aa808ddca6e0acae5da # v7.1.0
         with:
           config-name: "release-drafter-${{ needs.calculate-policy-from-tag.outputs.policy-name }}.yml"
-          disable-autolabeler: true
           prerelease: ${{ contains(needs.calculate-policy-from-tag.outputs.policy-version, '-alpha') || contains(needs.calculate-policy-from-tag.outputs.policy-version, '-beta') || contains(needs.calculate-policy-from-tag.outputs.policy-version, '-rc') }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload release assets
         if: ${{ ! startsWith(github.ref, 'refs/heads/') }}
