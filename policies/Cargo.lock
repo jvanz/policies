@@ -794,7 +794,7 @@ dependencies = [
 
 [[package]]
 name = "image-cve-policy"
-version = "0.5.8"
+version = "0.6.0"
 dependencies = [
  "anyhow",
  "cfg-if",
