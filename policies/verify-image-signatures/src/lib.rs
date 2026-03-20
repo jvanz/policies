@@ -359,23 +359,27 @@ where
                     container_image.as_str(),
                     s.pub_keys.clone(),
                     s.annotations.clone(),
-                ),
+                )
+                .map_err(|e| anyhow::Error::msg(e.to_string())),
                 Signature::Keyless(s) => verify_keyless_exact_match(
                     container_image.as_str(),
                     s.keyless.clone(),
                     s.annotations.clone(),
-                ),
+                )
+                .map_err(|e| anyhow::Error::msg(e.to_string())),
                 Signature::KeylessPrefix(s) => verify_keyless_prefix_match(
                     container_image.as_str(),
                     s.keyless_prefix.clone(),
                     s.annotations.clone(),
-                ),
+                )
+                .map_err(|e| anyhow::Error::msg(e.to_string())),
                 Signature::GithubActions(s) => verify_keyless_github_actions(
                     container_image.as_str(),
                     s.github_actions.owner.clone(),
                     s.github_actions.repo.clone(),
                     s.annotations.clone(),
-                ),
+                )
+                .map_err(|e| anyhow::Error::msg(e.to_string())),
                 Signature::Certificate(s) => {
                     let mut response: Result<VerificationResponse> =
                         Err(anyhow::anyhow!("Cannot verify"));
@@ -387,7 +391,8 @@ where
                             s.certificate_chain.clone(),
                             s.require_rekor_bundle,
                             s.annotations.clone(),
-                        );
+                        )
+                        .map_err(|e| anyhow::Error::msg(e.to_string()));
                         // All the certificates must be verified. As soon as one of
                         // them cannot be used to verify the image -> break from the
                         // loop and propagate the verification failure
