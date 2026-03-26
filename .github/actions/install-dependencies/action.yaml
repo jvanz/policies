@@ -28,7 +28,7 @@ runs:
   using: "composite"
   steps:
     - name: Install cosign
-      uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
+      uses: sigstore/cosign-installer@cad07c2e89fa2edd6e2d7bab4c1aa38e53f76003 # v4.1.1
     - name: Install kwctl
       shell: bash
       run: |
@@ -126,7 +126,7 @@ runs:
         chmod +x "$INSTALL_DIR"/semver
         echo "$INSTALL_DIR" >> "$GITHUB_PATH"
     - name: Install updatecli
-      uses: updatecli/updatecli-action@4fd2c16d992120bd5355264a03ad0cddec013e1b # v2.99.0
+      uses: updatecli/updatecli-action@4b17f4ea784de29f71f85f9bc4955402ba1ae53c # v2.100.0
     - name: Install OPA
       shell: bash
       run: |
