@@ -93,7 +93,7 @@ runs:
         SEMVER_VERSION="3.4.0"
         INSTALL_DIR="$HOME"/.semver
         mkdir -p "$INSTALL_DIR"
-        wget -O "$INSTALL_DIR"/semver https://github.com/fsaintjacques/semver-tool/raw/${SEMVER_VERSION}/src/semver
+        wget -O "$INSTALL_DIR"/semver https://github.com/fsaintjacques/semver-tool/raw/837ad91179c4126e3b7ff73c35091d5ef561d9a3/src/semver
         chmod +x "$INSTALL_DIR"/semver
         echo "$INSTALL_DIR" >> "$GITHUB_PATH"
     - name: Install updatecli

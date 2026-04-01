@@ -73,7 +73,7 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: Install cargo-set-version
-        run: cargo install cargo-edit@0.13.9
+        run: cargo install cargo-edit --version 0.13.9 --locked
 
       - name: Get policy metadata
         id: policy-info
