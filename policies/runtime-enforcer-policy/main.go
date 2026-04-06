@@ -17,6 +17,6 @@ var (
 func main() {
 	wapc.RegisterFunctions(wapc.Functions{
 		"validate":          validate,
-		"validate_settings": validateSettings,
+		"validate_settings": func(payload []byte) ([]byte, error) { return kubewarden.AcceptSettings() },
 	})
 }
