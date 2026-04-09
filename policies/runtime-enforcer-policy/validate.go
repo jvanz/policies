@@ -87,8 +87,8 @@ func validate(payload []byte) ([]byte, error) {
 		return kubewarden.RejectRequest(kubewarden.Message(err.Error()), kubewarden.Code(400))
 	}
 
-	wpName, ok := podLabels[PolicyLabelKey]
-	if !ok {
+	wpName, wpReferenced := podLabels[PolicyLabelKey]
+	if !wpReferenced {
 		return kubewarden.AcceptRequest()
 	}
 
