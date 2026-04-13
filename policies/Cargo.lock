@@ -541,7 +541,7 @@ dependencies = [
 
 [[package]]
 name = "flexvolume-drivers-psp"
-version = "1.0.14"
+version = "1.0.15"
 dependencies = [
  "k8s-openapi",
  "kubewarden-policy-sdk",
@@ -2099,7 +2099,7 @@ dependencies = [
 
 [[package]]
 name = "verify-image-signatures"
-version = "1.0.8"
+version = "1.0.9"
 dependencies = [
  "anyhow",
  "k8s-openapi",
