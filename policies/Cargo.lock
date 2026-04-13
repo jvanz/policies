@@ -541,7 +541,7 @@ dependencies = [
 
 [[package]]
 name = "flexvolume-drivers-psp"
-version = "1.0.14"
+version = "1.0.15"
 dependencies = [
  "k8s-openapi",
  "kubewarden-policy-sdk",
@@ -2010,7 +2010,7 @@ checksum = "ebc1c04c71510c7f702b52b7c350734c9ff1295c464a03335b00bb84fc54f853"
 
 [[package]]
 name = "unique-service-selector-policy"
-version = "1.0.10"
+version = "1.0.11"
 dependencies = [
  "k8s-openapi",
  "kubewarden-policy-sdk",
