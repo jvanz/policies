@@ -3,6 +3,7 @@
 @test "Accept a Deployment without policies specified" {
 	run kwctl run --allow-context-aware \
 		--raw -r test_data/deployment-no-policy.json \
+		--replay-host-capabilities-interactions test_data/replay-session-with-workload-policy.yml \
 		annotated-policy.wasm
 	[ "$status" -eq 0 ]
 	echo "$output"
