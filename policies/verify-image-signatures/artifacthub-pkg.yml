@@ -7,7 +7,7 @@
 version: 1.0.9
 name: verify-image-signatures
 displayName: Verify Image Signatures
-createdAt: 2026-04-13T17:59:11.080384687Z
+createdAt: 2026-04-14T11:54:47.6642796Z
 description: A Kubewarden Policy that verifies all the signatures of the container images referenced by a Pod
 license: Apache-2.0
 homeURL: https://github.com/kubewarden/policies
