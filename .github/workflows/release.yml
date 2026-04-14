@@ -15,6 +15,7 @@ jobs:
       policy-id: ${{ steps.calculate-vars.outputs.policy_id }}
       policy-name: ${{ steps.calculate-vars.outputs.policy_name }}
       has-artifacthub-metadata: ${{ steps.calculate-vars.outputs.has_artifacthub_metadata }}
+      skip-publishing: ${{ steps.calculate-vars.outputs.skip_publishing }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - id: calculate-vars
@@ -47,6 +48,28 @@ jobs:
           else
             echo "has_artifacthub_metadata=false" >> $GITHUB_OUTPUT
           fi
+
+          # Policies that should not be published to ArtifactHub or the policy-catalog.
+          # They still receive a GitHub Release and OCI package.
+          # This list is derived from policies absent in the artifacthub branch.
+          EXCLUDED_FROM_PUBLISHING=(
+            "context-aware-demo"
+            "go-wasi-context-aware-test-policy"
+            "raw-mutation-policy"
+            "raw-mutation-wasi-policy"
+            "raw-validation-opa-policy"
+            "raw-validation-policy"
+            "raw-validation-wasi-policy"
+            "sleeping-policy"
+          )
+          skip_publishing=false
+          for excluded in "${EXCLUDED_FROM_PUBLISHING[@]}"; do
+            if [ "$policy_name" == "$excluded" ]; then
+              skip_publishing=true
+              break
+            fi
+          done
+          echo "skip_publishing=$skip_publishing" >> $GITHUB_OUTPUT
 
   ci:
     uses: ./.github/workflows/reusable-ci.yaml
@@ -233,7 +256,9 @@ jobs:
             });
 
   push-artifacthub:
-    if: needs.calculate-policy-from-tag.outputs.has-artifacthub-metadata == 'true'
+    if: |
+      needs.calculate-policy-from-tag.outputs.has-artifacthub-metadata == 'true' &&
+      needs.calculate-policy-from-tag.outputs.skip-publishing != 'true'
     needs: [calculate-policy-from-tag, release]
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the
@@ -300,18 +325,21 @@ jobs:
           git commit -m "Bump ArtifactHub files for ${{ needs.calculate-policy-from-tag.outputs.policy-working-dir }}, version $VERSION"
 
           # push can fail as several release jobs run simultaneuously and there's new changes.
-          # Retry in loop with pull fast-forward:
+          # Retry in loop with rebase to replay our commit on top of any concurrent pushes:
           for i in {1..5}; do
-            git pull --ff-only origin artifacthub
+            git pull --rebase origin artifacthub
             if git push origin artifacthub; then
               break
             else
               echo "Push failed, retrying in 5s..."
               sleep 5
             fi
-          done
+          done || { echo "Failed to push to artifacthub branch after 5 retries"; exit 1; }
 
   release-catalog:
+    if: |
+      github.repository_owner == 'kubewarden' &&
+      needs.calculate-policy-from-tag.outputs.skip-publishing != 'true'
     needs: [calculate-policy-from-tag, release, push-artifacthub]
     uses: kubewarden/github-actions/.github/workflows/reusable-release-policy-catalog.yml@0f1672d63bd3572f204917d68390d87f7430069a # v5.0.0
     with:
