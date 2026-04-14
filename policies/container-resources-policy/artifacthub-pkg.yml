@@ -7,7 +7,7 @@
 version: 1.3.4
 name: container-resources
 displayName: Container Resources
-createdAt: 2026-04-13T17:57:49.911543776Z
+createdAt: 2026-04-14T11:52:12.633171506Z
 description: Policy is designed to enforce constraints on the resource requirements of Kubernetes containers
 license: Apache-2.0
 homeURL: https://github.com/kubewarden/policies
