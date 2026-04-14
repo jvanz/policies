@@ -25,21 +25,22 @@ jobs:
     outputs:
       policy_working_dirs: ${{ steps.calculate-policy-working-dirs.outputs.policy_working_dirs }}
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          fetch-depth: 0 # checkout all history to do git diff
       - name: calculate which policies need a CI job
         id: calculate-policy-working-dirs
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           if [ "${{github.event_name}}" == "workflow_dispatch" ]; then
             dir_bash_array=("${{ inputs.policy-working-dir }}")
           else
-            git remote -v
-            # list only changes of files in `policies/`:
-            # We compare base and head references to avoid detecting changes merged to close each other.
-            # Otherwise, a job to tag the same policy could be triggered twice.
-            git_files="$(git diff --no-color --find-renames --find-copies --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} -- policies)"
+            # Use the GitHub API to get the exact list of files changed in this
+            # PR. This is more reliable than git diff because it uses GitHub's
+            # own record of what changed, which is independent of the local git
+            # state, merge strategy (squash/rebase), and concurrent job race
+            # conditions.
+            git_files="$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
+              --paginate --jq '.[].filename' | grep '^policies/')"
 
             # build policy_working_dirs:
             dir_bash_array=($(echo "$git_files" | cut -d/ -f1,2 ))
