@@ -7,7 +7,7 @@
 version: 1.0.13
 name: seccomp-psp
 displayName: Seccomp PSP
-createdAt: 2026-04-13T18:02:00.828520438Z
+createdAt: 2026-04-14T11:57:09.635239672Z
 description: Pod Security Policy that controls usage of Seccomp profile
 license: Apache-2.0
 homeURL: https://github.com/kubewarden/policies
