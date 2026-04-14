@@ -7,7 +7,7 @@
 version: 1.0.12
 name: sysctl-psp
 displayName: Sysctl PSP
-createdAt: 2026-04-13T18:00:07.021905852Z
+createdAt: 2026-04-14T11:57:05.186926375Z
 description: A Pod Security Policy that controls usage of sysctls in pods
 license: Apache-2.0
 homeURL: https://github.com/kubewarden/policies
