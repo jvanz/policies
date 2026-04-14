@@ -7,7 +7,7 @@
 version: 1.0.11
 name: unique-service-selector-policy
 displayName: Unique service selector
-createdAt: 2026-04-13T17:59:42.534442315Z
+createdAt: 2026-04-14T11:55:14.533294251Z
 description: Policy validates that there are no services with the same set of selectors
 license: Apache-2.0
 homeURL: https://github.com/kubewarden/policies
