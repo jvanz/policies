@@ -1,4 +1,6 @@
 on:
+  schedule:
+    - cron: "30 3 12 * *" # At 03:30 on day-of-month 12
   workflow_dispatch:
     inputs:
       policy-working-dir:
@@ -33,9 +35,14 @@ jobs:
         shell: bash
         run: |
           if [ -z "${{inputs.policy-working-dir}}" ]; then
-            # All policies must be released
+            # All policies must be released (scheduled run or workflow_dispatch with no specific policy)
             git remote -v
             policies_working_dirs=($(find policies -maxdepth 2 -name Makefile -exec dirname '{}' \;))
+
+            declare -p policies_working_dirs # for debug
+            policy_working_dirs=$(jq --compact-output --null-input \
+              '$ARGS.positional | unique' \
+              --args -- "${policies_working_dirs[@]}")
           else
             policy_working_dir=policies/${{ inputs.policy-working-dir }}
             if [ ! -d "$policy_working_dir" ]; then
@@ -43,12 +50,13 @@ jobs:
               echo "::error title=Invalid inputs::$policy_working_dir does not exist"
               exit 1;
             fi
-            # Release a single policy
+            # Release a single policy 
             policies_working_dirs=("policies/${{ inputs.policy-working-dir }}")
+            declare -p policies_working_dirs # for debug
+            policy_working_dirs=$(jq --compact-output --null-input '$ARGS.positional | unique' --args -- "${policies_working_dirs[@]}")
           fi
 
-          declare -p policies_working_dirs # for debug
-          policy_working_dirs=$(jq --compact-output --null-input '$ARGS.positional | unique' --args -- "${policies_working_dirs[@]}")
+          echo "policy_working_dirs=$policy_working_dirs"
           echo "policy_working_dirs=$policy_working_dirs" >> $GITHUB_OUTPUT
 
   open-release-pr:
@@ -56,6 +64,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: calculate-policy-matrix
     strategy:
+      fail-fast: false
+      # limit the number of jobs to avoid rate limits errors from Github API
+      max-parallel: 5
       matrix:
         policy-working-dir: ${{ fromJSON(needs.calculate-policy-matrix.outputs.policy_working_dirs) }}
     steps:
