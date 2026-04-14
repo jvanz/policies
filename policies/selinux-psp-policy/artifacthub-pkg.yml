@@ -7,7 +7,7 @@
 version: 1.0.9
 name: selinux-psp
 displayName: Selinux PSP
-createdAt: 2026-04-13T18:01:18.298615127Z
+createdAt: 2026-04-14T11:58:41.214743848Z
 description: Replacement for the Kubernetes Pod Security Policy that controls the usage of SELinux
 license: Apache-2.0
 homeURL: https://github.com/kubewarden/policies
