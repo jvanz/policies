@@ -65,11 +65,3 @@ subjects:
     namespace: kubewarden
 ```
 
-This is a context aware policy, hence it can be deployed only as a
-`ClusterAdmissionPolicy`.
-
-Use the following command to scaffold the policy:
-
-```console
-kwctl scaffold manifest --type ClusterAdmissionPolicy --allow-context-aware <policy name>
-```
