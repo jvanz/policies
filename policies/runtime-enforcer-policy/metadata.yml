@@ -43,7 +43,7 @@ executionMode: kubewarden-wapc
 backgroundAudit: true
 annotations:
   # artifacthub specific:
-  io.artifacthub.displayName: Runtime Enforcer
+  io.artifacthub.displayName: WorkloadPolicy config verifier
   io.artifacthub.resources: Pod, Deployments, Replicaset, Statefulset, Daemonset, Job, Cronjob
   io.artifacthub.keywords: deployment, replicaset, statefulset, daemonset, job, cronjob, pod, runtime-enforcer
   io.kubewarden.policy.ociUrl: ghcr.io/kubewarden/policies/runtime-enforcer # must match release workflow oci-target
