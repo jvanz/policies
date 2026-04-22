@@ -14,7 +14,7 @@ Example:
 kind: Namespace
 metadata:
   labels:
-    admission.kubewarden.io/policy-server: <desired-PolicyServer>`
+    admission.kubewarden.io/policy-server: <desired-PolicyServer>
 ```
 
 Namespaces with the label will get any `AdmissionPolicy`/
@@ -35,9 +35,9 @@ This policy has no required settings.
 apiVersion: policies.kubewarden.io/v1
 kind: ClusterAdmissionPolicy
 metadata:
-  name: ns-to-policyserver
+  name: ns-policyserver-mapper
 spec:
-  module: registry://ghcr.io/kubewarden/policies/ns-to-policyserver:v0.1.0
+  module: registry://ghcr.io/kubewarden/policies/ns-policyserver-mapper:v0.1.0
   mode: protect
   mutating: true
   rules:
