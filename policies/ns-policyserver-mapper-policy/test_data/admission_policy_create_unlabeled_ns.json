@@ -1,0 +1,46 @@
+{
+  "uid": "cccccccc-dddd-eeee-ffff-000000000000",
+  "kind": {
+    "group": "policies.kubewarden.io",
+    "kind": "AdmissionPolicy",
+    "version": "v1"
+  },
+  "resource": {
+    "group": "policies.kubewarden.io",
+    "version": "v1",
+    "resource": "admissionpolicies"
+  },
+  "namespace": "unlabeled-ns",
+  "object": {
+    "apiVersion": "policies.kubewarden.io/v1",
+    "kind": "AdmissionPolicy",
+    "metadata": {
+      "name": "my-policy",
+      "namespace": "unlabeled-ns"
+    },
+    "spec": {
+      "policyServer": "default",
+      "module": "registry://ghcr.io/kubewarden/policies/pod-privileged:v0.2.7",
+      "rules": [
+        {
+          "apiGroups": [""],
+          "apiVersions": ["v1"],
+          "resources": ["pods"],
+          "operations": ["CREATE"]
+        }
+      ],
+      "mutating": false
+    }
+  },
+  "operation": "CREATE",
+  "requestKind": {
+    "group": "policies.kubewarden.io",
+    "version": "v1",
+    "kind": "AdmissionPolicy"
+  },
+  "userInfo": {
+    "username": "alice",
+    "uid": "alice-uid",
+    "groups": ["system:authenticated"]
+  }
+}

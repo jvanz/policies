@@ -1,0 +1,52 @@
+{
+  "uid": "bbbbbbbb-cccc-dddd-eeee-ffffffffffff",
+  "kind": {
+    "group": "policies.kubewarden.io",
+    "kind": "AdmissionPolicyGroup",
+    "version": "v1"
+  },
+  "resource": {
+    "group": "policies.kubewarden.io",
+    "version": "v1",
+    "resource": "admissionpolicygroups"
+  },
+  "namespace": "team-a",
+  "object": {
+    "apiVersion": "policies.kubewarden.io/v1",
+    "kind": "AdmissionPolicyGroup",
+    "metadata": {
+      "name": "my-policy-group",
+      "namespace": "team-a"
+    },
+    "spec": {
+      "policyServer": "default",
+      "policies": {
+        "check_images": {
+          "module": "registry://ghcr.io/kubewarden/policies/verify-image-signatures:v0.2.8",
+          "settings": {}
+        }
+      },
+      "rules": [
+        {
+          "apiGroups": [""],
+          "apiVersions": ["v1"],
+          "resources": ["pods"],
+          "operations": ["CREATE"]
+        }
+      ],
+      "expression": "check_images()",
+      "message": "Image verification failed."
+    }
+  },
+  "operation": "CREATE",
+  "requestKind": {
+    "group": "policies.kubewarden.io",
+    "version": "v1",
+    "kind": "AdmissionPolicyGroup"
+  },
+  "userInfo": {
+    "username": "alice",
+    "uid": "alice-uid",
+    "groups": ["system:authenticated"]
+  }
+}

@@ -22,6 +22,7 @@ members = [
   "host-namespaces-psp-policy",
   "image-cve-policy",
   "labels-policy",
+  "ns-policyserver-mapper-policy",
   "persistentvolumeclaim-storageclass-policy",
   "pod-ndots-policy",
   "pod-privileged-policy",
