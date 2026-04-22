@@ -51,7 +51,13 @@ fn validate(payload: &[u8]) -> CallResult {
     match policy_server {
         Some(ps) => {
             let mut object = validation_request.request.object.clone();
-            object["spec"]["policyServer"] = serde_json::Value::String(ps);
+            let spec = object
+                .get_mut("spec")
+                .and_then(|v| v.as_object_mut())
+                .ok_or_else(|| {
+                    anyhow::anyhow!("object has no 'spec' field or it is not a map")
+                })?;
+            spec.insert("policyServer".to_string(), serde_json::Value::String(ps));
             kubewarden::mutate_request(object)
         }
         None => kubewarden::reject_request(
@@ -162,6 +168,137 @@ mod tests {
         let vr: ValidationResponse = serde_json::from_slice(&response.unwrap()).unwrap();
         assert!(!vr.accepted);
         assert!(vr.message.unwrap_or_default().contains(POLICY_SERVER_LABEL));
+    }
+
+    #[test]
+    #[serial]
+    fn errors_when_object_has_no_spec() {
+        let namespace_name = "team-a";
+        let expected_ps = "policyserver-team-a";
+
+        let ns = make_namespace(
+            namespace_name,
+            Some(BTreeMap::from([(
+                POLICY_SERVER_LABEL.to_string(),
+                expected_ps.to_string(),
+            )])),
+        );
+
+        let ctx = mock_kubernetes_sdk::get_resource_context();
+        ctx.expect::<Namespace>()
+            .times(1)
+            .returning(move |_| Ok(ns.clone()));
+
+        // Build a payload whose object has no "spec" field
+        let object = json!({
+            "apiVersion": "policies.kubewarden.io/v1",
+            "kind": "AdmissionPolicy",
+            "metadata": { "name": "test-policy", "namespace": namespace_name },
+        });
+        let request = KubernetesAdmissionRequest {
+            namespace: namespace_name.to_string(),
+            object,
+            ..Default::default()
+        };
+        let vr = ValidationRequest::<Settings> {
+            settings: Settings::default(),
+            request,
+        };
+        let payload = serde_json::to_string(&vr).unwrap();
+
+        let response = validate(payload.as_bytes());
+        assert!(response.is_err(), "expected an error when spec is missing");
+    }
+
+    #[test]
+    #[serial]
+    fn mutates_policy_server_when_spec_exists_but_has_no_policy_server_field() {
+        let namespace_name = "team-a";
+        let expected_ps = "policyserver-team-a";
+
+        let ns = make_namespace(
+            namespace_name,
+            Some(BTreeMap::from([(
+                POLICY_SERVER_LABEL.to_string(),
+                expected_ps.to_string(),
+            )])),
+        );
+
+        let ctx = mock_kubernetes_sdk::get_resource_context();
+        ctx.expect::<Namespace>()
+            .times(1)
+            .returning(move |_| Ok(ns.clone()));
+
+        // Build a payload whose "spec" exists but has no "policyServer" key
+        let object = json!({
+            "apiVersion": "policies.kubewarden.io/v1",
+            "kind": "AdmissionPolicy",
+            "metadata": { "name": "test-policy", "namespace": namespace_name },
+            "spec": { "module": "registry://some-module" },
+        });
+        let request = KubernetesAdmissionRequest {
+            namespace: namespace_name.to_string(),
+            object,
+            ..Default::default()
+        };
+        let vr = ValidationRequest::<Settings> {
+            settings: Settings::default(),
+            request,
+        };
+        let payload = serde_json::to_string(&vr).unwrap();
+
+        let response = validate(payload.as_bytes());
+        assert!(response.is_ok());
+        let vr: ValidationResponse = serde_json::from_slice(&response.unwrap()).unwrap();
+        assert!(vr.accepted);
+        let mutated = vr.mutated_object.expect("should have mutated object");
+        assert_eq!(mutated["spec"]["policyServer"], expected_ps);
+        // pre-existing spec fields should be preserved
+        assert_eq!(mutated["spec"]["module"], "registry://some-module");
+    }
+
+    #[test]
+    #[serial]
+    fn errors_when_object_spec_is_not_a_map() {
+        let namespace_name = "team-a";
+        let expected_ps = "policyserver-team-a";
+
+        let ns = make_namespace(
+            namespace_name,
+            Some(BTreeMap::from([(
+                POLICY_SERVER_LABEL.to_string(),
+                expected_ps.to_string(),
+            )])),
+        );
+
+        let ctx = mock_kubernetes_sdk::get_resource_context();
+        ctx.expect::<Namespace>()
+            .times(1)
+            .returning(move |_| Ok(ns.clone()));
+
+        // Build a payload whose "spec" is a scalar, not a map
+        let object = json!({
+            "apiVersion": "policies.kubewarden.io/v1",
+            "kind": "AdmissionPolicy",
+            "metadata": { "name": "test-policy", "namespace": namespace_name },
+            "spec": "not-a-map",
+        });
+        let request = KubernetesAdmissionRequest {
+            namespace: namespace_name.to_string(),
+            object,
+            ..Default::default()
+        };
+        let vr = ValidationRequest::<Settings> {
+            settings: Settings::default(),
+            request,
+        };
+        let payload = serde_json::to_string(&vr).unwrap();
+
+        let response = validate(payload.as_bytes());
+        assert!(
+            response.is_err(),
+            "expected an error when spec is not a map"
+        );
     }
 
     #[test]
