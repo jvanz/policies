@@ -16,6 +16,11 @@ contextAwareResources:
   - apiVersion: v1
     kind: Namespace
 annotations:
+  # artifacthub specific
+  io.artifacthub.displayName: Namespace to PolicyServer mapper
+  io.artifacthub.resources: AdmissionPolicy,AdmissionPolicyGroup
+  io.artifacthub.keywords: namespace, policies, policyserver, admissionpolicy, admissionpolicygroup
+  # kubewarden specific
   io.kubewarden.policy.ociUrl: ghcr.io/kubewarden/policies/ns-policyserver-mapper
   io.kubewarden.policy.title: ns-policyserver-mapper
   io.kubewarden.policy.version: 0.1.0
