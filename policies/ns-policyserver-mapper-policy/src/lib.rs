@@ -54,9 +54,7 @@ fn validate(payload: &[u8]) -> CallResult {
             let spec = object
                 .get_mut("spec")
                 .and_then(|v| v.as_object_mut())
-                .ok_or_else(|| {
-                    anyhow::anyhow!("object has no 'spec' field or it is not a map")
-                })?;
+                .ok_or_else(|| anyhow::anyhow!("object has no 'spec' field or it is not a map"))?;
             spec.insert("policyServer".to_string(), serde_json::Value::String(ps));
             kubewarden::mutate_request(object)
         }
