@@ -20,5 +20,5 @@ require (
 
 replace (
 	github.com/go-openapi/strfmt => github.com/kubewarden/strfmt v0.1.3
-	github.com/rancher-sandbox/runtime-enforcer => github.com/holyspectral/runtime-enforcer v0.0.0-20260331010021-7be1fade743a
+	github.com/rancher-sandbox/runtime-enforcer => github.com/holyspectral/runtime-enforcer v0.13.0
 )
