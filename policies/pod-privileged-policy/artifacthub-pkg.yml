@@ -7,23 +7,23 @@
 version: 1.0.11
 name: pod-privileged-policy
 displayName: Pod Privileged Policy
-createdAt: 2026-04-13T19:31:48.037773315Z
+createdAt: 2026-05-11T18:04:55.480262007Z
 description: Limit the ability to create privileged containers
 license: Apache-2.0
 homeURL: https://github.com/kubewarden/policies
 containersImages:
-  - name: policy
-    image: ghcr.io/kubewarden/policies/pod-privileged:v1.0.11
+- name: policy
+  image: ghcr.io/kubewarden/policies/pod-privileged:v1.0.11
 keywords:
-  - psp
-  - pod
-  - container
-  - privileged
+- psp
+- pod
+- container
+- privileged
 links:
-  - name: policy
-    url: https://github.com/kubewarden/policies/releases/download/pod-privileged-policy/v1.0.11/policy.wasm
-  - name: source
-    url: https://github.com/kubewarden/policies
+- name: policy
+  url: https://github.com/kubewarden/policies/releases/download/pod-privileged-policy%2Fv1.0.11/policy.wasm
+- name: source
+  url: https://github.com/kubewarden/policies
 install: |
   The policy can be obtained using [`kwctl`](https://github.com/kubewarden/kwctl):
   ```console
@@ -34,12 +34,12 @@ install: |
   kwctl scaffold manifest -t ClusterAdmissionPolicy registry://ghcr.io/kubewarden/policies/pod-privileged:v1.0.11
   ```
 maintainers:
-  - name: Kubewarden developers
-    email: cncf-kubewarden-maintainers@lists.cncf.io
+- name: Kubewarden developers
+  email: cncf-kubewarden-maintainers@lists.cncf.io
 provider:
   name: kubewarden
 recommendations:
-  - url: https://artifacthub.io/packages/helm/kubewarden/kubewarden-controller
+- url: https://artifacthub.io/packages/helm/kubewarden/kubewarden-controller
 annotations:
   kubewarden/mutation: 'false'
   kubewarden/questions-ui: |
