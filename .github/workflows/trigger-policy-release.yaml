@@ -27,7 +27,7 @@ jobs:
     outputs:
       policy_working_dirs: ${{ steps.calculate-policy-dirs.outputs.policy_working_dirs }}
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           fetch-depth: 0 # checkout all history to do git diff
       - name: calculate which policies need a CI job
@@ -70,14 +70,14 @@ jobs:
       matrix:
         policy-working-dir: ${{ fromJSON(needs.calculate-policy-matrix.outputs.policy_working_dirs) }}
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           fetch-depth: 0
 
       - name: Install dependencies
         uses: ./.github/actions/install-dependencies
 
-      - uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: generate-token
         with:
           app-id: ${{ secrets.APP_ID }}
@@ -121,7 +121,7 @@ jobs:
 
       - name: Create draft release and calculate version
         id: create-release
-        uses: release-drafter/release-drafter@c2e2804cc59f45f57076a99af580d0fedb697927 # v7.3.0
+        uses: release-drafter/release-drafter@693d20e7c1ce1a81d3a41962f85914253b518449 # v7.3.1
         with:
           config-name: "release-drafter-${{ steps.policy-info.outputs.policy-basename }}.yml"
           version: ${{ steps.get-expected-version.outputs.version}}
