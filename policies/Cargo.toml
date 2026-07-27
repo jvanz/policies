@@ -59,7 +59,7 @@ regex = "1"
 rstest = "0.26.0"
 lazy_static = "1.5"
 mockall = "0.15"
-serial_test = "3.2"
+serial_test = "4.0"
 slog = "2.7"
 test_helpers = { path = "crates/test_helpers" }
 thiserror = "2.0.17"
