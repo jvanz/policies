@@ -12,7 +12,7 @@ anyhow = { workspace = true }
 k8s-openapi = { workspace = true }
 kubewarden-policy-sdk = { workspace = true }
 lazy_static = { workspace = true }
-pem = "3.0.4"
+pem = "4.0.0"
 serde = { features = ["derive"], workspace = true }
 serde_json = { workspace = true }
 slog = { workspace = true }
