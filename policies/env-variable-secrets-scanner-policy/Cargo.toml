@@ -12,6 +12,6 @@ base64 = "0.23.0"
 encoding = "0.2.33"
 k8s-openapi = { workspace = true }
 kubewarden-policy-sdk = { workspace = true }
-rusty_hog_scanner = { rev = "d65f94bd6b18324b089e9b1dcb63e9a5cc00307e", git = "https://github.com/newrelic/rusty-hog/" }
+rusty_hog_scanner = { rev = "9da595ad204f017cff576ffac5bce7f2bed1be2f", git = "https://github.com/newrelic/rusty-hog/" }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
