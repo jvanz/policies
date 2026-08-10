@@ -1672,7 +1672,7 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 [[package]]
 name = "rusty_hog_scanner"
 version = "0.1.0"
-source = "git+https://github.com/newrelic/rusty-hog/?rev=d65f94bd6b18324b089e9b1dcb63e9a5cc00307e#d65f94bd6b18324b089e9b1dcb63e9a5cc00307e"
+source = "git+https://github.com/newrelic/rusty-hog/?rev=9da595ad204f017cff576ffac5bce7f2bed1be2f#9da595ad204f017cff576ffac5bce7f2bed1be2f"
 dependencies = [
  "anyhow",
  "base64 0.21.7",
