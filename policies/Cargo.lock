@@ -616,7 +616,7 @@ dependencies = [
 
 [[package]]
 name = "flexvolume-drivers-psp"
-version = "1.0.16"
+version = "1.0.17"
 dependencies = [
  "k8s-openapi",
  "kubewarden-policy-sdk",
