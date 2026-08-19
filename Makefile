@@ -1,4 +1,11 @@
-.PHONY: clean annotated-policy.wasm test test-rust test-go lint lint-rust lint-go e2e-tests e2e-tests-rust e2e-tests-go
+.PHONY: clean annotated-policy.wasm test test-rust test-go lint lint-rust lint-go e2e-tests e2e-tests-rust e2e-tests-go hauler-values
+
+# Owner and repository used to generate the Hauler manifest Updatecli
+# values (see hack/generate-hauler-values.sh). Overridden by
+# update-hauler-manifest.yaml's workflow so the same automation works
+# unmodified on a fork.
+HAULER_OWNER ?= kubewarden
+HAULER_REPO ?= policies
 
 # Helper function to run a target across all policies (excluding crates/) with summary
 define run-policy-target
@@ -128,3 +135,7 @@ e2e-tests-rust:
 
 e2e-tests-go:
 	$(call run-go-policy-target,e2e-tests)
+
+hauler-values:
+	./hack/generate-hauler-values.sh --owner $(HAULER_OWNER) --repo $(HAULER_REPO) \
+		--output updatecli/values/hauler-manifest.generated.yaml
