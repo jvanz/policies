@@ -1,0 +1,567 @@
+# This is the main pipeline for the "hauler/manifest" policy.
+#
+# It reconciles a Hauler content manifest (a multi-document YAML file using
+# apiVersion `content.hauler.cattle.io/v1`, kinds `Images` / `Charts` /
+# `Files`) against a declarative list of desired documents/items provided
+# through values. It is generic: it does not hardcode any repository- or
+# project-specific data. See ../README.md for the values contract.
+#
+# Requires `yq` (https://github.com/mikefarah/yq, v4) and `jq` on the runner.
+
+name: "Reconcile Hauler manifest {{ .hauler.file }}"
+
+# Minimum Updatecli version this policy has been tested against. Earlier
+# versions may not correctly handle the `source "literal-id"`
+# deferred-resolution pattern this policy relies on (see README.md
+# "How it works").
+version: v0.109.0
+
+# {{ if .pipelineid }}
+pipelineid: "{{ .pipelineid }}"
+# {{ end }}
+
+conditions:
+  yq:
+    name: "Check yq is installed"
+    kind: shell
+    disablesourceinput: true
+    spec:
+      command: "yq --version"
+  jq:
+    name: "Check jq is installed"
+    kind: shell
+    disablesourceinput: true
+    spec:
+      command: "jq --version"
+
+sources:
+  # {{ range $id, $v := .versions }}
+  "version/{{ $id }}":
+    name: "Get version for {{ $id }}"
+    # {{ if eq $v.kind "dockerimage" }}
+    kind: "dockerimage"
+    spec:
+      image: "{{ $v.image }}"
+      # {{ if $v.versionfilter }}
+      versionfilter:
+        kind: "{{ $v.versionfilter.kind }}"
+        # {{ if $v.versionfilter.pattern }}
+        pattern: "{{ $v.versionfilter.pattern }}"
+        # {{ end }}
+      # {{ end }}
+    # {{ else if eq $v.kind "helmchart" }}
+    kind: "helmchart"
+    spec:
+      url: "{{ $v.url }}"
+      name: "{{ $v.name }}"
+    # {{ else if eq $v.kind "githubrelease" }}
+    kind: "githubrelease"
+    spec:
+      owner: "{{ $v.owner }}"
+      repository: "{{ $v.repository }}"
+      # {{ if $v.token }}
+      token: "{{ $v.token }}"
+      # {{ end }}
+      # {{ if $v.key }}
+      key: "{{ $v.key }}"
+      # {{ end }}
+      # {{ if $v.versionfilter }}
+      versionfilter:
+        kind: "{{ $v.versionfilter.kind }}"
+        # {{ if $v.versionfilter.pattern }}
+        pattern: "{{ $v.versionfilter.pattern }}"
+        # {{ end }}
+      # {{ end }}
+    # {{ else if eq $v.kind "shell" }}
+    kind: "shell"
+    spec:
+      command: "{{ $v.command }}"
+    # {{ else }}
+    kind: "yaml"
+    spec:
+      # {{ if $v.engine }}
+      engine: "{{ $v.engine }}"
+      # {{ end }}
+      # {{ if $v.file }}
+      file: "{{ $v.file }}"
+      # {{ else if $v.fileVersionFrom }}
+      file: '{{ $v.filePrefix }}{{"{{"}} source "{{ printf "version/%s" $v.fileVersionFrom }}" {{"}}"}}{{ $v.fileSuffix }}'
+      # {{ end }}
+      key: "{{ $v.key }}"
+    # {{ end }}
+    # {{ if $v.trimQuotes }}
+    transformers:
+      - trimprefix: '"'
+      - trimsuffix: '"'
+    # {{ end }}
+  # {{ end }}
+
+targets:
+  hauler:
+    name: "Reconcile {{ .hauler.file }}"
+    kind: "shell"
+    disablesourceinput: true
+    # {{ if .scm.enabled }}
+    scmid: "default"
+    # {{ end }}
+    dependson:
+      - "condition#yq"
+      - "condition#jq"
+      # {{ range $id, $v := .versions }}
+      - '{{ printf "source#version/%s" $id }}'
+      # {{ end }}
+    spec:
+      shell: "/usr/bin/env bash"
+      # Updatecli always sets the DRY_RUN environment variable for shell
+      # targets ("true" for `diff`, "false" for `apply`), regardless of the
+      # environments allowlist below. The script reconciles a scratch copy
+      # of the file and only writes it back when DRY_RUN is not "true", so a
+      # `diff` never mutates the manifest. `exitcode` is used instead of
+      # `file/checksum` so that a no-op `diff` (nothing would change) can
+      # still report success without a change on disk to hash.
+      changedif:
+        kind: "exitcode"
+        spec:
+          success: 0
+          warning: 2
+          failure: 1
+      command: |
+        set -euo pipefail
+
+        FILE={{ .hauler.file | quote }}
+        CREATE_FILE={{ if .hauler.createIfMissing }}true{{ else }}false{{ end }}
+        RAW_STATE_FILE=$(mktemp)
+        DESIRED_STATE_FILE=$(mktemp)
+        WORK=$(mktemp)
+        trap 'rm -f "$RAW_STATE_FILE" "$DESIRED_STATE_FILE" "$WORK"' EXIT
+
+        if ! command -v yq >/dev/null 2>&1; then
+          echo "ERROR: yq is required" >&2
+          exit 1
+        fi
+        if ! command -v jq >/dev/null 2>&1; then
+          echo "ERROR: jq is required" >&2
+          exit 1
+        fi
+        # Reconcile against a scratch copy so that a "diff" run (DRY_RUN=true)
+        # never mutates the real file; only "apply" (DRY_RUN=false) writes
+        # the result back, at the very end of this script.
+        #
+        # A missing manifest is only created when hauler.createIfMissing is
+        # true, and only when its parent directory already exists: an
+        # unexpectedly missing directory is far more likely to be a typo in
+        # hauler.file than a genuine request to bootstrap a manifest there.
+        FILE_CREATED=false
+        if [ -f "$FILE" ]; then
+          cp "$FILE" "$WORK"
+        else
+          if [ "$CREATE_FILE" != "true" ]; then
+            echo "ERROR: Hauler manifest file '$FILE' does not exist (set hauler.createIfMissing to true to create it)" >&2
+            exit 1
+          fi
+          FILE_DIR=$(dirname "$FILE")
+          if [ ! -d "$FILE_DIR" ]; then
+            echo "ERROR: cannot create Hauler manifest '$FILE': directory '$FILE_DIR' does not exist" >&2
+            exit 1
+          fi
+          FILE_CREATED=true
+          : >"$WORK"
+        fi
+
+        # The desired state is emitted as newline-delimited JSON (one
+        # standalone object per line: one "doc" record per document, one
+        # "item" record per item, linked by "_docIndex"), then reassembled
+        # into nested documents/items arrays below with jq.
+        #
+        # This is intentional, not stylistic: emitting JSON arrays directly
+        # from nested range loops requires a comma-separator guard (an if
+        # action gated on the loop index) around each array element. When
+        # such a guard encloses a further nested range that itself contains
+        # a reference to a named source value (as the items array does here,
+        # one level inside the documents array), Updatecli's dependency
+        # graph builder fails with an unrelated-looking internal template
+        # parsing error while trying to statically resolve that reference.
+        # Flattening the structure into tagged, comma-free NDJSON records
+        # avoids the pattern entirely.
+        cat >"$RAW_STATE_FILE" <<'UPDATECLI_HAULER_DESIRED_STATE_EOF'
+        {{- range $di, $doc := .documents }}
+        {
+          "_type": "doc",
+          "_docIndex": {{ $di }},
+          "name": {{ $doc.name | quote }},
+          "kind": {{ $doc.kind | quote }},
+          {{- if $doc.apiVersion }}
+          "apiVersion": {{ $doc.apiVersion | quote }},
+          {{- end }}
+          "createIfMissing": {{ if $doc.createIfMissing }}true{{ else }}false{{ end }},
+          "sort": {{ if $doc.sort }}true{{ else }}false{{ end }},
+          "prune": {{ if $doc.prune }}true{{ else }}false{{ end }},
+          "annotations": {
+            {{- $afirst := true }}
+            {{- range $k, $v := $doc.annotations }}
+            {{ if not $afirst }},{{ end }}{{ $k | quote }}: {{ $v | quote }}
+            {{- $afirst = false }}
+            {{- end }}
+          }
+        }
+        {{- range $ii, $item := $doc.items }}
+        {
+          "_type": "item",
+          "_docIndex": {{ $di }},
+          "repository": {{ $item.repository | default "" | quote }},
+          "name": {{ $item.name | default "" | quote }},
+          "repoURL": {{ $item.repoURL | default "" | quote }},
+          "tagTemplate": {{ $item.tagTemplate | default "{version}" | quote }},
+          "pathTemplate": {{ $item.pathTemplate | default "" | quote }},
+          "literalVersion": {{ $item.version | default "" | quote }},
+          "literalPath": {{ $item.path | default "" | quote }},
+          {{- if $item.versionFrom }}
+          "resolvedVersion": "{{"{{"}} source "{{ printf "version/%s" $item.versionFrom }}" {{"}}"}}",
+          {{- else }}
+          "resolvedVersion": "",
+          {{- end }}
+          "fields": {
+            {{- $ffirst := true }}
+            {{- range $fk, $fv := $item.fields }}
+            {{ if not $ffirst }},{{ end }}{{ $fk | quote }}: {{ $fv | quote }}
+            {{- $ffirst = false }}
+            {{- end }}
+          }
+        }
+        {{- end }}
+        {{- end }}
+        UPDATECLI_HAULER_DESIRED_STATE_EOF
+
+        if ! jq -s empty "$RAW_STATE_FILE" 2>/tmp/hauler-desired-state.err; then
+          echo "ERROR: internal error, the rendered desired state is not valid JSON:" >&2
+          cat /tmp/hauler-desired-state.err >&2
+          exit 1
+        fi
+
+        # Reassemble the flat "doc"/"item" NDJSON records into the nested
+        # {documents: [{..., items: [...]}]} shape the rest of this script
+        # expects.
+        jq -s '
+          (map(select(._type == "doc"))) as $docs
+          | (map(select(._type == "item"))) as $allitems
+          | {
+              documents: [
+                $docs[] as $d
+                | ($allitems | map(select(._docIndex == $d._docIndex) | del(._type, ._docIndex))) as $its
+                | ($d | del(._type, ._docIndex)) + {items: $its}
+              ]
+            }
+        ' "$RAW_STATE_FILE" >"$RAW_STATE_FILE.nested"
+        mv "$RAW_STATE_FILE.nested" "$RAW_STATE_FILE"
+
+        # Resolve the "{version}" and "{tag}" placeholders (tagTemplate,
+        # pathTemplate, fields) now that Updatecli has substituted the real
+        # value into resolvedVersion above. This step intentionally happens
+        # in jq and not in the Go template that rendered the block above:
+        # Updatecli's source lookup function returns a deferred placeholder
+        # when evaluated at manifest-render time, and piping that placeholder
+        # through Go template string functions such as replace or quote
+        # corrupts it before Updatecli gets a chance to resolve it for real.
+        jq '
+          .documents |= map(
+            .items |= map(
+              (if (.resolvedVersion // "") != "" then .resolvedVersion else (.literalVersion // "") end) as $version
+              | ((.tagTemplate // "{version}") | gsub("{version}"; $version)) as $tag
+              | (if (.pathTemplate // "") != "" then (.pathTemplate | gsub("{version}"; $version)) else (.literalPath // "") end) as $path
+              | (.fields // {} | with_entries(.value |= gsub("{tag}"; $tag) | .value |= gsub("{version}"; $version))) as $fields
+              | . + {version: $version, tag: $tag, path: $path, fields: $fields}
+            )
+          )
+        ' "$RAW_STATE_FILE" >"$DESIRED_STATE_FILE"
+
+        REPORT=()
+
+        # Record the file creation as a change of its own, so that creating an
+        # otherwise empty manifest still exits 2 and reaches the write-back at
+        # the end of this script instead of short-circuiting on "No changes
+        # needed" and leaving nothing on disk.
+        if [ "$FILE_CREATED" = "true" ]; then
+          REPORT+=("created manifest file '$FILE'")
+        fi
+
+        doc_count=$(jq '.documents | length' "$DESIRED_STATE_FILE")
+
+        for ((di = 0; di < doc_count; di++)); do
+          doc=$(jq -c ".documents[$di]" "$DESIRED_STATE_FILE")
+          name=$(jq -r '.name' <<<"$doc")
+          kind=$(jq -r '.kind' <<<"$doc")
+          create_if_missing=$(jq -r '.createIfMissing' <<<"$doc")
+          do_sort=$(jq -r '.sort' <<<"$doc")
+          do_prune=$(jq -r '.prune' <<<"$doc")
+
+          exists=$(NAME="$name" yq eval-all '(select(.metadata.name == env(NAME)) | .metadata.name) // ""' "$WORK")
+          if [ -z "$exists" ]; then
+            if [ "$create_if_missing" != "true" ]; then
+              echo "ERROR: document '$name' not found in $FILE and createIfMissing is false" >&2
+              exit 1
+            fi
+            api_version=$(jq -r '.apiVersion // "content.hauler.cattle.io/v1"' <<<"$doc")
+            new_doc=$(API_VERSION="$api_version" KIND="$kind" NAME="$name" yq eval -n '
+              .apiVersion = env(API_VERSION) |
+              .kind = env(KIND) |
+              .metadata.name = env(NAME)
+            ')
+            # Only separate from preceding content; a leading "---" would
+            # otherwise be written into a freshly created, still empty file.
+            if [ -s "$WORK" ]; then
+              printf '\n---\n%s\n' "$new_doc" >>"$WORK"
+            else
+              printf '%s\n' "$new_doc" >"$WORK"
+            fi
+            REPORT+=("[$name] created document (kind=$kind)")
+          fi
+
+          # Reconcile annotations
+          ann_keys=$(jq -r '.annotations // {} | keys[]' <<<"$doc")
+          if [ -n "$ann_keys" ]; then
+            while IFS= read -r key; do
+              [ -z "$key" ] && continue
+              value=$(jq -r --arg k "$key" '.annotations[$k]' <<<"$doc")
+              current=$(NAME="$name" KEY="$key" yq eval-all '(select(.metadata.name == env(NAME)) | .metadata.annotations[env(KEY)]) // ""' "$WORK")
+              if [ "$current" != "$value" ]; then
+                NAME="$name" KEY="$key" VALUE="$value" yq eval -i '
+                  (select(.metadata.name == env(NAME)) | .metadata.annotations[env(KEY)]) = env(VALUE)
+                ' "$WORK"
+                REPORT+=("[$name] annotation '$key' set to '$value'")
+              fi
+            done <<<"$ann_keys"
+          fi
+
+          case "$kind" in
+          Images) arr_path="images" ;;
+          Charts) arr_path="charts" ;;
+          Files) arr_path="files" ;;
+          *)
+            echo "ERROR: unsupported kind '$kind' for document '$name' (must be Images, Charts or Files)" >&2
+            exit 1
+            ;;
+          esac
+
+          desired_identities=()
+          item_count=$(jq '.items | length' <<<"$doc")
+
+          for ((ii = 0; ii < item_count; ii++)); do
+            item=$(jq -c ".items[$ii]" <<<"$doc")
+
+            case "$kind" in
+            Images)
+              repository=$(jq -r '.repository' <<<"$item")
+              tag=$(jq -r '.tag' <<<"$item")
+              identity="$repository"
+              desired_identities+=("$identity")
+              full_name="$repository:$tag"
+
+              mapfile -t existing < <(NAME="$name" yq eval-all '(select(.metadata.name == env(NAME)) | .spec.images[].name) // ""' "$WORK")
+              match_idx=-1
+              for idx in "${!existing[@]}"; do
+                existing_repo="${existing[$idx]%:*}"
+                if [ "$existing_repo" = "$repository" ]; then
+                  match_idx=$idx
+                  break
+                fi
+              done
+
+              if [ "$match_idx" -ge 0 ]; then
+                old_name="${existing[$match_idx]}"
+                if [ "$old_name" != "$full_name" ]; then
+                  NAME="$name" IDX="$match_idx" VALUE="$full_name" yq eval -i '
+                    (select(.metadata.name == env(NAME)) | .spec.images[env(IDX) | tonumber].name) = env(VALUE)
+                  ' "$WORK"
+                  REPORT+=("[$name] updated image '$old_name' -> '$full_name'")
+                fi
+              else
+                NAME="$name" VALUE="$full_name" yq eval -i '
+                  (select(.metadata.name == env(NAME)) | .spec.images) += [{"name": env(VALUE)}]
+                ' "$WORK"
+                REPORT+=("[$name] added image '$full_name'")
+                mapfile -t existing < <(NAME="$name" yq eval-all '(select(.metadata.name == env(NAME)) | .spec.images[].name) // ""' "$WORK")
+                match_idx=$((${#existing[@]} - 1))
+              fi
+
+              field_keys=$(jq -r '.fields // {} | keys[]' <<<"$item")
+              if [ -n "$field_keys" ]; then
+                while IFS= read -r fkey; do
+                  [ -z "$fkey" ] && continue
+                  fvalue=$(jq -r --arg k "$fkey" '.fields[$k]' <<<"$item")
+                  current=$(NAME="$name" IDX="$match_idx" FKEY="$fkey" yq eval-all '(select(.metadata.name == env(NAME)) | .spec.images[env(IDX) | tonumber][env(FKEY)]) // ""' "$WORK")
+                  if [ "$current" != "$fvalue" ]; then
+                    NAME="$name" IDX="$match_idx" FKEY="$fkey" FVALUE="$fvalue" yq eval -i '
+                      (select(.metadata.name == env(NAME)) | .spec.images[env(IDX) | tonumber][env(FKEY)]) = env(FVALUE)
+                    ' "$WORK"
+                    REPORT+=("[$name] image '$full_name' field '$fkey' set to '$fvalue'")
+                  fi
+                done <<<"$field_keys"
+              fi
+              ;;
+
+            Charts)
+              chart_name=$(jq -r '.name' <<<"$item")
+              repo_url=$(jq -r '.repoURL // ""' <<<"$item")
+              version=$(jq -r '.version // ""' <<<"$item")
+              identity="$chart_name"
+              desired_identities+=("$identity")
+
+              mapfile -t existing < <(NAME="$name" yq eval-all '(select(.metadata.name == env(NAME)) | .spec.charts[].name) // ""' "$WORK")
+              match_idx=-1
+              for idx in "${!existing[@]}"; do
+                if [ "${existing[$idx]}" = "$chart_name" ]; then
+                  match_idx=$idx
+                  break
+                fi
+              done
+
+              if [ "$match_idx" -ge 0 ]; then
+                current_version=$(NAME="$name" IDX="$match_idx" yq eval-all '(select(.metadata.name == env(NAME)) | .spec.charts[env(IDX) | tonumber].version) // ""' "$WORK")
+                if [ "$current_version" != "$version" ]; then
+                  NAME="$name" IDX="$match_idx" VALUE="$version" yq eval -i '
+                    (select(.metadata.name == env(NAME)) | .spec.charts[env(IDX) | tonumber].version) = env(VALUE)
+                  ' "$WORK"
+                  REPORT+=("[$name] updated chart '$chart_name' version -> '$version'")
+                fi
+                if [ -n "$repo_url" ]; then
+                  current_url=$(NAME="$name" IDX="$match_idx" yq eval-all '(select(.metadata.name == env(NAME)) | .spec.charts[env(IDX) | tonumber].repoURL) // ""' "$WORK")
+                  if [ "$current_url" != "$repo_url" ]; then
+                    NAME="$name" IDX="$match_idx" VALUE="$repo_url" yq eval -i '
+                      (select(.metadata.name == env(NAME)) | .spec.charts[env(IDX) | tonumber].repoURL) = env(VALUE)
+                    ' "$WORK"
+                    REPORT+=("[$name] updated chart '$chart_name' repoURL -> '$repo_url'")
+                  fi
+                fi
+              else
+                NAME="$name" CN="$chart_name" RU="$repo_url" VER="$version" yq eval -i '
+                  (select(.metadata.name == env(NAME)) | .spec.charts) += [{"name": env(CN), "repoURL": env(RU), "version": env(VER)}]
+                ' "$WORK"
+                REPORT+=("[$name] added chart '$chart_name' version '$version'")
+                mapfile -t existing < <(NAME="$name" yq eval-all '(select(.metadata.name == env(NAME)) | .spec.charts[].name) // ""' "$WORK")
+                match_idx=$((${#existing[@]} - 1))
+              fi
+
+              field_keys=$(jq -r '.fields // {} | keys[]' <<<"$item")
+              if [ -n "$field_keys" ]; then
+                while IFS= read -r fkey; do
+                  [ -z "$fkey" ] && continue
+                  fvalue=$(jq -r --arg k "$fkey" '.fields[$k]' <<<"$item")
+                  current=$(NAME="$name" IDX="$match_idx" FKEY="$fkey" yq eval-all '(select(.metadata.name == env(NAME)) | .spec.charts[env(IDX) | tonumber][env(FKEY)]) // ""' "$WORK")
+                  if [ "$current" != "$fvalue" ]; then
+                    NAME="$name" IDX="$match_idx" FKEY="$fkey" FVALUE="$fvalue" yq eval -i '
+                      (select(.metadata.name == env(NAME)) | .spec.charts[env(IDX) | tonumber][env(FKEY)]) = env(FVALUE)
+                    ' "$WORK"
+                    REPORT+=("[$name] chart '$chart_name' field '$fkey' set to '$fvalue'")
+                  fi
+                done <<<"$field_keys"
+              fi
+              ;;
+
+            Files)
+              file_name=$(jq -r '.name // ""' <<<"$item")
+              file_path=$(jq -r '.path // ""' <<<"$item")
+              identity="${file_name:-$file_path}"
+              desired_identities+=("$identity")
+
+              mapfile -t existing < <(NAME="$name" yq eval-all '(select(.metadata.name == env(NAME)) | .spec.files[] | (.name // .path)) // ""' "$WORK")
+              match_idx=-1
+              for idx in "${!existing[@]}"; do
+                if [ "${existing[$idx]}" = "$identity" ]; then
+                  match_idx=$idx
+                  break
+                fi
+              done
+
+              if [ "$match_idx" -ge 0 ]; then
+                current_path=$(NAME="$name" IDX="$match_idx" yq eval-all '(select(.metadata.name == env(NAME)) | .spec.files[env(IDX) | tonumber].path) // ""' "$WORK")
+                if [ "$current_path" != "$file_path" ]; then
+                  NAME="$name" IDX="$match_idx" VALUE="$file_path" yq eval -i '
+                    (select(.metadata.name == env(NAME)) | .spec.files[env(IDX) | tonumber].path) = env(VALUE)
+                  ' "$WORK"
+                  REPORT+=("[$name] updated file '$identity' path -> '$file_path'")
+                fi
+              else
+                NAME="$name" FN="$file_name" FP="$file_path" yq eval -i '
+                  (select(.metadata.name == env(NAME)) | .spec.files) += [{"name": env(FN), "path": env(FP)}]
+                ' "$WORK"
+                REPORT+=("[$name] added file '$identity'")
+              fi
+              ;;
+            esac
+          done
+
+          if [ "$do_prune" = "true" ]; then
+            case "$kind" in
+            Images)
+              mapfile -t existing < <(NAME="$name" yq eval-all '(select(.metadata.name == env(NAME)) | .spec.images[].name) // ""' "$WORK")
+              for idx in $(seq $((${#existing[@]} - 1)) -1 0); do
+                existing_repo="${existing[$idx]%:*}"
+                found=0
+                for want in "${desired_identities[@]:-}"; do
+                  [ "$existing_repo" = "$want" ] && found=1 && break
+                done
+                if [ "$found" -eq 0 ]; then
+                  NAME="$name" IDX="$idx" yq eval -i '
+                    (select(.metadata.name == env(NAME)) | .spec.images) |= del(.[env(IDX) | tonumber])
+                  ' "$WORK"
+                  REPORT+=("[$name] pruned image '${existing[$idx]}'")
+                fi
+              done
+              ;;
+            Charts)
+              mapfile -t existing < <(NAME="$name" yq eval-all '(select(.metadata.name == env(NAME)) | .spec.charts[].name) // ""' "$WORK")
+              for idx in $(seq $((${#existing[@]} - 1)) -1 0); do
+                found=0
+                for want in "${desired_identities[@]:-}"; do
+                  [ "${existing[$idx]}" = "$want" ] && found=1 && break
+                done
+                if [ "$found" -eq 0 ]; then
+                  NAME="$name" IDX="$idx" yq eval -i '
+                    (select(.metadata.name == env(NAME)) | .spec.charts) |= del(.[env(IDX) | tonumber])
+                  ' "$WORK"
+                  REPORT+=("[$name] pruned chart '${existing[$idx]}'")
+                fi
+              done
+              ;;
+            Files)
+              mapfile -t existing < <(NAME="$name" yq eval-all '(select(.metadata.name == env(NAME)) | .spec.files[] | (.name // .path)) // ""' "$WORK")
+              for idx in $(seq $((${#existing[@]} - 1)) -1 0); do
+                found=0
+                for want in "${desired_identities[@]:-}"; do
+                  [ "${existing[$idx]}" = "$want" ] && found=1 && break
+                done
+                if [ "$found" -eq 0 ]; then
+                  NAME="$name" IDX="$idx" yq eval -i '
+                    (select(.metadata.name == env(NAME)) | .spec.files) |= del(.[env(IDX) | tonumber])
+                  ' "$WORK"
+                  REPORT+=("[$name] pruned file '${existing[$idx]}'")
+                fi
+              done
+              ;;
+            esac
+          fi
+
+          if [ "$do_sort" = "true" ]; then
+            before_order=$(NAME="$name" yq eval-all "(select(.metadata.name == env(NAME)) | .spec.${arr_path}[].name) // \"\"" "$WORK")
+            NAME="$name" yq eval -i "
+              (select(.metadata.name == env(NAME)) | .spec.${arr_path}) |= sort_by(.name)
+            " "$WORK"
+            after_order=$(NAME="$name" yq eval-all "(select(.metadata.name == env(NAME)) | .spec.${arr_path}[].name) // \"\"" "$WORK")
+            if [ "$before_order" != "$after_order" ]; then
+              REPORT+=("[$name] sorted ${arr_path} by name")
+            fi
+          fi
+        done
+
+        if [ "${#REPORT[@]}" -eq 0 ]; then
+          echo "No changes needed."
+          exit 0
+        fi
+
+        printf '%s\n' "${REPORT[@]}"
+
+        if [ "${DRY_RUN:-false}" != "true" ]; then
+          cp "$WORK" "$FILE"
+        fi
+
+        exit 2

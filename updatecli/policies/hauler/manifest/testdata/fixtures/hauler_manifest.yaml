@@ -1,0 +1,38 @@
+# Sample multi-document Hauler manifest used to exercise the hauler/manifest
+# policy locally. See ../values.yaml.
+apiVersion: content.hauler.cattle.io/v1
+kind: Images
+metadata:
+  name: sample-container-images
+  annotations:
+    hauler.dev/certificate-oidc-issuer: "https://token.actions.githubusercontent.com"
+spec:
+  images:
+    - name: ghcr.io/example/app:v1.0.0
+      certificate-identity-regexp: "https://github.com/example/app/.github/workflows/release.yml@refs/tags/v1.0.0"
+---
+# The plugins are kept in their own document to allow a dedicated keyless
+# verification configuration without duplicating it per image.
+apiVersion: content.hauler.cattle.io/v1
+kind: Images
+metadata:
+  name: sample-plugins
+  annotations:
+    hauler.dev/certificate-oidc-issuer: "https://token.actions.githubusercontent.com"
+spec:
+  images:
+    - name: ghcr.io/example/plugin-one:v1.0.10
+    - name: ghcr.io/example/plugin-removed:v0.0.1
+---
+apiVersion: content.hauler.cattle.io/v1
+kind: Charts
+metadata:
+  name: sample-helm-charts
+spec:
+  charts:
+    - name: app
+      repoURL: "https://charts.example.com"
+      version: "6.0.0"
+    - name: app-reporter
+      repoURL: "https://charts.example.com/reporter"
+      version: "3.0.0"

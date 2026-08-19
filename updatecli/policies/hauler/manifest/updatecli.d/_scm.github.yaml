@@ -1,0 +1,53 @@
+# {{ if and .scm.enabled ( eq .scm.kind "github" ) }}
+scms:
+  default:
+    kind: "github"
+    spec:
+      user: "{{ .scm.user }}"
+      email: "{{ .scm.email }}"
+      owner: "{{ requiredEnv .scm.owner }}"
+      repository: "{{ .scm.repository }}"
+      token: "{{ requiredEnv .scm.env_token }}"
+      username: "{{ .scm.username | default .scm.user }}"
+      branch: "{{ .scm.branch }}"
+      # {{ if .scm.commitusingapi }}
+      commitusingapi: {{ .scm.commitusingapi }}
+      # {{ end }}
+      # {{ if .scm.commitmessage }}
+      commitmessage:
+        type: "{{ .scm.commitmessage.type }}"
+        scope: "{{ .scm.commitmessage.scope }}"
+        title: "{{ .scm.commitmessage.title }}"
+        hidecredit: true
+        # {{ if .scm.commitmessage.footers }}
+        footers: "{{ .scm.commitmessage.footers }}"
+        # {{ end }}
+      # {{ end }}
+# {{ if .pr.enabled }}
+actions:
+  default:
+    title: "{{ .pr.title }}"
+    kind: "github/pullrequest"
+    scmid: "default"
+    spec:
+      automerge: {{ .pr.automerge | default false }}
+      mergemethod: "{{ .pr.mergemethod | default "squash" }}"
+      draft: {{ .pr.draft | default false }}
+      # {{ if .pr.description }}
+      description: |
+        {{ .pr.description | nindent 8 }}
+      # {{ end }}
+      # {{ if .pr.reviewers }}
+      reviewers:
+        # {{ range .pr.reviewers }}
+        - "{{ . }}"
+        # {{ end }}
+      # {{ end }}
+      # {{ if .pr.labels }}
+      labels:
+        # {{ range .pr.labels }}
+        - "{{ . }}"
+        # {{ end }}
+      # {{ end }}
+# {{ end }}
+# {{ end }}

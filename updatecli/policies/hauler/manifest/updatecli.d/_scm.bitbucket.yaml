@@ -1,0 +1,38 @@
+# {{ if and .scm.enabled ( eq .scm.kind "bitbucket" ) }}
+# {{ $BitbucketPAT := env .scm.env_token }}
+scms:
+  default:
+    kind: "bitbucket"
+    spec:
+      user: "{{ .scm.user }}"
+      # {{ if .scm.email }}
+      email: "{{ .scm.email }}"
+      # {{ end }}
+      owner: "{{ requiredEnv .scm.owner }}"
+      repository: "{{ .scm.repository }}"
+      token: "{{ default $BitbucketPAT .scm.token }}"
+      username: "{{ .scm.username | default .scm.user }}"
+      branch: "{{ .scm.branch }}"
+      # {{ if .scm.commitmessage }}
+      commitmessage:
+        type: "{{ .scm.commitmessage.type }}"
+        scope: "{{ .scm.commitmessage.scope }}"
+        title: "{{ .scm.commitmessage.title }}"
+        hidecredit: true
+        # {{ if .scm.commitmessage.footers }}
+        footers: "{{ .scm.commitmessage.footers }}"
+        # {{ end }}
+      # {{ end }}
+# {{ if .pr.enabled }}
+actions:
+  default:
+    title: "{{ .pr.title }}"
+    kind: "bitbucket/pullrequest"
+    scmid: "default"
+    spec:
+      # {{ if .pr.description }}
+      description: |
+        {{ .pr.description | nindent 8 }}
+      # {{ end }}
+# {{ end }}
+# {{ end }}

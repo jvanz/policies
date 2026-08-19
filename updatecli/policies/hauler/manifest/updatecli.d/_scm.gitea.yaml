@@ -1,0 +1,35 @@
+# {{ if and .scm.enabled ( eq .scm.kind "gitea" ) }}
+scms:
+  default:
+    kind: "gitea"
+    spec:
+      user: "{{ .scm.user }}"
+      email: "{{ .scm.email }}"
+      owner: "{{ requiredEnv .scm.owner }}"
+      repository: "{{ .scm.repository }}"
+      token: "{{ requiredEnv .scm.env_token }}"
+      username: "{{ .scm.username | default .scm.user }}"
+      branch: "{{ .scm.branch }}"
+      # {{ if .scm.url }}
+      url: "{{ .scm.url }}"
+      # {{ end }}
+# {{ if .pr.enabled }}
+actions:
+  default:
+    title: "{{ .pr.title }}"
+    kind: "gitea/pullrequest"
+    scmid: "default"
+    spec:
+      automerge: {{ .pr.automerge | default false }}
+      # {{ if .pr.description }}
+      description: |
+        {{ .pr.description | nindent 8 }}
+      # {{ end }}
+      # {{ if .pr.labels }}
+      labels:
+        # {{ range .pr.labels }}
+        - "{{ . }}"
+        # {{ end }}
+      # {{ end }}
+# {{ end }}
+# {{ end }}

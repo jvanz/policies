@@ -1,0 +1,69 @@
+# Values used in addition to ../values.yaml when running:
+#   updatecli diff --config updatecli.d --values ../values.yaml --values values.yaml
+# from the "updatecli" directory (see ../../../../DEVELOPING.md-equivalent: this
+# repository's release/test scripts always run from the "updatecli" directory,
+# hence the "policies/hauler/manifest/..." prefix on every path below), to
+# exercise the policy against the sample manifest in testdata/fixtures/ without
+# needing an SCM.
+
+hauler:
+  file: "policies/hauler/manifest/testdata/fixtures/hauler_manifest.yaml"
+
+versions:
+  app:
+    kind: yaml
+    file: "policies/hauler/manifest/testdata/fixtures/values.yaml"
+    key: "$.image.tag"
+  appReporterChart:
+    kind: yaml
+    file: "policies/hauler/manifest/testdata/fixtures/app-chart.yaml"
+    key: "$.version"
+    trimQuotes: true
+
+documents:
+  - name: sample-container-images
+    kind: Images
+    createIfMissing: true
+    sort: false
+    prune: false
+    annotations:
+      hauler.dev/certificate-oidc-issuer: "https://token.actions.githubusercontent.com"
+    items:
+      - repository: ghcr.io/example/app
+        versionFrom: app
+        fields:
+          certificate-identity-regexp: "https://github.com/example/app/.github/workflows/release.yml@refs/tags/{tag}"
+
+  - name: sample-plugins
+    kind: Images
+    createIfMissing: true
+    sort: true
+    prune: true
+    annotations:
+      hauler.dev/certificate-oidc-issuer: "https://token.actions.githubusercontent.com"
+    items:
+      - repository: ghcr.io/example/plugin-one
+        version: "v1.0.13"
+
+  - name: sample-helm-charts
+    kind: Charts
+    items:
+      - name: app
+        repoURL: "https://charts.example.com"
+        version: "6.0.2"
+      - name: app-reporter
+        repoURL: "https://charts.example.com/reporter"
+        versionFrom: appReporterChart
+
+  - name: sample-install-scripts
+    kind: Files
+    createIfMissing: true
+    items:
+      - name: install.sh
+        path: "https://example.com/install.sh"
+
+scm:
+  enabled: false
+
+pr:
+  enabled: false

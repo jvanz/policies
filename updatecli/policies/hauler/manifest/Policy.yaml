@@ -1,0 +1,21 @@
+authors:
+  - José Guilherme Vanz <jvanz@jvanz.com>
+
+url: "https://github.com/updatecli/policies/"
+documentation: "https://github.com/updatecli/policies/tree/main/updatecli/policies/hauler/manifest/README.md"
+changelog: "https://github.com/updatecli/policies/tree/main/updatecli/policies/hauler/manifest/CHANGELOG.md"
+source: "https://github.com/updatecli/policies/tree/main/updatecli/policies/hauler/manifest/"
+version: 0.1.0
+vendor: Updatecli Project
+
+licenses:
+  - "Apache-2.0 license"
+
+description: |
+  Reconciles a Hauler content manifest (Images, Charts and Files documents,
+  apiVersion content.hauler.cattle.io/v1) against a declarative desired
+  state: missing documents and items are created, existing ones are updated
+  in place, comments and unrelated documents are preserved, and per-item
+  cosign keyless verification fields can be configured. Generic: carries no
+  project-specific data, so the same policy can be reused across any
+  repository maintaining a Hauler manifest.

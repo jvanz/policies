@@ -1,0 +1,63 @@
+# Default values for the "hauler/manifest" policy.
+#
+# Every list here is empty by design: this policy carries no project-specific
+# data. A consumer overrides these values (via `values:` or `valuesinline:`
+# in their updatecli-compose.yaml) to describe their own Hauler manifest.
+#
+# See README.md for the full values contract and worked examples.
+
+# pipelineid overrides the pipeline identifier. Useful to disambiguate
+# multiple instances of this policy (e.g. one per Hauler manifest file) in
+# the same compose run.
+# pipelineid: hauler-manifest
+
+hauler:
+  # file is the path to the Hauler manifest to reconcile, relative to the
+  # repository root (or scm working directory when scm.enabled is true).
+  file: "hauler_manifest.yaml"
+  # createIfMissing creates the manifest file when it does not exist yet,
+  # instead of failing. The parent directory must already exist either way:
+  # a missing directory is treated as a typo in `file`, not as a request to
+  # bootstrap a manifest there. Documents are still only written when their
+  # own `createIfMissing` is true.
+  createIfMissing: false
+
+# versions declares named sources used to resolve item versions. Each entry
+# becomes an Updatecli source. Supported `kind`s: yaml (default), dockerimage,
+# helmchart, githubrelease, shell.
+versions: {}
+
+# documents declares the desired state of the Hauler manifest, one entry per
+# top-level YAML document, selected by `metadata.name` (never by position).
+documents: []
+
+scm:
+  enabled: false
+  # kind selects the SCM backend. Supported: github, githubsearch, gitlab,
+  # gitea, bitbucket, stash.
+  kind: "github"
+  env_token: "UPDATECLI_GITHUB_TOKEN"
+  branch: "main"
+  commitusingapi: false
+  commitmessage:
+    type: "chore"
+    scope: "deps"
+    title: "Update Hauler manifest"
+  # search and limit are only used when scm.kind is "githubsearch".
+  # search: "org:my-org topic:hauler-manifest"
+  # limit: 3
+
+pr:
+  enabled: false
+  automerge: false
+  mergemethod: "squash"
+  draft: false
+  title: "chore(deps): Update Hauler manifest"
+  description: ""
+  labels: []
+  reviewers: []
+
+pipeline:
+  labels:
+    ecosystem: "hauler"
+    policy: "manifest"
