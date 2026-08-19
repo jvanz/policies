@@ -1,4 +1,4 @@
-.PHONY: clean annotated-policy.wasm test test-rust test-go lint lint-rust lint-go e2e-tests e2e-tests-rust e2e-tests-go hauler-values
+.PHONY: clean annotated-policy.wasm test test-rust test-go lint lint-rust lint-go e2e-tests e2e-tests-rust e2e-tests-go hauler-values check-hauler-manifest
 
 # Helper function to run a target across all policies (excluding crates/) with summary
 define run-policy-target
@@ -132,3 +132,6 @@ e2e-tests-go:
 hauler-values:
 	./hack/generate-hauler-values.sh \
 		--output updatecli/values/hauler-manifest.generated.yaml
+
+check-hauler-manifest:
+	$(call run-policy-target,check-hauler-manifest)

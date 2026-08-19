@@ -204,6 +204,6 @@ until its first release.
 To preview changes before the scheduled workflow lands them, run:
 
 ```console
-make hauler-values                                  # writes updatecli/values/hauler-manifest.generated.yaml
+make hauler-values   # writes updatecli/values/hauler-manifest.generated.yaml
 updatecli compose diff --file ./updatecli/update-hauler-manifest.yaml
 ```

@@ -43,3 +43,5 @@ debug:
 	@echo $(MAKEFILE_LIST)
 	@echo "ROOT_DIR=$(ROOT_DIR)"
 	@echo "CURDIR=$(CURDIR)"
+
+include ../common.mk

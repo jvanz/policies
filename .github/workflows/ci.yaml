@@ -65,3 +65,11 @@ jobs:
         policy-working-dir: ${{ fromJSON(needs.calculate-policy-matrix.outputs.policy_working_dirs) }}
     with:
       policy-working-dir: ${{ matrix.policy-working-dir }}
+
+  check-hauler-manifest:
+    name: Check Hauler manifest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check every policy is correctly listed in the Hauler manifest
+        run: make check-hauler-manifest

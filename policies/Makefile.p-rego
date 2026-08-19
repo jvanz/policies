@@ -42,3 +42,5 @@ debug:
 	@echo "CURDIR=$(CURDIR)"
 	@echo "POLICY_DIR=$(POLICY_DIR)"
 	@echo "POLICY_TYPE=$(POLICY_TYPE)"
+
+include ../common.mk
