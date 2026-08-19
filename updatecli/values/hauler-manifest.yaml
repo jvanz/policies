@@ -1,0 +1,498 @@
+pipelineid: "update_hauler_manifest"
+
+hauler:
+  file: "hauler_manifest.yaml"
+
+# One dockerimage source per published Kubewarden policy. The version is
+# read from the OCI registry (ghcr.io), not from the policy's metadata.yml,
+# so the Hauler manifest always reflects what is actually published.
+versions:
+  allow-privilege-escalation-psp:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/allow-privilege-escalation-psp"
+    versionfilter:
+      kind: semver
+  allowed-fsgroups-psp:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/allowed-fsgroups-psp"
+    versionfilter:
+      kind: semver
+  allowed-proc-mount-types-psp:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/allowed-proc-mount-types-psp"
+    versionfilter:
+      kind: semver
+  annotations:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/annotations"
+    versionfilter:
+      kind: semver
+  apparmor-psp:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/apparmor-psp"
+    versionfilter:
+      kind: semver
+  capabilities-psp:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/capabilities-psp"
+    versionfilter:
+      kind: semver
+  cel-policy:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/cel-policy"
+    versionfilter:
+      kind: semver
+  container-resources:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/container-resources"
+    versionfilter:
+      kind: semver
+  deprecated-api-versions:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/deprecated-api-versions"
+    versionfilter:
+      kind: semver
+  disallow-service-loadbalancer:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/disallow-service-loadbalancer"
+    versionfilter:
+      kind: semver
+  disallow-service-nodeport:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/disallow-service-nodeport"
+    versionfilter:
+      kind: semver
+  do-not-expose-admission-controller-webhook-services:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/do-not-expose-admission-controller-webhook-services"
+    versionfilter:
+      kind: semver
+  echo:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/echo"
+    versionfilter:
+      kind: semver
+  env-variable-secrets-scanner:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/env-variable-secrets-scanner"
+    versionfilter:
+      kind: semver
+  environment-variable-policy:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/environment-variable-policy"
+    versionfilter:
+      kind: semver
+  flexvolume-drivers-psp:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/flexvolume-drivers-psp"
+    versionfilter:
+      kind: semver
+  high-risk-service-account:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/high-risk-service-account"
+    versionfilter:
+      kind: semver
+  host-namespaces-psp:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/host-namespaces-psp"
+    versionfilter:
+      kind: semver
+  hostpaths-psp:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/hostpaths-psp"
+    versionfilter:
+      kind: semver
+  image-cve-policy:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/image-cve-policy"
+    versionfilter:
+      kind: semver
+  ingress:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/ingress"
+    versionfilter:
+      kind: semver
+  kyverno-dsl:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/kyverno-dsl"
+    versionfilter:
+      kind: semver
+  labels:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/labels"
+    versionfilter:
+      kind: semver
+  namespace-label-propagator:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/namespace-label-propagator"
+    versionfilter:
+      kind: semver
+  ns-policyserver-mapper:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/ns-policyserver-mapper"
+    versionfilter:
+      kind: semver
+  persistentvolumeclaim-storageclass-policy:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/persistentvolumeclaim-storageclass-policy"
+    versionfilter:
+      kind: semver
+  pod-ndots:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/pod-ndots"
+    versionfilter:
+      kind: semver
+  pod-privileged:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/pod-privileged"
+    versionfilter:
+      kind: semver
+  pod-runtime:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/pod-runtime"
+    versionfilter:
+      kind: semver
+  priority-class-policy:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/priority-class-policy"
+    versionfilter:
+      kind: semver
+  probes:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/probes"
+    versionfilter:
+      kind: semver
+  psa-label-enforcer:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/psa-label-enforcer"
+    versionfilter:
+      kind: semver
+  rancher-project-propagate-labels:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/rancher-project-propagate-labels"
+    versionfilter:
+      kind: semver
+  rancher-project-quotas-namespace-validator:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/rancher-project-quotas-namespace-validator"
+    versionfilter:
+      kind: semver
+  readonly-root-filesystem-psp:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/readonly-root-filesystem-psp"
+    versionfilter:
+      kind: semver
+  runtime-enforcer:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/runtime-enforcer"
+    versionfilter:
+      kind: semver
+  safe-annotations:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/safe-annotations"
+    versionfilter:
+      kind: semver
+  safe-labels:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/safe-labels"
+    versionfilter:
+      kind: semver
+  seccomp-psp:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/seccomp-psp"
+    versionfilter:
+      kind: semver
+  selinux-psp:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/selinux-psp"
+    versionfilter:
+      kind: semver
+  share-pid-namespace-policy:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/share-pid-namespace-policy"
+    versionfilter:
+      kind: semver
+  sysctl-psp:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/sysctl-psp"
+    versionfilter:
+      kind: semver
+  trusted-repos:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/trusted-repos"
+    versionfilter:
+      kind: semver
+  unique-ingress-policy:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/unique-ingress-policy"
+    versionfilter:
+      kind: semver
+  unique-service-selector-policy:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/unique-service-selector-policy"
+    versionfilter:
+      kind: semver
+  user-group-psp:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/user-group-psp"
+    versionfilter:
+      kind: semver
+  verify-image-signatures:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/verify-image-signatures"
+    versionfilter:
+      kind: semver
+  volumemounts:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/volumemounts"
+    versionfilter:
+      kind: semver
+  volumes-psp:
+    kind: dockerimage
+    image: "ghcr.io/kubewarden/policies/volumes-psp"
+    versionfilter:
+      kind: semver
+
+documents:
+  - name: kubewarden-policies
+    kind: Images
+    apiVersion: "content.hauler.cattle.io/v1"
+    createIfMissing: true
+    sort: true
+    prune: true
+    annotations:
+      hauler.dev/certificate-oidc-issuer: "https://token.actions.githubusercontent.com"
+    items:
+      - repository: ghcr.io/kubewarden/policies/allow-privilege-escalation-psp
+        versionFrom: allow-privilege-escalation-psp
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/allow-privilege-escalation-psp-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/allowed-fsgroups-psp
+        versionFrom: allowed-fsgroups-psp
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/allowed-fsgroups-psp-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/allowed-proc-mount-types-psp
+        versionFrom: allowed-proc-mount-types-psp
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/allowed-proc-mount-types-psp-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/annotations
+        versionFrom: annotations
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/annotations-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/apparmor-psp
+        versionFrom: apparmor-psp
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/apparmor-psp-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/capabilities-psp
+        versionFrom: capabilities-psp
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/capabilities-psp-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/cel-policy
+        versionFrom: cel-policy
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/cel-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/container-resources
+        versionFrom: container-resources
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/container-resources-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/deprecated-api-versions
+        versionFrom: deprecated-api-versions
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/deprecated-api-versions-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/disallow-service-loadbalancer
+        versionFrom: disallow-service-loadbalancer
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/disallow-service-loadbalancer-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/disallow-service-nodeport
+        versionFrom: disallow-service-nodeport
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/disallow-service-nodeport-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/do-not-expose-admission-controller-webhook-services
+        versionFrom: do-not-expose-admission-controller-webhook-services
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/do-not-expose-admission-controller-webhook-services-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/echo
+        versionFrom: echo
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/echo/{version}"
+      - repository: ghcr.io/kubewarden/policies/env-variable-secrets-scanner
+        versionFrom: env-variable-secrets-scanner
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/env-variable-secrets-scanner-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/environment-variable-policy
+        versionFrom: environment-variable-policy
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/environment-variable-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/flexvolume-drivers-psp
+        versionFrom: flexvolume-drivers-psp
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/flexvolume-drivers-psp-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/high-risk-service-account
+        versionFrom: high-risk-service-account
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/high-risk-service-account-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/host-namespaces-psp
+        versionFrom: host-namespaces-psp
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/host-namespaces-psp-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/hostpaths-psp
+        versionFrom: hostpaths-psp
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/hostpaths-psp-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/image-cve-policy
+        versionFrom: image-cve-policy
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/image-cve-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/ingress
+        versionFrom: ingress
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/ingress-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/kyverno-dsl
+        versionFrom: kyverno-dsl
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/kyverno-dsl-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/labels
+        versionFrom: labels
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/labels-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/namespace-label-propagator
+        versionFrom: namespace-label-propagator
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/namespace-label-propagator-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/ns-policyserver-mapper
+        versionFrom: ns-policyserver-mapper
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/ns-policyserver-mapper-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/persistentvolumeclaim-storageclass-policy
+        versionFrom: persistentvolumeclaim-storageclass-policy
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/persistentvolumeclaim-storageclass-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/pod-ndots
+        versionFrom: pod-ndots
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/pod-ndots-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/pod-privileged
+        versionFrom: pod-privileged
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/pod-privileged-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/pod-runtime
+        versionFrom: pod-runtime
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/pod-runtime-class-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/priority-class-policy
+        versionFrom: priority-class-policy
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/priority-class-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/probes
+        versionFrom: probes
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/probes-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/psa-label-enforcer
+        versionFrom: psa-label-enforcer
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/psa-label-enforcer-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/rancher-project-propagate-labels
+        versionFrom: rancher-project-propagate-labels
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/rancher-project-propagate-labels/{version}"
+      - repository: ghcr.io/kubewarden/policies/rancher-project-quotas-namespace-validator
+        versionFrom: rancher-project-quotas-namespace-validator
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/rancher-project-quotas-namespace-validator/{version}"
+      - repository: ghcr.io/kubewarden/policies/readonly-root-filesystem-psp
+        versionFrom: readonly-root-filesystem-psp
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/readonly-root-filesystem-psp-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/runtime-enforcer
+        versionFrom: runtime-enforcer
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/runtime-enforcer-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/safe-annotations
+        versionFrom: safe-annotations
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/safe-annotations-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/safe-labels
+        versionFrom: safe-labels
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/safe-labels-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/seccomp-psp
+        versionFrom: seccomp-psp
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/seccomp-psp-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/selinux-psp
+        versionFrom: selinux-psp
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/selinux-psp-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/share-pid-namespace-policy
+        versionFrom: share-pid-namespace-policy
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/share-pid-namespace-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/sysctl-psp
+        versionFrom: sysctl-psp
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/sysctl-psp-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/trusted-repos
+        versionFrom: trusted-repos
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/trusted-repos-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/unique-ingress-policy
+        versionFrom: unique-ingress-policy
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/unique-ingress-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/unique-service-selector-policy
+        versionFrom: unique-service-selector-policy
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/unique-service-selector-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/user-group-psp
+        versionFrom: user-group-psp
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/user-group-psp-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/verify-image-signatures
+        versionFrom: verify-image-signatures
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/verify-image-signatures/{version}"
+      - repository: ghcr.io/kubewarden/policies/volumemounts
+        versionFrom: volumemounts
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/volumeMounts-policy/{version}"
+      - repository: ghcr.io/kubewarden/policies/volumes-psp
+        versionFrom: volumes-psp
+        fields:
+          certificate-identity-regexp: "https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/volumes-psp-policy/{version}"
+
+scm:
+  enabled: true
+  kind: "github"
+  owner: "UPDATECLI_GITHUB_OWNER"
+  repository: "policies"
+  env_token: "UPDATECLI_GITHUB_TOKEN"
+  branch: "main"
+  user: "Kubewarden bot"
+  email: "cncf-kubewarden-maintainers@lists.cncf.io"
+  commitusingapi: true
+  commitmessage:
+    type: "chore"
+    scope: "deps"
+    title: "Update Hauler manifest with published policy versions"
+    footers: "Signed-off-by: Kubewarden bot <cncf-kubewarden-maintainers@lists.cncf.io>"
+
+pr:
+  enabled: true
+  automerge: false
+  mergemethod: "squash"
+  title: "chore(deps): Update Hauler manifest"
+  description: |
+    Automatic update of `hauler_manifest.yaml` with the latest published
+    Kubewarden policy versions read from the OCI registry.
+
+    This PR has been created by automation.
+  labels:
+    - "kind/chore"
+    - "area/dependencies"
+  reviewers:
+    - "kubewarden/kubewarden-developers"
+
+pipeline:
+  labels:
+    ecosystem: "hauler"
+    policy: "manifest"

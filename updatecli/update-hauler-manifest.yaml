@@ -1,0 +1,10 @@
+name: Update Hauler manifest
+
+policies:
+  - name: Reconcile hauler_manifest.yaml with published policy versions
+    # TODO: switch to ghcr.io/updatecli/policies/hauler/manifest once the
+    # upstream policy (https://github.com/updatecli/policies) is merged and
+    # published. For now this points at a fork used to develop the policy.
+    policy: ghcr.io/jvanz/updatecli/policies/hauler/manifest:0.1.0
+    values:
+      - ./values/hauler-manifest.yaml

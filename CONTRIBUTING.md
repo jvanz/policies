@@ -149,3 +149,38 @@ the `policies` directory modified:
 
 Example: If you update the `pod-privileged-policy` policy to version `0.1.5`,
 the CI will generate the tag: `pod-privileged-policy/v0.1.5`
+
+# Hauler Manifest
+
+`hauler_manifest.yaml`, at the root of the repository, is a
+[Hauler](https://github.com/hauler-dev/hauler) content manifest listing every
+published policy image (`ghcr.io/kubewarden/policies/<policy-id>:<version>`),
+so downstream consumers can vendor/air-gap all Kubewarden policies with a
+single `hauler` invocation.
+
+The manifest is reconciled weekly by
+`.github/workflows/update-hauler-manifest.yaml`, which runs the
+[`hauler/manifest`](https://github.com/updatecli/policies/tree/main/updatecli/policies/hauler/manifest)
+Updatecli policy (via `updatecli compose apply --file
+./updatecli/update-hauler-manifest.yaml`). Each policy's version is read
+directly from the OCI registry (not from `metadata.yml`), so the manifest
+always reflects what is actually published, even if a release PR bumping
+`metadata.yml` has not merged yet. If a change is detected, a PR is opened
+against `main`.
+
+To add a newly published policy to the manifest, add matching entries to
+`updatecli/values/hauler-manifest.yaml`:
+
+- a `versions.<policy-id>` entry (a `dockerimage` source pointed at
+  `ghcr.io/kubewarden/policies/<policy-id>` with a `semver` version filter)
+- a corresponding item under `documents[0].items`, with `repository`,
+  `versionFrom: <policy-id>`, and a `certificate-identity-regexp` field
+  pinned to that policy's release workflow tag
+  (`.../release.yml@refs/tags/<policy-directory-name>/{version}`)
+
+Policies without an `io.kubewarden.policy.ociUrl` under
+`ghcr.io/kubewarden/policies/` (e.g. test-only or unpublished policies) are
+not included.
+
+Run `updatecli compose diff --file ./updatecli/update-hauler-manifest.yaml`
+locally to preview changes before they land via the scheduled workflow.
