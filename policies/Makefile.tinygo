@@ -48,3 +48,4 @@ debug:
 	@echo "POLICY_DIR=$(POLICY_DIR)"
 
 include ../go-common.mk
+include ../common.mk

@@ -168,19 +168,44 @@ always reflects what is actually published, even if a release PR bumping
 `metadata.yml` has not merged yet. If a change is detected, a PR is opened
 against `main`.
 
-To add a newly published policy to the manifest, add matching entries to
-`updatecli/values/hauler-manifest.yaml`:
+## Keeping the Manifest in Sync
 
-- a `versions.<policy-id>` entry (a `dockerimage` source pointed at
-  `ghcr.io/kubewarden/policies/<policy-id>` with a `semver` version filter)
-- a corresponding item under `documents[0].items`, with `repository`,
-  `versionFrom: <policy-id>`, and a `certificate-identity-regexp` field
-  pinned to that policy's release workflow tag
-  (`.../release.yml@refs/tags/<policy-directory-name>/{version}`)
+CI enforces that every policy is correctly represented in the Hauler
+manifest tooling. Each policy's `make check-hauler-manifest` target (run by
+`reusable-ci.yaml`, and therefore also by the release workflow) verifies:
 
-Policies without an `io.kubewarden.policy.ociUrl` under
-`ghcr.io/kubewarden/policies/` (e.g. test-only or unpublished policies) are
-not included.
+- a policy **not** listed in `policies/excluded-from-publishing.txt` is
+  present in both `hauler_manifest.yaml` and
+  `updatecli/values/hauler-manifest.yaml`
+- a policy listed there is present in **neither** file
 
-Run `updatecli compose diff --file ./updatecli/update-hauler-manifest.yaml`
-locally to preview changes before they land via the scheduled workflow.
+The check only verifies presence, never versions: the weekly Updatecli
+automation is the source of truth for versions, and it will drift from
+`metadata.yml` on purpose whenever a version bump hasn't been published to
+the OCI registry yet (see `hack/check-hauler-manifest.sh`). A release fails
+if this check fails, so a brand-new policy must be added to the manifest
+tooling, or to the exclusion list, before its first release:
+
+- **To publish it**, add matching entries to
+  `updatecli/values/hauler-manifest.yaml`:
+  - a `versions.<policy-id>` entry (a `dockerimage` source pointed at
+    `ghcr.io/kubewarden/policies/<policy-id>` with a `semver` version filter)
+  - a corresponding item under `documents[0].items`, with `repository`,
+    `versionFrom: <policy-id>`, and a `certificate-identity-regexp` field
+    pinned to that policy's release workflow tag
+    (`.../release.yml@refs/tags/<policy-directory-name>/{version}`)
+
+  and a matching image entry in `hauler_manifest.yaml` itself, using the
+  version you intend to release first (the weekly automation corrects it
+  afterwards if needed).
+
+- **To keep it out** (test-only or otherwise unpublished policies), add the
+  policy's directory name to `policies/excluded-from-publishing.txt`
+  instead. This is also the file `release.yml` reads to decide whether to
+  skip publishing to ArtifactHub and the policy-catalog.
+
+Run `make -C <policy-directory> check-hauler-manifest` locally to check a
+single policy, or `make check-hauler-manifest` from the repository root to
+check all of them. Run
+`updatecli compose diff --file ./updatecli/update-hauler-manifest.yaml`
+to preview what the scheduled workflow would change.

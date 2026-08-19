@@ -40,3 +40,4 @@ e2e-tests: annotated-policy.wasm
 
 
 include ../go-common.mk
+include ../common.mk

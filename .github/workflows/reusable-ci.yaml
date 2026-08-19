@@ -60,3 +60,11 @@ jobs:
         shell: bash
         run: |
           make -C ${{ inputs.policy-working-dir}} e2e-tests
+  check-hauler-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check policy is correctly listed in the Hauler manifest
+        shell: bash
+        run: |
+          make -C ${{ inputs.policy-working-dir}} check-hauler-manifest

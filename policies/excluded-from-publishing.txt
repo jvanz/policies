@@ -1,0 +1,15 @@
+# Policies that must NOT be published to ArtifactHub, the policy-catalog, or
+# the Hauler manifest (hauler_manifest.yaml / updatecli/values/hauler-manifest.yaml
+# at the repository root). They still receive a GitHub Release and an OCI
+# package.
+#
+# One policy directory name per line. Blank lines and lines starting with
+# '#' are ignored.
+context-aware-demo
+go-wasi-context-aware-test-policy
+raw-mutation-policy
+raw-mutation-wasi-policy
+raw-validation-opa-policy
+raw-validation-policy
+raw-validation-wasi-policy
+sleeping-policy

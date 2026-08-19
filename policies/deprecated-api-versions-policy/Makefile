@@ -25,6 +25,10 @@ test: fmt lint
 clean:
 	$(MAKE) --file ../Makefile.rust $@
 
+.PHONY: check-hauler-manifest
+check-hauler-manifest:
+	$(MAKE) --file ../Makefile.rust $@
+
 .PHONY: expected-policy-metadata
 expected-policy-metadata:
 	cargo --locked run --quiet --package policy-metadata-helper -- --metadata-path metadata.yml build
