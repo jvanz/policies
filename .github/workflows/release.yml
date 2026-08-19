@@ -49,25 +49,19 @@ jobs:
             echo "has_artifacthub_metadata=false" >> $GITHUB_OUTPUT
           fi
 
-          # Policies that should not be published to ArtifactHub or the policy-catalog.
-          # They still receive a GitHub Release and OCI package.
-          EXCLUDED_FROM_PUBLISHING=(
-            "context-aware-demo"
-            "go-wasi-context-aware-test-policy"
-            "raw-mutation-policy"
-            "raw-mutation-wasi-policy"
-            "raw-validation-opa-policy"
-            "raw-validation-policy"
-            "raw-validation-wasi-policy"
-            "sleeping-policy"
-          )
+          # Policies that should not be published to ArtifactHub, the
+          # policy-catalog, or the Hauler manifest. They still receive a
+          # GitHub Release and OCI package. See policies/excluded-from-publishing.txt
+          # for the authoritative list.
           skip_publishing=false
-          for excluded in "${EXCLUDED_FROM_PUBLISHING[@]}"; do
+          while IFS= read -r excluded; do
+            excluded="$(echo "$excluded" | sed -e 's/#.*//' -e 's/[[:space:]]//g')"
+            [ -z "$excluded" ] && continue
             if [ "$policy_name" == "$excluded" ]; then
               skip_publishing=true
               break
             fi
-          done
+          done <policies/excluded-from-publishing.txt
           echo "skip_publishing=$skip_publishing" >> $GITHUB_OUTPUT
 
   ci:
