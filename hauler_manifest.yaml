@@ -6,8 +6,8 @@ metadata:
     hauler.dev/certificate-oidc-issuer: https://token.actions.githubusercontent.com
 spec:
   images:
-    - name: ghcr.io/kubewarden/policies/allow-privilege-escalation-psp:v1.0.13
-      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/allow-privilege-escalation-psp-policy/v1.0.13
+    - name: ghcr.io/kubewarden/policies/allow-privilege-escalation-psp:v1.0.12
+      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/allow-privilege-escalation-psp-policy/v1.0.12
     - name: ghcr.io/kubewarden/policies/allowed-fsgroups-psp:v1.0.12
       certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/allowed-fsgroups-psp-policy/v1.0.12
     - name: ghcr.io/kubewarden/policies/allowed-proc-mount-types-psp:v1.0.15
@@ -78,29 +78,3 @@ spec:
       certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/readonly-root-filesystem-psp-policy/v1.0.13
     - name: ghcr.io/kubewarden/policies/runtime-enforcer:v0.1.4
       certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/runtime-enforcer-policy/v0.1.4
-    - name: ghcr.io/kubewarden/policies/safe-annotations:v1.0.7
-      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/safe-annotations-policy/v1.0.7
-    - name: ghcr.io/kubewarden/policies/safe-labels:v1.0.12
-      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/safe-labels-policy/v1.0.12
-    - name: ghcr.io/kubewarden/policies/seccomp-psp:v1.0.15
-      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/seccomp-psp-policy/v1.0.15
-    - name: ghcr.io/kubewarden/policies/selinux-psp:v1.1.2
-      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/selinux-psp-policy/v1.1.2
-    - name: ghcr.io/kubewarden/policies/share-pid-namespace-policy:v1.0.14
-      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/share-pid-namespace-policy/v1.0.14
-    - name: ghcr.io/kubewarden/policies/sysctl-psp:v1.0.14
-      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/sysctl-psp-policy/v1.0.14
-    - name: ghcr.io/kubewarden/policies/trusted-repos:v2.1.4
-      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/trusted-repos-policy/v2.1.4
-    - name: ghcr.io/kubewarden/policies/unique-ingress-policy:v1.0.12
-      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/unique-ingress-policy/v1.0.12
-    - name: ghcr.io/kubewarden/policies/unique-service-selector-policy:v1.0.13
-      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/unique-service-selector-policy/v1.0.13
-    - name: ghcr.io/kubewarden/policies/user-group-psp:v1.1.5
-      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/user-group-psp-policy/v1.1.5
-    - name: ghcr.io/kubewarden/policies/verify-image-signatures:v1.0.11
-      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/verify-image-signatures/v1.0.11
-    - name: ghcr.io/kubewarden/policies/volumemounts:v1.0.11
-      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/volumeMounts-policy/v1.0.11
-    - name: ghcr.io/kubewarden/policies/volumes-psp:v1.1.10
-      certificate-identity-regexp: https://github.com/kubewarden/policies/.github/workflows/release.yml@refs/tags/volumes-psp-policy/v1.1.10
