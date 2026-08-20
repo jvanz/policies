@@ -162,8 +162,12 @@ EOF
 scm:
   enabled: true
   kind: "github"
-  owner: "UPDATECLI_GITHUB_OWNER"
-  repository: "$REPO"
+  # owner/repository are deliberately omitted. The hauler/manifest policy
+  # derives them from GITHUB_REPOSITORY at run time, so the PR is opened
+  # against whichever repository the workflow runs in (a fork when
+  # testing, kubewarden/policies upstream). They must not be tied to
+  # \$OWNER/\$REPO above, which point at the registry the policy images
+  # are published to, not at the repository running this workflow.
   env_token: "UPDATECLI_GITHUB_TOKEN"
   branch: "main"
   user: "Kubewarden bot"

@@ -48,7 +48,6 @@ jobs:
 
       - name: Update Hauler manifest
         env:
-          UPDATECLI_GITHUB_OWNER: ${{ github.repository_owner }}
           UPDATECLI_GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |-
           updatecli compose apply --file ./updatecli/update-hauler-manifest.yaml

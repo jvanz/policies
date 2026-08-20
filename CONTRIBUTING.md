@@ -190,6 +190,12 @@ Doing that against an existing manifest rewrites the whole thing. Every policy
 is re-added under `ghcr.io/<you>/policies/...`, and because the policy sets
 `prune: true`, every `kubewarden`-owned entry is dropped.
 
+`--owner`/`--repo` only affect the image path and the
+`certificate-identity-regexp`. The repository the PR is opened against is
+separate: the policy reads it from `GITHUB_REPOSITORY`, which GitHub Actions
+sets to the running repository. That is what lets a fork pull versions from
+the upstream `kubewarden` registry while opening its PR against the fork.
+
 You do not need to add a newly published policy to the values file by hand. The
 next generation picks up any policy directory that has a `Makefile` and is not
 listed in `policies/excluded-from-publishing.txt`. The reverse case is the one
@@ -202,6 +208,8 @@ until its first release.
 To preview changes before the scheduled workflow lands them, run:
 
 ```console
+export GITHUB_REPOSITORY=<owner>/<repo>             # the policy reads owner/repo from this
+export UPDATECLI_GITHUB_TOKEN=<token>               # needs contents:read on that repo
 make hauler-values                                  # writes updatecli/values/hauler-manifest.generated.yaml
 updatecli compose diff --file ./updatecli/update-hauler-manifest.yaml
 ```
