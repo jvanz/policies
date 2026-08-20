@@ -36,9 +36,6 @@ jobs:
           permission-pull-requests: write
 
       - name: Generate Updatecli values for this repository
-        env:
-          HAULER_OWNER: ${{ github.repository_owner }}
-          HAULER_REPO: ${{ github.event.repository.name }}
         run: make hauler-values
 
       - name: Update Hauler manifest
