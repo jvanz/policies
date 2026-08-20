@@ -116,6 +116,7 @@ pipelineid: "update_hauler_manifest"
 
 hauler:
   file: "hauler_manifest.yaml"
+  createIfMissing: true
 
 # One dockerimage source per published Kubewarden policy. The version is
 # read from the OCI registry (ghcr.io), not from the policy's metadata.yml,
