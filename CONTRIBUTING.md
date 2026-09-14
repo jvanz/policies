@@ -140,26 +140,28 @@ I[User push a new tag] --> E
 
 ## Publish the 'latest' tag of one policy
 
-You can also run `release.yaml` manually from a branch. Such a run builds one
+You can also run `release.yml` manually, against a branch. That run builds one
 policy and publishes it with the `:latest` tag:
 
 ```console
-gh workflow run release.yaml \
+gh workflow run release.yml \
     -f "policy-working-dir=allowed-proc-mount-types-psp-policy" \
     -R kubewarden/policies
 ```
 
 The version comes from the `io.kubewarden.policy.version` annotation of
-`metadata.yml`. A run from a branch only puhses the `:latest` OCI tag. It doesn't
-create a git tag nor a GitHub release, and doesn't update neither ArtifactHub
-nor the policy catalog.
+`metadata.yml`. A run against a branch only pushes the `:latest` OCI tag. It
+creates no git tag and no GitHub release. It updates neither ArtifactHub nor
+the policy catalog.
 
 > [!NOTE]
-> A run of `release.yaml` from a tag is a normal release. It takes the policy
-> and the version from the tag, and it ignores the `policy-working-dir` input.
-> `release-tag.yaml` uses this: GitHub fires no workflow for a tag that
-> `GITHUB_TOKEN` pushes, so `release-tag.yaml` starts `release.yaml` with
-> `gh workflow run release.yml --ref <tag>`.
+> A run of `release.yml` against a tag is a normal release. The policy name
+> and the version come from the tag name, and the run ignores the
+> `policy-working-dir` input.
+>
+> `release-tag.yaml` starts this kind of run. GitHub fires no workflow for a
+> tag pushed with `GITHUB_TOKEN`, so `release-tag.yaml` must start the run
+> itself, with `gh workflow run release.yml --ref <tag>`.
 
 # Tag Pattern
 

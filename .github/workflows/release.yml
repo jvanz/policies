@@ -3,11 +3,11 @@ on:
     inputs:
       policy-working-dir:
         description: |
-          Policy directory under the policies folder. Give it when you run this
-          workflow from a branch: the run builds that policy and publishes it
-          with the ':latest' tag, and it creates no git tag and no GitHub
-          release. A run from a tag ignores this input and takes the policy and
-          the version from the tag.
+          Bare policy directory name, without the 'policies/' prefix. Give this
+          input when the workflow runs against a branch. That run builds the
+          policy and publishes it with the ':latest' tag only. It creates no
+          git tag and no GitHub release. A run against a tag ignores this
+          input. The policy name and the version come from the tag name.
         required: false
         type: string
         default: ""
@@ -31,18 +31,26 @@ jobs:
       - id: calculate-vars
         shell: bash
         run: |
-          # A run from a tag gives the policy and the version through the tag.
-          # This happens on a push of a tag, and also on a manual run that
-          # `release-tag.yaml` starts: GitHub fires no workflow for a tag that
-          # GITHUB_TOKEN pushes, so `release-tag.yaml` starts this workflow with
-          # `gh workflow run release.yml --ref <tag>` and gives no input.
-          # A run from a branch has no tag, so it needs the input.
+          # This workflow runs against a tag or a branch. `github.ref` tells
+          # us which, not `github.event_name`.
+          #
+          # A run against a tag is a full release. The policy name and the
+          # version come from the tag name. Two triggers start this run:
+          #   - a direct push of a '*/v*' tag
+          #   - a workflow_dispatch that `release-tag.yaml` sends with
+          #     `gh workflow run release.yml --ref <tag>`, with no input.
+          #     GitHub fires no workflow for a tag pushed with GITHUB_TOKEN,
+          #     so `release-tag.yaml` must start this run itself.
+          #
+          # A run against a branch only publishes the ':latest' tag. There is
+          # no tag to read the policy name from, so it needs the
+          # `policy-working-dir` input.
           if [ "${{ startsWith(github.ref, 'refs/tags/') }}" == "true" ]; then
             policy_name=$( echo ${{ github.ref_name }} | sed 's/\(.*\)\/\(.*\)$/\1/' )
           else
             policy_name='${{ inputs.policy-working-dir }}'
             if [ -z "$policy_name" ]; then
-              echo "::error title=Missing input::a run from a branch needs the 'policy-working-dir' input"
+              echo "::error title=Missing input::this run needs the 'policy-working-dir' input, because it runs against a branch"
               exit 1;
             fi
           fi
@@ -75,7 +83,7 @@ jobs:
           if [ "${{ startsWith(github.ref, 'refs/tags/') }}" == "true" ]; then
             policy_version=$( echo ${{ github.ref_name }} | sed 's/\(.*\)\/\(.*\)$/\2/' | cut -c2- )
           else
-            # A run from a branch has no tag. The version comes from metadata.yml.
+            # A run against a branch has no tag. The version comes from metadata.yml instead.
             policy_version=$(yq -r '.annotations."io.kubewarden.policy.version"' $policy_working_dir/metadata.yml)
           fi
 
