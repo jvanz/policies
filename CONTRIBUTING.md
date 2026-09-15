@@ -75,6 +75,8 @@ language-scoped variants are also available.
 | `lint-go`        | Go policies                                                                       |
 | `e2e-tests-rust` | Rust policies                                                                     |
 | `e2e-tests-go`   | Go policies                                                                       |
+| `test-shell`     | The release tooling under `hack/` (needs `bats`)                                  |
+| `lint-shell`     | The release tooling under `hack/` (needs `shellcheck`)                            |
 
 The language detection is file-based: a policy directory is considered Rust if
 it contains a `Cargo.toml`, and Go if it contains a `go.mod`. These sets are
@@ -82,6 +84,86 @@ mutually exclusive. The shared crates under `policies/crates/` are all Rust and
 are included in the `*-rust` targets for `test` and `lint` (consistent with the
 full-repo targets), but not for `e2e-tests` since crates have no end-to-end
 tests.
+
+# Pull Request Titles Decide the Release
+
+Give every pull request a title in the
+[Conventional Commits](https://www.conventionalcommits.org/) form:
+
+```
+<type>[(scope)][!]: <description>
+```
+
+**The title is not a formality. It decides the next version number of every
+policy the pull request touches, and it becomes the changelog entry of that
+release.** Labels do not: they exist so maintainers can search and triage, and
+the release tooling never reads them.
+
+## How a title becomes a version
+
+The tooling reads the title of every pull request merged since the last release
+of a policy, and applies the largest increase any of them asks for.
+
+| Title                                    | Version increase | Changelog section |
+| ---------------------------------------- | ---------------- | ----------------- |
+| `feat(cel-policy)!: drop a setting`       | major            | Breaking changes  |
+| `feat: accept a new setting`              | minor            | Features          |
+| `fix: reject the malformed input`         | patch            | Bug Fixes         |
+| `chore(deps): bump serde`                 | patch            | Maintenance       |
+| anything else, including an unusable title | patch           | Maintenance       |
+
+A `BREAKING CHANGE:` footer in the body of the pull request has the same effect
+as the `!` in the title.
+
+Two rules keep a change to the tooling from re-versioning the policies:
+
+- A `!` only counts on `feat`, `fix`, `perf`, `refactor` and `revert`. A
+  breaking change to the CI is not a breaking change to a policy.
+- A `!` under the scope `ci`, `build`, `deps`, `docs`, `test` or `release` does
+  not count either. A pull request that edits `metadata.yml` in all 58 policies
+  would otherwise raise the major version of all 58 at once.
+
+A title the tooling cannot read is not an error. It counts as a patch, its text
+goes into the Maintenance section as it stands, and the run prints a warning.
+Getting it right still matters: the released version is wrong in a way nobody
+notices until the release is out.
+
+## Which pull requests count towards a policy
+
+A pull request counts towards the release of a policy when it changed at least
+one file under that policy's directory, and when it was merged after the last
+release of that policy. A pull request that touches four policies appears in
+the release notes of all four.
+
+## Seeing the result before you release
+
+The tooling is a plain shell script, so you can run the whole computation
+against the real repository without pushing anything:
+
+```console
+# one policy
+hack/policy-release-notes.sh --policy-working-dir policies/echo --dry-run
+
+# every policy, from a single API query
+hack/policy-release-notes.sh --base main --write-pr-cache /tmp/prs.json
+hack/policy-release-notes.sh --all --pr-cache /tmp/prs.json
+```
+
+It prints the baseline release, the pull requests it found, the version it
+resolved and the release notes it would write.
+
+## If a title was wrong
+
+Correct the title of the merged pull request on GitHub, then run the release
+again: the tooling reads the titles at release time, not at merge time. When
+the release has already gone out, force the version you want:
+
+```console
+gh workflow run trigger-policy-release.yaml \
+    -f "policy-working-dir=echo" \
+    -f "policy-version=1.2.3" \
+    -R kubewarden/policies
+```
 
 # How to Release a Policy
 
