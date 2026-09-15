@@ -1,4 +1,11 @@
-.PHONY: clean annotated-policy.wasm test test-rust test-go lint lint-rust lint-go e2e-tests e2e-tests-rust e2e-tests-go
+.PHONY: clean annotated-policy.wasm test test-rust test-go test-shell lint lint-rust lint-go lint-shell e2e-tests e2e-tests-rust e2e-tests-go
+
+# The release tooling in hack/. It decides the version of every policy, so it
+# is checked and tested like any other code.
+#
+# hack/release-all-policies.sh is left out: it predates this target and carries
+# a shellcheck warning of its own. Add it here once that is dealt with.
+SHELL_SCRIPTS := hack/policy-release-notes.sh hack/lib/conventional-commit.sh
 
 # Helper function to run a target across all policies (excluding crates/) with summary
 define run-policy-target
@@ -101,6 +108,13 @@ annotated-policy.wasm:
 test:
 	$(call run-policy-target,test)
 	$(call run-crate-target,test)
+
+# Unit tests for the release tooling in hack/. Needs bats.
+test-shell:
+	bats hack/tests/
+
+lint-shell:
+	shellcheck -x $(SHELL_SCRIPTS)
 
 test-rust:
 	$(call run-rust-policy-target,test)

@@ -88,3 +88,18 @@ jobs:
         policy-working-dir: ${{ fromJSON(needs.calculate-policy-matrix.outputs.policy_working_dirs) }}
     with:
       policy-working-dir: ${{ matrix.policy-working-dir }}
+
+  release-tooling:
+    name: Release tooling
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install bats
+        run: sudo apt-get install -y bats
+
+      - name: Check the shell scripts
+        run: make lint-shell
+
+      - name: Test the release tooling
+        run: make test-shell
