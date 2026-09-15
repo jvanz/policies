@@ -15,6 +15,10 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: release-drafter/release-drafter/autolabeler@34d80673e067bdc0c24568d3af899c216adcfaa9 # v7.7.0
+      # The labelling action lives in this repository and reads the shared
+      # conventional-commit parser from hack/, so the tree has to be present.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: ./.github/actions/label-pr-by-title
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

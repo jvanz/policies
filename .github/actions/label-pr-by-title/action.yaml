@@ -1,0 +1,87 @@
+name: "label-pr-by-title"
+description: |
+  Label a pull request from the conventional-commit type in its title.
+
+  The labels exist so that maintainers can search and triage pull requests.
+  No release logic reads them: the version of a policy and its changelog come
+  from the pull request titles, through hack/policy-release-notes.sh. The two
+  share one parser, hack/lib/conventional-commit.sh, so a label and a changelog
+  section can never disagree.
+branding:
+  icon: "tag"
+  color: "blue"
+
+inputs:
+  pr-number:
+    description: "Number of the pull request to label."
+    required: false
+    default: ${{ github.event.pull_request.number }}
+  token:
+    description: "Token with 'pull-requests: write' permission."
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Label the pull request from its title
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        GH_REPO: ${{ github.repository }}
+        PR_NUMBER: ${{ inputs.pr-number }}
+      run: |
+        set -o errexit
+        set -o nounset
+        set -o pipefail
+
+        source "${GITHUB_ACTION_PATH}/../../../hack/lib/conventional-commit.sh"
+
+        PR_JSON="$(gh pr view "$PR_NUMBER" --json title,body)"
+        TITLE="$(jq -r '.title' <<< "$PR_JSON")"
+        BODY="$(jq -r '.body // ""' <<< "$PR_JSON")"
+
+        echo "pull request #${PR_NUMBER}: ${TITLE}"
+
+        if ! PARSED="$(cc_parse "$TITLE" "$BODY")"; then
+          echo "::warning::The title of this pull request is not a conventional commit. Labelling it as a chore. Expected '<type>[(scope)][!]: <description>', for example 'feat(cel-policy): add a matcher'."
+        fi
+        TYPE="$(sed -n 1p <<< "$PARSED")"
+        SCOPE="$(sed -n 2p <<< "$PARSED")"
+        BREAKING="$(sed -n 3p <<< "$PARSED")"
+
+        echo "type=${TYPE} scope=${SCOPE:-<none>} breaking=${BREAKING}"
+
+        declare -a TO_APPLY=()
+        EXISTING="$(gh label list --limit 500 --json name --jq '.[].name')"
+
+        # A label that does not exist makes "gh pr edit" fail, which would turn
+        # a missing label into a failed check. A fork of this repository starts
+        # with none of these labels, so create the ones that are absent.
+        ensure_label() {
+          local name="$1" colour="$2" description="$3"
+          if ! grep -qxF "$name" <<< "$EXISTING"; then
+            echo "creating the missing label '${name}'"
+            gh label create "$name" --color "$colour" --description "$description" \
+              || echo "::warning::Could not create the label '${name}'. Skipping it."
+          fi
+        }
+
+        while IFS= read -r label; do
+          [ -n "$label" ] || continue
+          case "$label" in
+            kind/breaking-change) ensure_label "$label" "b60205" "Changes the behaviour a policy promises its users" ;;
+            area/dependencies)    ensure_label "$label" "0366d6" "Updates a dependency" ;;
+            kind/feature)         ensure_label "$label" "0e8a16" "Adds a capability" ;;
+            kind/bug)             ensure_label "$label" "d73a4a" "Corrects a defect" ;;
+            kind/chore)           ensure_label "$label" "cfd3d7" "Maintenance work" ;;
+          esac
+          TO_APPLY+=(--add-label "$label")
+        done < <(cc_labels "$TYPE" "$SCOPE" "$BREAKING")
+
+        if [ "${#TO_APPLY[@]}" -eq 0 ]; then
+          echo "no label to apply"
+          exit 0
+        fi
+
+        echo "applying: ${TO_APPLY[*]}"
+        gh pr edit "$PR_NUMBER" "${TO_APPLY[@]}"
