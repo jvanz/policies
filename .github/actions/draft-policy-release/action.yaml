@@ -1,0 +1,103 @@
+name: "draft-policy-release"
+description: |
+  Resolve the next version of a policy and write its draft GitHub release.
+
+  Both come from the conventional-commit titles of the pull requests merged
+  since the last release of that policy. This action is a thin wrapper around
+  hack/policy-release-notes.sh, which a maintainer can run locally:
+
+    hack/policy-release-notes.sh --policy-working-dir policies/echo --dry-run
+branding:
+  icon: "file-text"
+  color: "blue"
+
+inputs:
+  policy-working-dir:
+    description: |
+      Policy directory, with the "policies/" prefix. For example "policies/echo".
+    required: true
+  base:
+    description: |
+      Branch whose merged pull requests make up the release. Defaults to the
+      branch the workflow runs on, which keeps a maintenance branch from
+      collecting the pull requests of main.
+    required: false
+    default: ""
+  version:
+    description: |
+      Version to release, without the "v" prefix. Leave it empty to resolve one
+      from the pull request titles.
+    required: false
+    default: ""
+  pr-cache:
+    description: |
+      JSON file holding the merged pull requests, as written by
+      "policy-release-notes.sh --write-pr-cache". Give this when the caller
+      already fetched them, so that a matrix over every policy costs one query
+      rather than one query per policy.
+    required: false
+    default: ""
+  dry-run:
+    description: "Resolve and print, but write no release."
+    required: false
+    default: "false"
+  token:
+    description: "Token with 'contents: write' permission."
+    required: true
+
+outputs:
+  resolved_version:
+    description: |
+      The version to release, without the "v" prefix. Empty when nothing was
+      merged since the last release, which means there is nothing to release.
+    value: ${{ steps.draft.outputs.resolved_version }}
+  tag:
+    description: 'The tag of the release, in the form "<policy>/v<version>".'
+    value: ${{ steps.draft.outputs.tag }}
+  id:
+    description: "The numeric id of the draft release."
+    value: ${{ steps.draft.outputs.id }}
+  pr_count:
+    description: "How many merged pull requests the release covers."
+    value: ${{ steps.draft.outputs.pr_count }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Resolve the version and draft the release
+      id: draft
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+        GH_REPO: ${{ github.repository }}
+      run: |
+        set -o errexit
+        set -o nounset
+        set -o pipefail
+
+        declare -a ARGS=(
+          --policy-working-dir "${{ inputs.policy-working-dir }}"
+          --output "$GITHUB_OUTPUT"
+        )
+
+        BASE="${{ inputs.base }}"
+        [ -n "$BASE" ] || BASE="${GITHUB_REF_NAME}"
+        ARGS+=(--base "$BASE")
+
+        # The workflow writes the literal string '' when it forces no version.
+        # The script treats that as absent, but passing it on keeps the two
+        # ends honest about what was asked for.
+        #
+        # These are "if" blocks, not "&&" chains: under "set -e" a chain whose
+        # test fails returns non-zero and ends the step.
+        if [ -n "${{ inputs.version }}" ]; then
+          ARGS+=(--version "${{ inputs.version }}")
+        fi
+        if [ -n "${{ inputs.pr-cache }}" ]; then
+          ARGS+=(--pr-cache "${{ inputs.pr-cache }}")
+        fi
+        if [ "${{ inputs.dry-run }}" = "true" ]; then
+          ARGS+=(--dry-run)
+        fi
+
+        "${GITHUB_ACTION_PATH}/../../../hack/policy-release-notes.sh" "${ARGS[@]}"

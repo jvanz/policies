@@ -59,6 +59,27 @@ jobs:
           echo "policy_working_dirs=$policy_working_dirs"
           echo "policy_working_dirs=$policy_working_dirs" >> $GITHUB_OUTPUT
 
+      # Fetch the merged pull requests once, here, and hand the result to every
+      # matrix job. A run over all 58 policies then costs one GraphQL query
+      # instead of 58. This is why the matrix below can stay inside the API
+      # rate limit.
+      - name: Fetch the merged pull requests
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          ./hack/policy-release-notes.sh \
+            --base "${GITHUB_REF_NAME}" \
+            --write-pr-cache merged-prs.json
+
+      - name: Upload the merged pull requests
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: merged-prs
+          path: merged-prs.json
+          retention-days: 1
+
   open-release-pr:
     name: "Open PR to release policy"
     runs-on: ubuntu-latest
@@ -86,6 +107,11 @@ jobs:
       - name: Install cargo-set-version
         run: cargo install cargo-edit --version 0.13.9 --locked
 
+      - name: Download the merged pull requests
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v7.0.0
+        with:
+          name: merged-prs
+
       - name: Get policy metadata
         id: policy-info
         uses: ./.github/actions/get-policy-metadata
@@ -107,27 +133,46 @@ jobs:
           fi
           # If there is no tag with the current version in the metadata file,
           # the previous version of the policy is missing. It looks like that
-          # the policy is bein released for the first time. Then, release
-          # drafter should use the current version already set in the policy.
-          # Otherwise, let's release-drafter calculate the version for us based
-          # on the PRs merged.
+          # the policy is being released for the first time. Then, the release
+          # notes generator should use the version already set in the policy.
+          # Otherwise, let it resolve the version from the merged PR titles.
           policy_tag=$(git tag -l  $(basename ${{ matrix.policy-working-dir }})/v${{ steps.policy-info.outputs.policy-version }})
           if [ -z "$policy_tag" ]; then
             # No tag, let's use the version from the policy
             echo "version=${{ steps.policy-info.outputs.policy-version }}" >> $GITHUB_OUTPUT
             exit 0
           fi
-          echo "version=''" >> $GITHUB_OUTPUT
+          echo "version=" >> $GITHUB_OUTPUT
 
       - name: Create draft release and calculate version
         id: create-release
-        uses: release-drafter/release-drafter@34d80673e067bdc0c24568d3af899c216adcfaa9 # v7.7.0
+        uses: ./.github/actions/draft-policy-release
         with:
-          config-name: "release-drafter-${{ steps.policy-info.outputs.policy-basename }}.yml"
-          version: ${{ steps.get-expected-version.outputs.version}}
+          policy-working-dir: "${{ matrix.policy-working-dir }}"
+          base: "${{ github.ref_name }}"
+          version: "${{ steps.get-expected-version.outputs.version }}"
+          pr-cache: merged-prs.json
           token: ${{ steps.generate-token.outputs.token }}
 
-      - name: Ensure that release drafter is not downgrading the policy version
+      # Nothing was merged against this policy since its last release, so there
+      # is no release to make. The remaining steps would open an empty pull
+      # request and tag a tree identical to the one already released.
+      - name: Stop when there is nothing to release
+        id: nothing-to-release
+        shell: bash
+        env:
+          RESOLVED_VERSION: ${{ steps.create-release.outputs.resolved_version }}
+          POLICY_WORKING_DIR: ${{ matrix.policy-working-dir }}
+        run: |
+          if [ -z "$RESOLVED_VERSION" ]; then
+            echo "No pull request touched ${POLICY_WORKING_DIR} since its last release."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Ensure that the resolved version is not a downgrade
+        if: ${{ steps.nothing-to-release.outputs.skip == 'false' }}
         run: |
           semver_result=$(semver compare ${{ steps.policy-info.outputs.policy-version }} ${{ steps.create-release.outputs.resolved_version }}) 
           if [ "$semver_result" == "1" ]; then
@@ -139,13 +184,13 @@ jobs:
       # the script will not update the metadata.yaml file. Therefore, the tag
       # is the only thing missing
       - name: Trigger tagging workflow
-        if: ${{ steps.get-expected-version.outputs.version == steps.policy-info.outputs.policy-version }}
+        if: ${{ steps.nothing-to-release.outputs.skip == 'false' && steps.get-expected-version.outputs.version == steps.policy-info.outputs.policy-version }}
         run: gh workflow run release-tag.yaml --field  "policy-working-dir=${{matrix.policy-working-dir }}"
         env:
           GH_TOKEN: ${{ github.token }}
 
-      - name: Create values.yaml for Updatecli based on release drafter release and policy information
-        if: ${{ steps.get-expected-version.outputs.version != steps.policy-info.outputs.policy-version }}
+      - name: Create values.yaml for Updatecli from the resolved version and the policy information
+        if: ${{ steps.nothing-to-release.outputs.skip == 'false' && steps.get-expected-version.outputs.version != steps.policy-info.outputs.policy-version }}
         run: |
           cat <<EOF > values.yaml
           github:
@@ -159,7 +204,7 @@ jobs:
           EOF
 
       - name: Open PR with updatecli
-        if: ${{ steps.get-expected-version.outputs.version != steps.policy-info.outputs.policy-version }}
+        if: ${{ steps.nothing-to-release.outputs.skip == 'false' && steps.get-expected-version.outputs.version != steps.policy-info.outputs.policy-version }}
         env:
           UPDATECLI_GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |-
