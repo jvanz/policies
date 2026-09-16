@@ -88,3 +88,16 @@ jobs:
         policy-working-dir: ${{ fromJSON(needs.calculate-policy-matrix.outputs.policy_working_dirs) }}
     with:
       policy-working-dir: ${{ matrix.policy-working-dir }}
+
+  check-release-please-config:
+    name: Check release-please config is up to date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.27"
+      - name: Regenerate the config and manifest
+        run: make release-please-config
+      - name: Fail if the regenerated files differ
+        run: git diff --exit-code -- release-please-config.json .release-please-manifest.json
