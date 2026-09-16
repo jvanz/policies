@@ -83,6 +83,29 @@ are included in the `*-rust` targets for `test` and `lint` (consistent with the
 full-repo targets), but not for `e2e-tests` since crates have no end-to-end
 tests.
 
+# PR Titles and Labels
+
+PR titles must follow [Conventional Commits](https://www.conventionalcommits.org/):
+`<type>(<optional scope>): <subject>`, for example `fix(cel-policy): handle
+empty input` or `feat!: drop legacy API`.
+
+`.github/workflows/label-pr.yaml` reads the PR title and applies a `kind/*`
+label automatically:
+
+| Title prefix | Label |
+| --- | --- |
+| `feat` | `kind/feature` |
+| `fix` | `kind/bug` |
+| `chore`, `build`, `ci`, `docs`, `test`, `refactor`, `style`, `perf`, `revert` | `kind/chore` |
+| `build(deps)`, `chore(deps)`, `fix(deps)` | `area/dependencies` (in addition to the type label) |
+| any type with `!` (e.g. `feat!:`) | `kind/breaking-change` (in addition to the type label) |
+
+A title that does not start with one of these types gets no `kind/*` label,
+and the workflow prints a warning on the PR run. `kind/*` labels are used for
+release changelog categorization by release-drafter, and — together with
+`area/*` labels, applied from the paths changed by the PR — for searching in
+the GitHub UI.
+
 # How to Release a Policy
 
 The release process is fully automated via CI/CD to ensure consistency and
