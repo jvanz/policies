@@ -1,0 +1,68 @@
+name: Label PR
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+
+permissions: {}
+
+jobs:
+  kind-label:
+    name: Label kind/* from PR title
+    # Skip fork PRs — the GITHUB_TOKEN is read-only and cannot add labels
+    if: github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name
+    permissions:
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply label(s) based on the PR title
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          set -e
+
+          labels=()
+
+          # Breaking change: "type(scope)!: subject" or "type!: subject".
+          # Additive: a breaking change still gets its own type label below.
+          if [[ "$PR_TITLE" =~ ^[a-z]+(\([^\)]*\))?\!: ]]; then
+            labels+=("kind/breaking-change")
+          fi
+
+          # Dependency bumps, regardless of which conventional type they used.
+          if [[ "$PR_TITLE" =~ ^(build|chore|fix)\(deps\)!?: ]]; then
+            labels+=("area/dependencies")
+          fi
+
+          if [[ "$PR_TITLE" =~ ^feat(\([^\)]*\))?\!?: ]]; then
+            labels+=("kind/feature")
+          elif [[ "$PR_TITLE" =~ ^fix(\([^\)]*\))?\!?: ]]; then
+            labels+=("kind/bug")
+          elif [[ "$PR_TITLE" =~ ^(chore|build|ci|docs|test|refactor|style|perf|revert)(\([^\)]*\))?\!?: ]]; then
+            labels+=("kind/chore")
+          fi
+
+          if [ ${#labels[@]} -eq 0 ]; then
+            echo "::warning title=Unrecognized PR title::PR title '$PR_TITLE' does not start with a known conventional commit type (feat, fix, build, chore, ci, docs, test, refactor, style, perf, revert). No kind/* label was applied."
+            exit 0
+          fi
+
+          echo "Applying labels: ${labels[*]}"
+          gh pr edit "$PR_NUMBER" --add-label "$(IFS=,; echo "${labels[*]}")"
+
+  area-label:
+    name: Label area/* from changed paths
+    if: github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name
+    permissions:
+      pull-requests: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@634933edcd8ababfe52f92936142cc22ac488b1b # v6.0.1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+          sync-labels: false

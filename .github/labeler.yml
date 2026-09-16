@@ -1,0 +1,41 @@
+# Configuration for actions/labeler (.github/workflows/label-pr.yaml).
+# Applies area/* labels based on the paths changed by a PR.
+#
+# area/dependencies is intentionally NOT path-based here: it is applied by
+# the title-based job in label-pr.yaml instead, because release-prep PRs
+# (opened by updatecli) touch Cargo.toml/Cargo.lock/go.mod but are not
+# dependency bumps.
+
+area/crates:
+  - changed-files:
+      - any-glob-to-any-file: "policies/crates/**"
+
+area/policies:
+  - changed-files:
+      - all-globs-to-all-files:
+          - "policies/**"
+          - "!policies/crates/**"
+
+area/release:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "updatecli/**"
+          - "hack/**"
+          - ".github/workflows/release*.y*ml"
+          - ".github/workflows/trigger-policy-release.yaml"
+          - ".github/release-drafter*.yml"
+
+area/ci:
+  - changed-files:
+      - any-glob-to-any-file: ".github/**"
+
+area/build:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/Makefile"
+          - "policies/Makefile.*"
+          - "policies/go-common.mk"
+
+area/docs:
+  - changed-files:
+      - any-glob-to-any-file: "**/*.md"
