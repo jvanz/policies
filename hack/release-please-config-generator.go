@@ -38,11 +38,12 @@ type config struct {
 	BootstrapSHA            string                   `json:"bootstrap-sha,omitempty"`
 	SeparatePullRequests    bool                     `json:"separate-pull-requests"`
 	SkipChangelog           bool                     `json:"skip-changelog"`
-	SkipGithubRelease       bool                     `json:"skip-github-release"`
+	Draft                   bool                     `json:"draft"`
+	ForceTagCreation        bool                     `json:"force-tag-creation"`
 	IncludeComponentInTag   bool                     `json:"include-component-in-tag"`
 	IncludeVInTag           bool                     `json:"include-v-in-tag"`
 	TagSeparator            string                   `json:"tag-separator"`
-	Label                   string                   `json:"label"`
+	ExtraLabel              string                   `json:"extra-label"`
 	PullRequestTitlePattern string                   `json:"pull-request-title-pattern"`
 	ReleaseSearchDepth      int                      `json:"release-search-depth"`
 	SequentialCalls         bool                     `json:"sequential-calls"`
@@ -123,15 +124,22 @@ func main() {
 	}
 
 	cfg := config{
-		Schema:                  "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
-		BootstrapSHA:            bootstrapSHA,
-		SeparatePullRequests:    true,
-		SkipChangelog:           true,
-		SkipGithubRelease:       true,
+		Schema:               "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+		BootstrapSHA:         bootstrapSHA,
+		SeparatePullRequests: true,
+		SkipChangelog:        true,
+		// The release stays a draft until release.yml attaches the wasm
+		// module and the SBOM to it, then publishes it.
+		Draft: true,
+		// Required alongside "draft". GitHub does not create the git tag
+		// for a draft release until it is published, so without this,
+		// release-please would fail to find the previous release on its
+		// next run.
+		ForceTagCreation:        true,
 		IncludeComponentInTag:   true,
 		IncludeVInTag:           true,
 		TagSeparator:            "/",
-		Label:                   "TRIGGER-RELEASE,kind/chore,area/release",
+		ExtraLabel:              "kind/chore,area/release",
 		PullRequestTitlePattern: "build: Prepare for release ${component} ${version}",
 		ReleaseSearchDepth:      600,
 		SequentialCalls:         true,
