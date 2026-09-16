@@ -6,14 +6,16 @@ on:
           Bare policy directory name, without the 'policies/' prefix. Give this
           input when the workflow runs against a branch. That run builds the
           policy and publishes it with the ':latest' tag only. It creates no
-          git tag and no GitHub release. A run against a tag ignores this
-          input. The policy name and the version come from the tag name.
+          git tag and no GitHub release.
+
+          A run against a tag ignores this input. The policy name and the
+          version come from the tag name instead. release-please.yaml starts
+          this kind of run automatically, with '--ref <tag>', once it tags a
+          release. release-tag.yaml can also start one by hand, for a manual
+          release.
         required: false
         type: string
         default: ""
-  push:
-    tags:
-      - "*/v*"
 
 name: Release policy
 
@@ -271,27 +273,21 @@ jobs:
 
       # A manual run publishes the ':latest' tag only. A GitHub release needs a
       # tag, and a manual run does not create one.
-      - name: Create release
-        id: create-release
+      #
+      # A run against a tag started by release-please.yaml already has a
+      # draft release, made by release-please itself. A run started by hand
+      # through release-tag.yaml has no release yet, since that workflow only
+      # pushes the tag. Create one in that case, so the two paths converge.
+      - name: Ensure a release exists
         if: ${{ ! startsWith(github.ref, 'refs/heads/') }}
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ github.ref_name }}
-          POLICY_VERSION: ${{ needs.calculate-policy-from-tag.outputs.policy-version }}
         run: |
-          EXTRA_FLAGS=(--latest)
-          case "$POLICY_VERSION" in
-            *-alpha*|*-beta*|*-rc*) EXTRA_FLAGS=(--prerelease --latest=false) ;;
-          esac
-
-          gh release create "$TAG_NAME" \
-            --title "$TAG_NAME" \
-            --generate-notes \
-            "${EXTRA_FLAGS[@]}"
-
-          RELEASE_ID=$(gh release view "$TAG_NAME" --json databaseId --jq .databaseId)
-          echo "id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
+          if ! gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release create "$TAG_NAME" --title "$TAG_NAME" --draft --generate-notes
+          fi
 
       - name: Upload release assets
         if: ${{ ! startsWith(github.ref, 'refs/heads/') }}
@@ -305,6 +301,21 @@ jobs:
             "$POLICY_WORKING_DIR/policy.wasm" \
             "$POLICY_WORKING_DIR/policy-sbom.spdx.json" \
             "$POLICY_WORKING_DIR/policy-sbom.spdx.jsonl.bundle.sigstore"
+
+      - name: Publish the release
+        if: ${{ ! startsWith(github.ref, 'refs/heads/') }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+          POLICY_VERSION: ${{ needs.calculate-policy-from-tag.outputs.policy-version }}
+        run: |
+          EXTRA_FLAGS=(--draft=false --latest)
+          case "$POLICY_VERSION" in
+            *-alpha*|*-beta*|*-rc*) EXTRA_FLAGS=(--draft=false --prerelease --latest=false) ;;
+          esac
+
+          gh release edit "$TAG_NAME" "${EXTRA_FLAGS[@]}"
 
   push-artifacthub:
     if: |
