@@ -20,6 +20,7 @@ const (
 )
 
 var versionAnnotationRe = regexp.MustCompile(`(?m)^\s*io\.kubewarden\.policy\.version:\s*"?([0-9][^"\s]*)"?\s*$`)
+var cargoPackageNameRe = regexp.MustCompile(`(?m)^\s*name\s*=\s*"([^"]+)"\s*$`)
 
 type packageConfig struct {
 	Component   string          `json:"component"`
@@ -47,7 +48,6 @@ type config struct {
 	PullRequestTitlePattern string                   `json:"pull-request-title-pattern"`
 	ReleaseSearchDepth      int                      `json:"release-search-depth"`
 	SequentialCalls         bool                     `json:"sequential-calls"`
-	Plugins                 []string                 `json:"plugins"`
 	Packages                map[string]packageConfig `json:"packages"`
 }
 
@@ -95,25 +95,72 @@ func main() {
 		}
 
 		releaseType := "simple"
-		if _, err := os.Stat(filepath.Join(policyDir, "Cargo.toml")); err == nil {
+		cargoTomlPath := filepath.Join(policyDir, "Cargo.toml")
+		var crateName string
+		if cargoBytes, err := os.ReadFile(cargoTomlPath); err == nil {
 			releaseType = "rust"
+			match := cargoPackageNameRe.FindSubmatch(cargoBytes)
+			if match == nil {
+				panic(fmt.Sprintf("%s: could not find [package] name", cargoTomlPath))
+			}
+			crateName = string(match[1])
 		}
 
 		key := policiesDir + "/" + name
+		extraFiles := []extraFileSpec{
+			{
+				Type:     "yaml",
+				Path:     "metadata.yml",
+				JSONPath: "$.annotations['io.kubewarden.policy.version']",
+			},
+			{
+				Type: "generic",
+				Path: "metadata.yml",
+			},
+		}
+
+		if releaseType == "rust" {
+			// A Rust policy needs a third entry, to update its version in
+			// the shared lock file policies/Cargo.lock.
+			//
+			// release-please's "cargo-workspace" plugin would normally do
+			// this, and its documentation recommends it for Rust monorepos.
+			// It cannot be used here: the plugin reads the workspace
+			// manifest from the repository root
+			// (src/plugins/cargo-workspace.ts in release-please), and this
+			// repository keeps it at policies/Cargo.toml instead. The
+			// plugin has no option to point it elsewhere, and fails with
+			// "Failed to find file: Cargo.toml" when it looks at the root.
+			//
+			// Without the plugin, the "rust" strategy still bumps
+			// policies/<policy>/Cargo.toml correctly, since each policy is
+			// released as its own crate. But it looks for that crate's
+			// lock file at policies/<policy>/Cargo.lock, which does not
+			// exist; the real one, policies/Cargo.lock, is never touched.
+			// A release PR that leaves it behind would fail CI, because
+			// policies/Makefile.rust builds every Rust policy with
+			// --locked.
+			//
+			// So this entry is written by hand instead of through the
+			// plugin. The leading slash makes the path relative to the
+			// repository root, not to this policy's directory (see
+			// BaseStrategy.addPath in release-please). The jsonpath must
+			// match on the crate name from [package], not the directory
+			// name: several Rust policies use a different one, for example
+			// volumeMounts-policy is the crate volumemounts-policy. Keep
+			// this entry in sync by running `make release-please-config`
+			// again after renaming a policy directory or a crate.
+			extraFiles = append(extraFiles, extraFileSpec{
+				Type:     "toml",
+				Path:     "/policies/Cargo.lock",
+				JSONPath: fmt.Sprintf("$.package[?(@.name=='%s')].version", crateName),
+			})
+		}
+
 		packages[key] = packageConfig{
 			Component:   name,
 			ReleaseType: releaseType,
-			ExtraFiles: []extraFileSpec{
-				{
-					Type:     "yaml",
-					Path:     "metadata.yml",
-					JSONPath: "$.annotations['io.kubewarden.policy.version']",
-				},
-				{
-					Type: "generic",
-					Path: "metadata.yml",
-				},
-			},
+			ExtraFiles:  extraFiles,
 		}
 
 		match := versionAnnotationRe.FindSubmatch(metadataBytes)
@@ -123,6 +170,11 @@ func main() {
 		manifest[key] = string(match[1])
 	}
 
+	// No "plugins" key is set here on purpose. Do not add the
+	// "cargo-workspace" plugin back without reading the comment above the
+	// per-Rust-policy extra-files entry: this repository's Cargo workspace
+	// lives at policies/Cargo.toml, not at the repository root, and that
+	// plugin cannot be told to look there.
 	cfg := config{
 		Schema:               "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
 		BootstrapSHA:         bootstrapSHA,
@@ -143,7 +195,6 @@ func main() {
 		PullRequestTitlePattern: "build: Prepare for release ${component} ${version}",
 		ReleaseSearchDepth:      600,
 		SequentialCalls:         true,
-		Plugins:                 []string{"cargo-workspace"},
 		Packages:                packages,
 	}
 

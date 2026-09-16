@@ -12,9 +12,6 @@
   "pull-request-title-pattern": "build: Prepare for release ${component} ${version}",
   "release-search-depth": 600,
   "sequential-calls": true,
-  "plugins": [
-    "cargo-workspace"
-  ],
   "packages": {
     "policies/allow-privilege-escalation-psp-policy": {
       "component": "allow-privilege-escalation-psp-policy",
@@ -28,6 +25,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='allow-privilege-escalation-psp')].version"
         }
       ]
     },
@@ -43,6 +45,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='psp-allowed-fsgroups')].version"
         }
       ]
     },
@@ -58,6 +65,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='allowed-proc-mount-types-psp')].version"
         }
       ]
     },
@@ -73,6 +85,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='annotations-policy')].version"
         }
       ]
     },
@@ -88,6 +105,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='apparmor-psp')].version"
         }
       ]
     },
@@ -103,6 +125,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='capabilities-psp')].version"
         }
       ]
     },
@@ -148,6 +175,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='context-aware-policy-demo')].version"
         }
       ]
     },
@@ -163,6 +195,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='deprecated-api-versions')].version"
         }
       ]
     },
@@ -208,6 +245,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='do-not-expose-admission-controller-webhook-services')].version"
         }
       ]
     },
@@ -223,6 +265,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='echo')].version"
         }
       ]
     },
@@ -238,6 +285,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='env-variable-secrets-scanner-policy')].version"
         }
       ]
     },
@@ -253,6 +305,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='environment-variable-policy')].version"
         }
       ]
     },
@@ -268,6 +325,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='flexvolume-drivers-psp')].version"
         }
       ]
     },
@@ -298,6 +360,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='high-risk-service-account-policy')].version"
         }
       ]
     },
@@ -313,6 +380,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='host-namespaces-psp')].version"
         }
       ]
     },
@@ -343,6 +415,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='image-cve-policy')].version"
         }
       ]
     },
@@ -388,6 +465,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='labels-policy')].version"
         }
       ]
     },
@@ -418,6 +500,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='ns-policyserver-mapper')].version"
         }
       ]
     },
@@ -433,6 +520,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='persistentvolumeclaim-storageclass-policy')].version"
         }
       ]
     },
@@ -448,6 +540,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='pod-ndots')].version"
         }
       ]
     },
@@ -463,6 +560,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='pod-privileged-policy')].version"
         }
       ]
     },
@@ -478,6 +580,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='pod-runtime-class-policy')].version"
         }
       ]
     },
@@ -493,6 +600,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='priority-class-policy')].version"
         }
       ]
     },
@@ -508,6 +620,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='probes-policy')].version"
         }
       ]
     },
@@ -523,6 +640,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='psa-label-enforcer')].version"
         }
       ]
     },
@@ -538,6 +660,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='rancher-project-propagate-labels')].version"
         }
       ]
     },
@@ -613,6 +740,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='raw-validation-policy')].version"
         }
       ]
     },
@@ -643,6 +775,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='readonly-root-filesystem-psp-policy')].version"
         }
       ]
     },
@@ -703,6 +840,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='seccomp-psp-policy')].version"
         }
       ]
     },
@@ -718,6 +860,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='selinux-psp')].version"
         }
       ]
     },
@@ -733,6 +880,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='share-pid-namespace-policy')].version"
         }
       ]
     },
@@ -748,6 +900,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='sleeping-policy')].version"
         }
       ]
     },
@@ -778,6 +935,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='trusted-repos-policy')].version"
         }
       ]
     },
@@ -808,6 +970,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='unique-service-selector-policy')].version"
         }
       ]
     },
@@ -823,6 +990,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='user-group-psp')].version"
         }
       ]
     },
@@ -838,6 +1010,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='verify-image-signatures')].version"
         }
       ]
     },
@@ -853,6 +1030,11 @@
         {
           "type": "generic",
           "path": "metadata.yml"
+        },
+        {
+          "type": "toml",
+          "path": "/policies/Cargo.lock",
+          "jsonpath": "$.package[?(@.name=='volumemounts-policy')].version"
         }
       ]
     },
