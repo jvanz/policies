@@ -107,10 +107,14 @@ pull request per policy that has a releasable commit, titled
 `build: Prepare for release <policy> <version>`. The PR bumps
 `io.kubewarden.policy.version` and `com.github.release.tag` in `metadata.yml`,
 and `Cargo.toml`/`Cargo.lock` for a Rust policy. It carries the
-`TRIGGER-RELEASE` label.
+`kind/chore` and `area/release` labels, plus release-please's own
+`autorelease: pending` label.
 
-Merging that PR starts `release-tag.yaml`, which tags the release and starts
-`release.yml` (see below).
+Merging that PR does not release the policy by itself. On the next push to
+`main`, `release-please.yaml` finds the merged PR, creates the tag
+`<policy>/v<version>`, and drafts the GitHub release. It then starts
+`release.yml` for that tag, which builds the policy, signs it, publishes it to
+the OCI registry, and publishes the release.
 
 `release-please-config.json` and `.release-please-manifest.json` list every
 policy. Run `make release-please-config` after you add, remove, or rename a
@@ -133,9 +137,8 @@ release-please PR:
 
    An empty commit does not work: release-please assigns a commit to a
    policy by the files it touches.
-3. **Bypass release-please and tag by hand.** `release-tag.yaml` still
-   accepts a manual dispatch. It reads the version straight from
-   `metadata.yml`:
+3. **Bypass release-please and tag by hand.** `release-tag.yaml` accepts a
+   manual dispatch. It reads the version straight from `metadata.yml`:
 
    ```console
    gh workflow run release-tag.yaml \
@@ -143,7 +146,13 @@ release-please PR:
        -R kubewarden/policies
    ```
 
-   Bump `metadata.yml` (and `Cargo.toml` for a Rust policy) yourself first.
+   Bump `metadata.yml` (and `Cargo.toml` for a Rust policy) **and**
+   `.release-please-manifest.json` together first, in the same commit.
+   `release-tag.yaml` refuses to tag a version that is not higher than the
+   latest existing tag, and refuses to tag when the manifest disagrees with
+   `metadata.yml`. Both checks exist so that a manual release cannot leave
+   release-please's state behind what is already published; without them,
+   release-please would later propose a version that was already released.
 
 The release CI flow is something like this:
 
@@ -152,8 +161,9 @@ flowchart TD
 
 A[Push to main] --> B[release-please.yaml opens/updates a release PR per policy]
 B --> C[PR merged]
-C --> D[release-tag.yaml creates the tag]
-D --> E[release.yml builds, signs, and publishes the policy]
+C --> D[release-please.yaml tags the release and drafts it]
+D --> E[release-please.yaml starts release.yml for the tag]
+E --> F[release.yml builds, signs, and publishes the policy]
 ```
 
 ## Publish the 'latest' tag of one policy
@@ -177,9 +187,11 @@ the policy catalog.
 > and the version come from the tag name, and the run ignores the
 > `policy-working-dir` input.
 >
-> `release-tag.yaml` starts this kind of run. GitHub fires no workflow for a
-> tag pushed with `GITHUB_TOKEN`, so `release-tag.yaml` must start the run
-> itself, with `gh workflow run release.yml --ref <tag>`.
+> `release.yml` no longer triggers on a tag push directly. GitHub does not
+> reliably fire a `push` event for a tag created outside of a direct `git
+> push` from a user, so both `release-please.yaml` and `release-tag.yaml`
+> start this kind of run themselves, with `gh workflow run release.yml --ref
+> <tag>`.
 
 # Tag Pattern
 
