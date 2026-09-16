@@ -1,0 +1,32 @@
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+name: Release please
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    # A tag pushed with GITHUB_TOKEN does not fire a `push: tags` event, so
+    # `release-tag.yaml` never starts for a release PR merged with the
+    # default token. Use the GitHub App token instead.
+    steps:
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: generate-token
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          # `release-please-config.json` sets `skip-github-release: true`
+          # already, so this action only opens/updates release PRs.
+          # `release-tag.yaml` tags and releases instead, on merge.
