@@ -274,64 +274,37 @@ jobs:
       - name: Create release
         id: create-release
         if: ${{ ! startsWith(github.ref, 'refs/heads/') }}
-        uses: release-drafter/release-drafter@34d80673e067bdc0c24568d3af899c216adcfaa9 # v7.7.0
-        with:
-          config-name: "release-drafter-${{ needs.calculate-policy-from-tag.outputs.policy-name }}.yml"
-          prerelease: ${{ contains(needs.calculate-policy-from-tag.outputs.policy-version, '-alpha') || contains(needs.calculate-policy-from-tag.outputs.policy-version, '-beta') || contains(needs.calculate-policy-from-tag.outputs.policy-version, '-rc') }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+          POLICY_VERSION: ${{ needs.calculate-policy-from-tag.outputs.policy-version }}
+        run: |
+          EXTRA_FLAGS=(--latest)
+          case "$POLICY_VERSION" in
+            *-alpha*|*-beta*|*-rc*) EXTRA_FLAGS=(--prerelease --latest=false) ;;
+          esac
+
+          gh release create "$TAG_NAME" \
+            --title "$TAG_NAME" \
+            --generate-notes \
+            "${EXTRA_FLAGS[@]}"
+
+          RELEASE_ID=$(gh release view "$TAG_NAME" --json databaseId --jq .databaseId)
+          echo "id=$RELEASE_ID" >> "$GITHUB_OUTPUT"
 
       - name: Upload release assets
         if: ${{ ! startsWith(github.ref, 'refs/heads/') }}
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        shell: bash
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
           POLICY_WORKING_DIR: ${{ needs.calculate-policy-from-tag.outputs.policy-working-dir }}
-          RELEASE_ID: ${{ steps.create-release.outputs.id }}
-        with:
-          script: |
-            let fs = require('fs');
-            let path = require('path');
-            let workingDir = process.env.POLICY_WORKING_DIR || '.';
-
-            let files = [
-            `${workingDir}/policy.wasm`,
-            `${workingDir}/policy-sbom.spdx.json`,
-            `${workingDir}/policy-sbom.spdx.jsonl.bundle.sigstore`,
-            ]
-            const {RELEASE_ID} = process.env
-
-            for (const file of files) {
-              let file_data = fs.readFileSync(file);
-
-              let response = await github.rest.repos.uploadReleaseAsset({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                release_id: `${RELEASE_ID}`,
-                name: path.basename(file),
-                data: file_data,
-              });
-            }
-      - name: Publish release
-        # if we are on a single repo, we obtain the last draft release as it contains the changelog
-        # and edit it by adding the artifacts. Then we mark the release as latest
-        if: ${{ ! startsWith(github.ref, 'refs/heads/') }}
-        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-        env:
-          RELEASE_ID: ${{ steps.create-release.outputs.id }}
-        with:
-          script: |
-            const {RELEASE_ID} = process.env
-            const TAG_NAME = "${{ github.ref_name }}";
-            isPreRelease = ${{ contains(github.ref_name, '-alpha') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-rc') }}
-            github.rest.repos.updateRelease({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              release_id: `${RELEASE_ID}`,
-              draft: false,
-              tag_name: TAG_NAME,
-              name: TAG_NAME,
-              prerelease: isPreRelease,
-              make_latest: !isPreRelease
-            });
+        run: |
+          gh release upload "$TAG_NAME" \
+            "$POLICY_WORKING_DIR/policy.wasm" \
+            "$POLICY_WORKING_DIR/policy-sbom.spdx.json" \
+            "$POLICY_WORKING_DIR/policy-sbom.spdx.jsonl.bundle.sigstore"
 
   push-artifacthub:
     if: |
