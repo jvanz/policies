@@ -28,7 +28,7 @@
   "policies/ns-policyserver-mapper-policy": "0.1.4",
   "policies/persistentvolumeclaim-storageclass-policy": "1.1.9",
   "policies/pod-ndots-policy": "1.0.13",
-  "policies/pod-privileged-policy": "1.0.14",
+  "policies/pod-privileged-policy": "1.0.15",
   "policies/pod-runtime-class-policy": "1.0.13",
   "policies/priority-class-policy": "1.1.9",
   "policies/probes-policy": "1.0.8",
