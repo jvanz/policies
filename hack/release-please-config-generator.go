@@ -19,7 +19,10 @@ const (
 	policiesDir  = "policies"
 )
 
-var versionAnnotationRe = regexp.MustCompile(`(?m)^\s*io\.kubewarden\.policy\.version:\s*"?([0-9][^"\s]*)"?\s*$`)
+var versionAnnotationRe = regexp.MustCompile(`(?m)^\s*io\.kubewarden\.policy\.version:\s*"?([0-9][^"\s]*)"?\s*(#.*)?$`)
+var versionMarkerRe = regexp.MustCompile(`(?m)^\s*io\.kubewarden\.policy\.version:.*x-release-please-version\s*$`)
+var releaseTagLineRe = regexp.MustCompile(`(?m)^\s*com\.github\.release\.tag:`)
+var releaseTagMarkerRe = regexp.MustCompile(`(?m)^\s*com\.github\.release\.tag:.*x-release-please-version\s*$`)
 var cargoPackageNameRe = regexp.MustCompile(`(?m)^\s*name\s*=\s*"([^"]+)"\s*$`)
 
 type packageConfig struct {
@@ -106,13 +109,23 @@ func main() {
 			crateName = string(match[1])
 		}
 
+		// The "generic" updater is the only one usable on metadata.yml.
+		// The "yaml" updater fully re-serializes the document, which
+		// strips every comment (including the marker the "generic"
+		// updater itself relies on) and reformats the file. So every
+		// version annotation in metadata.yml must carry the
+		// "x-release-please-version" marker instead; this generator
+		// refuses to run otherwise, since a missing marker would make
+		// release-please silently skip that annotation on a release.
+		if !versionMarkerRe.Match(metadataBytes) {
+			panic(fmt.Sprintf("%s: io.kubewarden.policy.version is missing the x-release-please-version marker", metadataPath))
+		}
+		if releaseTagLineRe.Match(metadataBytes) && !releaseTagMarkerRe.Match(metadataBytes) {
+			panic(fmt.Sprintf("%s: com.github.release.tag is missing the x-release-please-version marker", metadataPath))
+		}
+
 		key := policiesDir + "/" + name
 		extraFiles := []extraFileSpec{
-			{
-				Type:     "yaml",
-				Path:     "metadata.yml",
-				JSONPath: "$.annotations['io.kubewarden.policy.version']",
-			},
 			{
 				Type: "generic",
 				Path: "metadata.yml",
@@ -150,10 +163,24 @@ func main() {
 			// volumeMounts-policy is the crate volumemounts-policy. Keep
 			// this entry in sync by running `make release-please-config`
 			// again after renaming a policy directory or a crate.
+			//
+			// The filter compares against "@.name.value", not "@.name".
+			// release-please's TOML updater parses with a "tagged" parser
+			// (src/util/toml-edit.ts) that wraps every scalar as
+			// {start, end, value}, so it can splice the replacement back
+			// into the original text without reformatting the file. A
+			// filter written the ordinary way, "@.name=='...'", compares
+			// that wrapper object to a string and never matches; verified
+			// empirically against release-please's own GenericToml class
+			// and this repository's actual policies/Cargo.lock. This is
+			// an internal detail of release-please's TOML updater, not
+			// documented, and could change in a future release; a
+			// regression would fail loudly, as a release pull request
+			// whose build fails under `cargo --locked`.
 			extraFiles = append(extraFiles, extraFileSpec{
 				Type:     "toml",
 				Path:     "/policies/Cargo.lock",
-				JSONPath: fmt.Sprintf("$.package[?(@.name=='%s')].version", crateName),
+				JSONPath: fmt.Sprintf("$.package[?(@.name.value=='%s')].version", crateName),
 			})
 		}
 
@@ -187,12 +214,17 @@ func main() {
 		// for a draft release until it is published, so without this,
 		// release-please would fail to find the previous release on its
 		// next run.
-		ForceTagCreation:        true,
-		IncludeComponentInTag:   true,
-		IncludeVInTag:           true,
-		TagSeparator:            "/",
-		ExtraLabel:              "kind/chore,area/release",
-		PullRequestTitlePattern: "build: Prepare for release ${component} ${version}",
+		ForceTagCreation:      true,
+		IncludeComponentInTag: true,
+		IncludeVInTag:         true,
+		TagSeparator:          "/",
+		ExtraLabel:            "kind/chore,area/release",
+		// PullRequestTitle.toString() already inserts a space before the
+		// component when ${component} is not empty, so the pattern must
+		// not add a second one. Verified: with a leading space here, the
+		// title read "build: Prepare for release  <policy> <version>",
+		// with two spaces.
+		PullRequestTitlePattern: "build: Prepare for release${component} ${version}",
 		ReleaseSearchDepth:      600,
 		SequentialCalls:         true,
 		Packages:                packages,

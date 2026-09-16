@@ -9,7 +9,7 @@
   "include-v-in-tag": true,
   "tag-separator": "/",
   "extra-label": "kind/chore,area/release",
-  "pull-request-title-pattern": "build: Prepare for release ${component} ${version}",
+  "pull-request-title-pattern": "build: Prepare for release${component} ${version}",
   "release-search-depth": 600,
   "sequential-calls": true,
   "packages": {
@@ -18,18 +18,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='allow-privilege-escalation-psp')].version"
+          "jsonpath": "$.package[?(@.name.value=='allow-privilege-escalation-psp')].version"
         }
       ]
     },
@@ -38,18 +33,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='psp-allowed-fsgroups')].version"
+          "jsonpath": "$.package[?(@.name.value=='psp-allowed-fsgroups')].version"
         }
       ]
     },
@@ -58,18 +48,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='allowed-proc-mount-types-psp')].version"
+          "jsonpath": "$.package[?(@.name.value=='allowed-proc-mount-types-psp')].version"
         }
       ]
     },
@@ -78,18 +63,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='annotations-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='annotations-policy')].version"
         }
       ]
     },
@@ -98,18 +78,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='apparmor-psp')].version"
+          "jsonpath": "$.package[?(@.name.value=='apparmor-psp')].version"
         }
       ]
     },
@@ -118,18 +93,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='capabilities-psp')].version"
+          "jsonpath": "$.package[?(@.name.value=='capabilities-psp')].version"
         }
       ]
     },
@@ -137,11 +107,6 @@
       "component": "cel-policy",
       "release-type": "simple",
       "extra-files": [
-        {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
         {
           "type": "generic",
           "path": "metadata.yml"
@@ -153,11 +118,6 @@
       "release-type": "simple",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         }
@@ -168,18 +128,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='context-aware-policy-demo')].version"
+          "jsonpath": "$.package[?(@.name.value=='context-aware-policy-demo')].version"
         }
       ]
     },
@@ -188,18 +143,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='deprecated-api-versions')].version"
+          "jsonpath": "$.package[?(@.name.value=='deprecated-api-versions')].version"
         }
       ]
     },
@@ -207,11 +157,6 @@
       "component": "disallow-service-loadbalancer-policy",
       "release-type": "simple",
       "extra-files": [
-        {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
         {
           "type": "generic",
           "path": "metadata.yml"
@@ -223,11 +168,6 @@
       "release-type": "simple",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         }
@@ -238,18 +178,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='do-not-expose-admission-controller-webhook-services')].version"
+          "jsonpath": "$.package[?(@.name.value=='do-not-expose-admission-controller-webhook-services')].version"
         }
       ]
     },
@@ -258,18 +193,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='echo')].version"
+          "jsonpath": "$.package[?(@.name.value=='echo')].version"
         }
       ]
     },
@@ -278,18 +208,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='env-variable-secrets-scanner-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='env-variable-secrets-scanner-policy')].version"
         }
       ]
     },
@@ -298,18 +223,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='environment-variable-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='environment-variable-policy')].version"
         }
       ]
     },
@@ -318,18 +238,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='flexvolume-drivers-psp')].version"
+          "jsonpath": "$.package[?(@.name.value=='flexvolume-drivers-psp')].version"
         }
       ]
     },
@@ -337,11 +252,6 @@
       "component": "go-wasi-context-aware-test-policy",
       "release-type": "simple",
       "extra-files": [
-        {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
         {
           "type": "generic",
           "path": "metadata.yml"
@@ -353,18 +263,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='high-risk-service-account-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='high-risk-service-account-policy')].version"
         }
       ]
     },
@@ -373,18 +278,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='host-namespaces-psp')].version"
+          "jsonpath": "$.package[?(@.name.value=='host-namespaces-psp')].version"
         }
       ]
     },
@@ -392,11 +292,6 @@
       "component": "hostpaths-psp-policy",
       "release-type": "simple",
       "extra-files": [
-        {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
         {
           "type": "generic",
           "path": "metadata.yml"
@@ -408,18 +303,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='image-cve-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='image-cve-policy')].version"
         }
       ]
     },
@@ -427,11 +317,6 @@
       "component": "ingress-policy",
       "release-type": "simple",
       "extra-files": [
-        {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
         {
           "type": "generic",
           "path": "metadata.yml"
@@ -443,11 +328,6 @@
       "release-type": "simple",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         }
@@ -458,18 +338,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='labels-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='labels-policy')].version"
         }
       ]
     },
@@ -477,11 +352,6 @@
       "component": "namespace-label-propagator-policy",
       "release-type": "simple",
       "extra-files": [
-        {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
         {
           "type": "generic",
           "path": "metadata.yml"
@@ -493,18 +363,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='ns-policyserver-mapper')].version"
+          "jsonpath": "$.package[?(@.name.value=='ns-policyserver-mapper')].version"
         }
       ]
     },
@@ -513,18 +378,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='persistentvolumeclaim-storageclass-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='persistentvolumeclaim-storageclass-policy')].version"
         }
       ]
     },
@@ -533,18 +393,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='pod-ndots')].version"
+          "jsonpath": "$.package[?(@.name.value=='pod-ndots')].version"
         }
       ]
     },
@@ -553,18 +408,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='pod-privileged-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='pod-privileged-policy')].version"
         }
       ]
     },
@@ -573,18 +423,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='pod-runtime-class-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='pod-runtime-class-policy')].version"
         }
       ]
     },
@@ -593,18 +438,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='priority-class-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='priority-class-policy')].version"
         }
       ]
     },
@@ -613,18 +453,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='probes-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='probes-policy')].version"
         }
       ]
     },
@@ -633,18 +468,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='psa-label-enforcer')].version"
+          "jsonpath": "$.package[?(@.name.value=='psa-label-enforcer')].version"
         }
       ]
     },
@@ -653,18 +483,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='rancher-project-propagate-labels')].version"
+          "jsonpath": "$.package[?(@.name.value=='rancher-project-propagate-labels')].version"
         }
       ]
     },
@@ -672,11 +497,6 @@
       "component": "rancher-project-quotas-namespace-validator",
       "release-type": "simple",
       "extra-files": [
-        {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
         {
           "type": "generic",
           "path": "metadata.yml"
@@ -688,11 +508,6 @@
       "release-type": "simple",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         }
@@ -702,11 +517,6 @@
       "component": "raw-mutation-wasi-policy",
       "release-type": "simple",
       "extra-files": [
-        {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
         {
           "type": "generic",
           "path": "metadata.yml"
@@ -718,11 +528,6 @@
       "release-type": "simple",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         }
@@ -733,18 +538,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='raw-validation-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='raw-validation-policy')].version"
         }
       ]
     },
@@ -752,11 +552,6 @@
       "component": "raw-validation-wasi-policy",
       "release-type": "simple",
       "extra-files": [
-        {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
         {
           "type": "generic",
           "path": "metadata.yml"
@@ -768,18 +563,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='readonly-root-filesystem-psp-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='readonly-root-filesystem-psp-policy')].version"
         }
       ]
     },
@@ -787,11 +577,6 @@
       "component": "runtime-enforcer-policy",
       "release-type": "simple",
       "extra-files": [
-        {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
         {
           "type": "generic",
           "path": "metadata.yml"
@@ -803,11 +588,6 @@
       "release-type": "simple",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         }
@@ -817,11 +597,6 @@
       "component": "safe-labels-policy",
       "release-type": "simple",
       "extra-files": [
-        {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
         {
           "type": "generic",
           "path": "metadata.yml"
@@ -833,18 +608,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='seccomp-psp-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='seccomp-psp-policy')].version"
         }
       ]
     },
@@ -853,18 +623,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='selinux-psp')].version"
+          "jsonpath": "$.package[?(@.name.value=='selinux-psp')].version"
         }
       ]
     },
@@ -873,18 +638,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='share-pid-namespace-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='share-pid-namespace-policy')].version"
         }
       ]
     },
@@ -893,18 +653,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='sleeping-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='sleeping-policy')].version"
         }
       ]
     },
@@ -912,11 +667,6 @@
       "component": "sysctl-psp-policy",
       "release-type": "simple",
       "extra-files": [
-        {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
         {
           "type": "generic",
           "path": "metadata.yml"
@@ -928,18 +678,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='trusted-repos-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='trusted-repos-policy')].version"
         }
       ]
     },
@@ -947,11 +692,6 @@
       "component": "unique-ingress-policy",
       "release-type": "simple",
       "extra-files": [
-        {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
         {
           "type": "generic",
           "path": "metadata.yml"
@@ -963,18 +703,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='unique-service-selector-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='unique-service-selector-policy')].version"
         }
       ]
     },
@@ -983,18 +718,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='user-group-psp')].version"
+          "jsonpath": "$.package[?(@.name.value=='user-group-psp')].version"
         }
       ]
     },
@@ -1003,18 +733,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='verify-image-signatures')].version"
+          "jsonpath": "$.package[?(@.name.value=='verify-image-signatures')].version"
         }
       ]
     },
@@ -1023,18 +748,13 @@
       "release-type": "rust",
       "extra-files": [
         {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
-        {
           "type": "generic",
           "path": "metadata.yml"
         },
         {
           "type": "toml",
           "path": "/policies/Cargo.lock",
-          "jsonpath": "$.package[?(@.name=='volumemounts-policy')].version"
+          "jsonpath": "$.package[?(@.name.value=='volumemounts-policy')].version"
         }
       ]
     },
@@ -1042,11 +762,6 @@
       "component": "volumes-psp-policy",
       "release-type": "simple",
       "extra-files": [
-        {
-          "type": "yaml",
-          "path": "metadata.yml",
-          "jsonpath": "$.annotations['io.kubewarden.policy.version']"
-        },
         {
           "type": "generic",
           "path": "metadata.yml"
