@@ -50,7 +50,7 @@
   "policies/sleeping-policy": "0.1.8",
   "policies/sysctl-psp-policy": "1.0.15",
   "policies/trusted-repos-policy": "2.1.5",
-  "policies/unique-ingress-policy": "1.0.13",
+  "policies/unique-ingress-policy": "1.0.14",
   "policies/unique-service-selector-policy": "1.0.14",
   "policies/user-group-psp-policy": "1.1.6",
   "policies/verify-image-signatures": "1.0.12",
