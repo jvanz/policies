@@ -10,7 +10,7 @@
   "policies/context-aware-demo": "0.1.16",
   "policies/deprecated-api-versions-policy": "1.0.12",
   "policies/disallow-service-loadbalancer-policy": "1.0.15",
-  "policies/disallow-service-nodeport-policy": "1.0.0",
+  "policies/disallow-service-nodeport-policy": "1.0.1",
   "policies/do-not-expose-admission-controller-webhook-services-policy": "1.1.9",
   "policies/echo": "0.1.20",
   "policies/env-variable-secrets-scanner-policy": "1.0.16",
