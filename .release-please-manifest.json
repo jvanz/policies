@@ -55,5 +55,5 @@
   "policies/user-group-psp-policy": "1.1.6",
   "policies/verify-image-signatures": "1.0.12",
   "policies/volumeMounts-policy": "1.0.12",
-  "policies/volumes-psp-policy": "1.1.11"
+  "policies/volumes-psp-policy": "1.1.12"
 }
