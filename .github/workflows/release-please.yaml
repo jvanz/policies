@@ -11,6 +11,16 @@ name: Release please
 
 jobs:
   release-please:
+    # Opt-in. release-please writes to files that this repository tracks:
+    # metadata.yml, policies/Cargo.lock, the Cargo.toml of each member, and
+    # .release-please-manifest.json. A fork that runs it forks the version
+    # history, and then every synchronization with the upstream repository
+    # conflicts on those files. Without this guard the workflow also fails on
+    # every push to main in a fork, which has no APP_ID or APP_PRIVATE_KEY.
+    #
+    # Set the ENABLE_RELEASE_PLEASE repository variable to 'true' to enable
+    # it. See the "Forks" section of CONTRIBUTING.md.
+    if: vars.ENABLE_RELEASE_PLEASE == 'true'
     runs-on: ubuntu-latest
     # release-please creates the tag and the GitHub release for a merged
     # release pull request. A tag created with GITHUB_TOKEN does not fire a
