@@ -226,6 +226,30 @@ F --> G[release.yml builds and publishes]
 H[Maintainer pushes a tag by hand] --> G
 ```
 
+## SBOM of a Rust policy
+
+An SBOM (software bill of materials) is a list of the components in a build.
+`release.yml` makes one SPDX file for each policy and attaches it to the
+GitHub release as `policy-sbom.spdx.json`. Syft finds crates (Rust packages)
+through `Cargo.lock`, and the Rust policies share one workspace `Cargo.lock`.
+For this reason the release builds a Rust policy with `cargo auditable build`,
+converts the crate list in the Wasm module to a CycloneDX file with
+`auditable2cdx`, and reads that file with the `sbom-cataloger` of Syft. The
+release fails if the SBOM of a Rust policy has no cargo packages.
+
+The crate list can contain crates that the policy does not use.
+cargo-auditable takes the list from `cargo metadata`, which enables the
+features (optional parts of a crate) that all workspace members ask for. If
+another policy enables a feature of a shared crate, the extra crates of that
+feature appear in the SBOM of every Rust policy. No crate is missing. The
+upstream issue is
+[cargo-auditable#216](https://github.com/rust-secure-code/cargo-auditable/issues/216).
+To see the exact crates of one policy, run this command in `policies/`:
+
+```console
+cargo tree --locked -p <policy-name> --target wasm32-wasip1 -e normal,build
+```
+
 ## Repository settings that the release flow expects
 
 - **Immutable releases**.

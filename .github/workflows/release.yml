@@ -204,6 +204,10 @@ jobs:
             is_rust_policy=true
             # Syft cannot read the cargo-auditable data in a Wasm file.
             # auditable2cdx converts it to CycloneDX, which syft can read.
+            # The list is a superset of the compiled crates, because
+            # cargo-auditable unifies features across the whole workspace.
+            # See CONTRIBUTING.md, "SBOM of a Rust policy", and
+            # https://github.com/rust-secure-code/cargo-auditable/issues/216
             if ! auditable2cdx annotated-policy.wasm > policy.cdx.json; then
               echo "::error title=No crate list::The Wasm module has no cargo-auditable data. Make sure that the build ran 'cargo auditable build'."
               exit 1
