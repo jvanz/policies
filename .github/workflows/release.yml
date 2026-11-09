@@ -175,7 +175,7 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install-dependencies
         with:
-          install-rust-sbom-tools: true
+          install-rust-sbom-tools: ${{ hashFiles(format('{0}/Cargo.toml', needs.calculate-policy-from-tag.outputs.policy-working-dir)) != '' }}
 
       - name: Build Wasm module
         shell: bash
