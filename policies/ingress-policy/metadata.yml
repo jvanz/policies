@@ -26,4 +26,4 @@ annotations:
   io.kubewarden.policy.license: Apache-2.0
   io.kubewarden.policy.category: Ingress
   io.kubewarden.policy.severity: high
-  com.github.release.tag: ingress-policy/v10.0.0
+  com.github.release.tag: ingress-policy/v10.0.1
